@@ -3,16 +3,24 @@
  * and the Next.js data layer, so it must stay isomorphic (no server-only APIs).
  */
 
+// Read from the Next.js (NEXT_PUBLIC_*) prefix OR the Sanity CLI/Vite
+// (SANITY_STUDIO_*) prefix, so the same config works for `next build` and
+// `sanity deploy`. These values are public, non-secret.
 export const apiVersion =
-  process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-10-01'
+  process.env.NEXT_PUBLIC_SANITY_API_VERSION ||
+  process.env.SANITY_STUDIO_API_VERSION ||
+  '2024-10-01'
 
 export const dataset = assertValue(
-  process.env.NEXT_PUBLIC_SANITY_DATASET,
+  process.env.NEXT_PUBLIC_SANITY_DATASET ||
+    process.env.SANITY_STUDIO_DATASET ||
+    'production',
   'Missing environment variable: NEXT_PUBLIC_SANITY_DATASET'
 )
 
 export const projectId = assertValue(
-  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ||
+    process.env.SANITY_STUDIO_PROJECT_ID,
   'Missing environment variable: NEXT_PUBLIC_SANITY_PROJECT_ID'
 )
 
