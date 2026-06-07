@@ -1,69 +1,67 @@
-<div align="center">
-  
-# Front-End Development Resources
+# Resource Base
 
-<br>
+A curated, searchable directory of the best free resources for developers and
+designers — and, over time, for any category worth collecting. Built as a real
+application with full control over design and data.
 
-### An amazing repository where you can discover a plethora of resources related to Front-End Development, which will make your life easier.
+Originally a VitePress documentation site, now a Next.js + Sanity directory with
+~500 resources, fuzzy search, multi-tag/multi-category taxonomy, automated
+broken-link checking, community submissions and favorites.
 
-<br>
+## Stack
 
-#### This website is created by [Emre Erden](https://emreerden.dev) and brings together various resources for Front-End Development. Its purpose is to provide the best resources that can be useful for both beginners and professionals, and to facilitate the development process.
+- **Next.js (App Router)** + **Tailwind CSS** + **shadcn/ui** — the app and design
+- **Sanity** — headless CMS; add/remove/fix resources without committing code
+- **cmdk + Fuse.js** — self-built ⌘K command palette + fuzzy search (no Algolia)
+- **Vercel** — hosting, Cron (broken-link checker) and Analytics
 
-<br>
+## Architecture
 
-#### If you like this repository, you can support it by giving a star ⭐
+| Concern | Where |
+| --- | --- |
+| Content (resources, categories, tags, submissions) | Sanity — Studio embedded at `/studio` |
+| Public pages | `app/(site)/` — home, `/browse`, `/category/[...slug]`, `/tag/[slug]`, `/favorites`, `/submit` |
+| Data layer | `sanity/lib/` (read client + GROQ + tag-cached fetch) |
+| Search & filters | `components/browse-client.tsx`, `components/command-palette.tsx` (client-side) |
+| Favorites | `lib/favorites.ts` (localStorage) |
+| Submissions | `app/api/submit/route.ts` → Sanity `submission` doc (moderated) |
+| Broken-link checker | `app/api/cron/check-links/route.ts` + `vercel.json` cron |
+| Content edits go live | Sanity webhook → `app/api/revalidate/route.ts` (no redeploy) |
+| Legacy SEO | 301 redirects in `next.config.ts` |
 
-<br>
+## Local development
 
-#### If you want to develop and want to be seen in the ["Contributors"](https://frontresources.dev/contributors/) section, you can follow the instructions below.
+1. Copy env and fill in your Sanity values:
+   ```bash
+   cp .env.example .env.local
+   ```
+   - `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`
+   - `SANITY_API_READ_TOKEN` (Viewer role) — used server-side by the read client
+   - `SANITY_API_WRITE_TOKEN` (Editor role) — migration, submissions, cron
+   - `SANITY_REVALIDATE_SECRET`, `CRON_SECRET`
+2. Install and run:
+   ```bash
+   pnpm install
+   pnpm dev
+   ```
+3. Open `http://localhost:3000`, Studio at `/studio`.
 
-</div>
-  
-<br>
-<br>
-<br>
+## Migrating the legacy markdown
+
+The original VitePress markdown lives in `_migration-source/`. To (re)import:
+
+```bash
+pnpm migrate:dry   # parse + summarise, write nothing
+pnpm migrate       # import into Sanity (idempotent — safe to re-run)
+```
+
+## Deploying
+
+Deploy to Vercel, set the env vars above in the project settings, and add a
+Sanity webhook (sanity.io/manage → API → Webhooks) pointing at
+`/api/revalidate` with the `SANITY_REVALIDATE_SECRET` and projection
+`{ "_type": _type }`. The broken-link cron runs daily via `vercel.json`.
 
 ---
 
-<br>
-
-# To Contribute:
-
-###### "First of all, it is very valuable that you even think about contributing to the resources, thank you very much for that."
-
-<br>
-<br>
-
-The following topics will be opened as "Pull Request" and "Issue" and the subject and content of the subject must be written correctly, in accordance with the document, understandable and detailed.
-
-<br>
-
-### You can contribute to the following topics.
-
-- You can open a "Pull Request" to add a resource.\
-  (The resource must have completely **Free** or **Free Option**)
-
-- You can open a "Pull Request" or "Issue" to fix errors or broken links in the resources.
-
-- If there is no suitable category for the resource you want to add, you can open "Issue".
-
-- You can open "Issue" for typos.
-
-<br>
-
-### If you want to contribute to the above topics, you can follow the steps below.
-
-- Clone the [repo](https://github.com/Wiazeph/Front-End-Development-Resources).
-
-- Find the relevant files in the "**docs**" folder. (Please note the rule above.)
-
-- Add the resource or resources to the list by placing them at the bottom of the list in the same way as the other resources.
-
-- And then add yourself to the bottom of the list by following the template in the "contributors/index.md" sections, including your social media accounts if you want to add them.
-
-- Open a "Pull Request" to the "main" branch.
-
-- After the "Pull Request" is opened, you can see your changes in the "Files Changed" section of the "Pull Request". If your changes are correct, you can send them by clicking the "Create Pull Request" button under "Pull Request".
-
-<br>
+Created by [Emre Erden](https://emreerden.dev).
