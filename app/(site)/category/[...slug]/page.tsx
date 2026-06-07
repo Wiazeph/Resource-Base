@@ -1,0 +1,138 @@
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import type { Metadata } from "next";
+import { ChevronRight } from "lucide-react";
+import { ResourceGrid } from "@/components/resource-grid";
+import { CategoryIcon } from "@/components/category-icon";
+import { sanityFetch } from "@/sanity/lib/fetch";
+import {
+  allCategoriesQuery,
+  categoryBySlugQuery,
+  categorySlugsQuery,
+} from "@/sanity/lib/queries";
+import type { Category, CategoryWithResources } from "@/lib/types";
+import { siteUrl } from "@/lib/site";
+
+export async function generateStaticParams() {
+  const slugs = await sanityFetch<string[]>({
+    query: categorySlugsQuery,
+    tags: ["category"],
+  });
+  return slugs.map((slug) => ({ slug: [slug] }));
+}
+
+async function load(slugParts: string[]) {
+  // The catch-all gives the full path; the category itself is the last segment.
+  const slug = slugParts[slugParts.length - 1];
+  const category = await sanityFetch<CategoryWithResources | null>({
+    query: categoryBySlugQuery,
+    params: { slug },
+    tags: ["category", "resource"],
+  });
+  return { slug, category };
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string[] }>;
+}): Promise<Metadata> {
+  const { category } = await load((await params).slug);
+  if (!category) return {};
+  return {
+    title: category.title,
+    description:
+      category.description ??
+      `Curated ${category.title.toLowerCase()} resources.`,
+  };
+}
+
+export default async function CategoryPage({
+  params,
+}: {
+  params: Promise<{ slug: string[] }>;
+}) {
+  const { slug, category } = await load((await params).slug);
+  if (!category) notFound();
+
+  const allCategories = await sanityFetch<Category[]>({
+    query: allCategoriesQuery,
+    tags: ["category"],
+  });
+  const meta = allCategories.find((c) => c.slug === slug);
+  const parent = meta?.parentSlug
+    ? allCategories.find((c) => c.slug === meta.parentSlug)
+    : undefined;
+  const children = allCategories.filter((c) => c.parentSlug === slug);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: category.title,
+    url: `${siteUrl}/category/${slug}`,
+    hasPart: category.resources.slice(0, 50).map((r) => ({
+      "@type": "WebPage",
+      name: r.name,
+      url: r.url,
+    })),
+  };
+
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
+      <nav className="mb-6 flex items-center gap-1 text-sm text-muted-foreground">
+        <Link href="/browse" className="hover:text-foreground">
+          Browse
+        </Link>
+        {parent && (
+          <>
+            <ChevronRight className="size-3.5" />
+            <Link
+              href={`/category/${parent.slug}`}
+              className="hover:text-foreground"
+            >
+              {parent.title}
+            </Link>
+          </>
+        )}
+        <ChevronRight className="size-3.5" />
+        <span className="text-foreground">{category.title}</span>
+      </nav>
+
+      <div className="mb-8 flex items-center gap-4">
+        <span className="grid size-14 place-items-center rounded-xl bg-primary/10 text-primary">
+          <CategoryIcon name={category.icon} className="size-7" />
+        </span>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {category.title}
+          </h1>
+          <p className="text-muted-foreground">
+            {category.resources.length} resources
+          </p>
+        </div>
+      </div>
+
+      {children.length > 0 && (
+        <div className="mb-8 flex flex-wrap gap-2">
+          {children.map((c) => (
+            <Link
+              key={c._id}
+              href={`/category/${c.slug}`}
+              className="rounded-full border border-border bg-card px-3 py-1.5 text-sm transition-colors hover:border-primary/40"
+            >
+              {c.title}
+              <span className="ml-1.5 text-muted-foreground">{c.count}</span>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      <ResourceGrid resources={category.resources} />
+    </div>
+  );
+}
