@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { resourcesBySubmitterQuery } from "@/sanity/lib/queries";
 import { PublicProfileView } from "@/components/public-profile";
@@ -11,23 +11,20 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-async function loadProfile(username: string): Promise<PublicProfile | null> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("public_profiles")
-    .select("*")
-    .ilike("username", username)
-    .maybeSingle();
-  return (data as PublicProfile) ?? null;
-}
-
 export default async function PublicProfilePage({
   params,
 }: {
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
-  const profile = await loadProfile(username);
+
+  // Cookie-free anonymous read → fast, no session round-trip.
+  const supabase = createPublicClient();
+  const { data: profile } = await supabase
+    .from("public_profiles")
+    .select("*")
+    .ilike("username", username)
+    .maybeSingle<PublicProfile>();
   if (!profile) notFound();
 
   const resources = await sanityFetch<Resource[]>({
