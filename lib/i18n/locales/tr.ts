@@ -1,4 +1,11 @@
 export const tr = {
+
+  categories: {
+    title: "Kategoriler",
+    subtitle: "Saçma yan projelerden ciddi bilime kadar — tüm dizini kategorilere göre keşfet.",
+    count: "{{count}} kaynak",
+    domain: { developer: "Geliştirme", designer: "Tasarım", general: "Genel" },
+  },
   language: { label: "Dil" },
 
   header: {
@@ -7,6 +14,7 @@ export const tr = {
   },
 
   nav: {
+    categories: "Kategoriler",
     notifications: "Bildirimler",
     favorites: "Favoriler",
     submit: "Kaynak öner",

@@ -30,6 +30,15 @@ export function SiteHeader() {
           <span className="hidden sm:inline">Resource Base</span>
         </Link>
 
+        <nav className="ml-2 hidden md:flex">
+          <Link
+            href="/categories"
+            className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {t("nav.categories")}
+          </Link>
+        </nav>
+
         <div className="ml-auto flex items-center gap-2">
           <button
             onClick={openSearch}

@@ -1,4 +1,11 @@
 export const fr = {
+
+  categories: {
+    title: "Catégories",
+    subtitle: "Des projets farfelus à la science sérieuse — explorez tout le répertoire par catégorie.",
+    count: "{{count}} ressources",
+    domain: { developer: "Développement", designer: "Design", general: "Général" },
+  },
   language: { label: "Langue" },
 
   header: {
@@ -7,6 +14,7 @@ export const fr = {
   },
 
   nav: {
+    categories: "Catégories",
     notifications: "Notifications",
     favorites: "Favoris",
     submit: "Proposer une ressource",

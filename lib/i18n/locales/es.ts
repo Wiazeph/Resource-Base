@@ -1,4 +1,11 @@
 export const es = {
+
+  categories: {
+    title: "Categorías",
+    subtitle: "Desde proyectos absurdos hasta ciencia seria — explora todo el directorio por categoría.",
+    count: "{{count}} recursos",
+    domain: { developer: "Desarrollo", designer: "Diseño", general: "General" },
+  },
   language: { label: "Idioma" },
 
   header: {
@@ -7,6 +14,7 @@ export const es = {
   },
 
   nav: {
+    categories: "Categorías",
     notifications: "Notificaciones",
     favorites: "Favoritos",
     submit: "Sugerir un recurso",

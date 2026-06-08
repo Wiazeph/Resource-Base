@@ -1,4 +1,11 @@
 export const de = {
+
+  categories: {
+    title: "Kategorien",
+    subtitle: "Von verrückten Nebenprojekten bis zur ernsthaften Wissenschaft — durchstöbere das gesamte Verzeichnis nach Kategorie.",
+    count: "{{count}} Ressourcen",
+    domain: { developer: "Entwicklung", designer: "Design", general: "Allgemein" },
+  },
   language: { label: "Sprache" },
 
   header: {
@@ -7,6 +14,7 @@ export const de = {
   },
 
   nav: {
+    categories: "Kategorien",
     notifications: "Benachrichtigungen",
     favorites: "Favoriten",
     submit: "Ressource vorschlagen",

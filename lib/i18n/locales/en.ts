@@ -1,4 +1,11 @@
 export const en = {
+
+  categories: {
+    title: "Categories",
+    subtitle: "From silly side-projects to serious science — explore the full directory by category.",
+    count: "{{count}} resources",
+    domain: { developer: "Development", designer: "Design", general: "General" },
+  },
   language: { label: "Language" },
 
   header: {
@@ -7,6 +14,7 @@ export const en = {
   },
 
   nav: {
+    categories: "Categories",
     notifications: "Notifications",
     favorites: "Favorites",
     submit: "Submit a resource",
