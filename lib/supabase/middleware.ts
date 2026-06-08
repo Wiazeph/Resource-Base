@@ -1,9 +1,22 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+/** Page routes that require a signed-in user. */
+const PROTECTED_PAGES = [
+  "/submit",
+  "/favorites",
+  "/notifications",
+  "/profile/edit",
+];
+
+/** API routes that require a signed-in user. */
+const PROTECTED_APIS = ["/api/submit"];
+
 /**
- * Refreshes the Supabase session cookie on every matched request. Does NOT
- * gate any route — browsing stays fully public. Standard @supabase/ssr pattern.
+ * Refreshes the Supabase session cookie AND gates protected routes. Public
+ * browsing (home, categories, category, tag, public profiles) stays open;
+ * account-only pages/APIs require a session — the outermost defense layer on
+ * top of per-page getUser() checks and Supabase RLS.
  */
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -29,8 +42,26 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  // Touch the user to trigger a token refresh when needed.
-  await supabase.auth.getUser();
+  // Refresh + read the session.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { pathname } = request.nextUrl;
+
+  if (!user) {
+    // Protected APIs → 401 (no redirect).
+    if (PROTECTED_APIS.some((p) => pathname.startsWith(p))) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+    // Protected pages → bounce home with a flag so the UI can prompt sign-in.
+    if (PROTECTED_PAGES.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      url.search = "?auth=required";
+      return NextResponse.redirect(url);
+    }
+  }
 
   return response;
 }
