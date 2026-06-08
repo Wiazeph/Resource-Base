@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { writeClient } from "@/sanity/lib/writeClient";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -31,6 +32,17 @@ function isValidUrl(url: string): boolean {
 }
 
 export async function POST(req: NextRequest) {
+  // Auth is required — derive the user from the verified server session, never
+  // from the request body (so a client cannot spoof someone else's userId or
+  // submit anonymously).
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
   if (rateLimited(ip)) {
@@ -55,7 +67,9 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const userId = typeof data.userId === "string" ? data.userId : null;
+  // Identity comes from the session, not the body.
+  const userId = user.id;
+  const email = user.email ?? "";
 
   try {
     const created = await writeClient.create({
@@ -64,27 +78,24 @@ export async function POST(req: NextRequest) {
       url,
       suggestedCategory: (data.suggestedCategory ?? "").slice(0, 100),
       note: (data.note ?? "").slice(0, 1000),
-      email: (data.email ?? "").slice(0, 200),
-      ...(userId ? { submittedBy: userId } : {}),
+      email: email.slice(0, 200),
+      submittedBy: userId,
       status: "pending",
       createdAt: new Date().toISOString(),
     });
 
     // Mirror to Supabase so the submission is tied to the user and the
-    // approval notification can find its target. Best-effort: a mirror failure
-    // shouldn't fail the submission.
-    if (userId) {
-      try {
-        await createAdminClient().from("submissions").insert({
-          user_id: userId,
-          sanity_submission_id: created._id,
-          name: name.slice(0, 200),
-          url,
-          status: "pending",
-        });
-      } catch (mirrorErr) {
-        console.error("submission mirror failed", mirrorErr);
-      }
+    // approval notification can find its target. Best-effort.
+    try {
+      await createAdminClient().from("submissions").insert({
+        user_id: userId,
+        sanity_submission_id: created._id,
+        name: name.slice(0, 200),
+        url,
+        status: "pending",
+      });
+    } catch (mirrorErr) {
+      console.error("submission mirror failed", mirrorErr);
     }
 
     return NextResponse.json({ ok: true });
