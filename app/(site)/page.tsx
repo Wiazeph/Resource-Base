@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Sparkles } from "lucide-react";
 import { BrowseClient } from "@/components/browse-client";
+import { AnnouncementBanner } from "@/components/announcement-banner";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import {
   allCategoriesQuery,
@@ -33,14 +34,17 @@ export default async function HomePage() {
   );
 
   return (
-    <Suspense>
-      <BrowseClient
-        resources={resources}
-        categories={categories}
-        tags={tags}
-        basePath="/"
-        intro={intro}
-      />
-    </Suspense>
+    <>
+      <AnnouncementBanner />
+      <Suspense>
+        <BrowseClient
+          resources={resources}
+          categories={categories}
+          tags={tags}
+          basePath="/"
+          intro={intro}
+        />
+      </Suspense>
+    </>
   );
 }
