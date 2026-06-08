@@ -7,6 +7,7 @@ import Fuse from "fuse.js";
 import {
   ChevronLeft,
   ChevronRight,
+  ChevronsLeft,
   Search,
   SlidersHorizontal,
   X,
@@ -315,6 +316,7 @@ export function BrowseClient({
               }}
               prevLabel={t("browse.prev")}
               nextLabel={t("browse.next")}
+              firstLabel={t("browse.first")}
               pageLabel={t("browse.page", {
                 page: currentPage,
                 total: totalPages,
@@ -370,6 +372,7 @@ function Pagination({
   prevLabel,
   nextLabel,
   pageLabel,
+  firstLabel,
 }: {
   page: number;
   totalPages: number;
@@ -377,9 +380,20 @@ function Pagination({
   prevLabel: string;
   nextLabel: string;
   pageLabel: string;
+  firstLabel: string;
 }) {
   return (
     <div className="mt-10 flex items-center justify-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={page <= 1}
+        onClick={() => onChange(1)}
+        aria-label={firstLabel}
+        title={firstLabel}
+      >
+        <ChevronsLeft className="size-4" />
+      </Button>
       <Button
         variant="outline"
         size="sm"
