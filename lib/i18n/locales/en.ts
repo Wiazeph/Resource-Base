@@ -110,6 +110,8 @@ export const en = {
     signUp: "Sign up",
     createAccount: "Create account",
     emailPlaceholder: "you@example.com",
+    usernamePlaceholder: "Username",
+    usernameInvalid: "Username must be 3-20 characters: a-z, 0-9, - or _",
     passwordPlaceholder: "Password",
     confirmEmail: "Check your email to confirm your account.",
     welcomeBack: "Welcome back!",

@@ -50,10 +50,17 @@ export function AuthDialog({
     setPending(true);
     try {
       if (mode === "signup") {
+        const username = String(form.get("username") ?? "").trim().toLowerCase();
+        if (!/^[a-z0-9_-]{3,20}$/.test(username)) {
+          toast.error(t("auth.usernameInvalid"));
+          setPending(false);
+          return;
+        }
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: callbackUrl },
+          // Metadata flows into the profiles row via the handle_new_user trigger.
+          options: { emailRedirectTo: callbackUrl, data: { username } },
         });
         if (error) throw error;
         toast.success(t("auth.confirmEmail"));
@@ -118,6 +125,17 @@ export function AuthDialog({
                   emailAuth(mode, new FormData(e.currentTarget));
                 }}
               >
+                {mode === "signup" && (
+                  <Input
+                    name="username"
+                    required
+                    minLength={3}
+                    maxLength={20}
+                    pattern="[a-zA-Z0-9_\-]{3,20}"
+                    placeholder={t("auth.usernamePlaceholder")}
+                    autoComplete="username"
+                  />
+                )}
                 <Input
                   name="email"
                   type="email"

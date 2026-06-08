@@ -110,6 +110,8 @@ export const fr = {
     signUp: "S'inscrire",
     createAccount: "Créer un compte",
     emailPlaceholder: "vous@exemple.com",
+    usernamePlaceholder: "Nom d’utilisateur",
+    usernameInvalid: "Le nom d’utilisateur doit faire 3 à 20 caractères : a-z, 0-9, - ou _",
     passwordPlaceholder: "Mot de passe",
     confirmEmail: "Vérifiez vos e-mails pour confirmer votre compte.",
     welcomeBack: "Bon retour !",

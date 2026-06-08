@@ -110,6 +110,8 @@ export const tr = {
     signUp: "Kayıt ol",
     createAccount: "Hesap oluştur",
     emailPlaceholder: "sen@ornek.com",
+    usernamePlaceholder: "Kullanıcı adı",
+    usernameInvalid: "Kullanıcı adı 3-20 karakter olmalı: a-z, 0-9, - veya _",
     passwordPlaceholder: "Şifre",
     confirmEmail: "Hesabını onaylamak için e-postanı kontrol et.",
     welcomeBack: "Tekrar hoş geldin!",
