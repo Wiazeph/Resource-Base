@@ -1,12 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Boxes, Plus, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Boxes, Search } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { OPEN_COMMAND_EVENT } from "@/components/command-palette";
 import { UserMenu } from "@/components/auth/user-menu";
-import { NotificationBell } from "@/components/notifications/notification-bell";
 
 function openSearch() {
   window.dispatchEvent(new Event(OPEN_COMMAND_EVENT));
@@ -23,21 +21,6 @@ export function SiteHeader() {
           <span className="hidden sm:inline">Resource Base</span>
         </Link>
 
-        <nav className="ml-2 hidden items-center gap-1 text-sm md:flex">
-          <Link
-            href="/browse"
-            className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Browse
-          </Link>
-          <Link
-            href="/favorites"
-            className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Favorites
-          </Link>
-        </nav>
-
         <div className="ml-auto flex items-center gap-2">
           <button
             onClick={openSearch}
@@ -50,16 +33,8 @@ export function SiteHeader() {
             </kbd>
           </button>
 
-          <Button asChild size="sm" className="hidden sm:flex">
-            <Link href="/submit">
-              <Plus className="size-4" />
-              Submit
-            </Link>
-          </Button>
-
-          <NotificationBell />
-          <UserMenu />
           <ThemeToggle />
+          <UserMenu />
         </div>
       </div>
     </header>
