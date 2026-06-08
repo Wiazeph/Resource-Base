@@ -30,7 +30,7 @@ export default async function SiteLayout({
           <div className="flex min-h-screen flex-col">
             <SiteHeader />
             <CommandPalette resources={resources} />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 pt-6">{children}</main>
             <SiteFooter />
           </div>
         </ClickCountsProvider>
