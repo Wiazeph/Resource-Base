@@ -29,6 +29,7 @@ export const en = {
   },
 
   nav: {
+    profile: "Profile",
     categories: "Categories",
     notifications: "Notifications",
     favorites: "Favorites",
@@ -65,6 +66,7 @@ export const en = {
   languages: { en: "English", tr: "Turkish" },
 
   card: {
+    addedBy: "added by @{{username}}",
     by: "by {{author}}",
     broken: "broken",
     addFavorite: "Add favorite",

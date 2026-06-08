@@ -3,6 +3,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { CommandPalette } from "@/components/command-palette";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { ClickCountsProvider } from "@/components/click-counts-provider";
+import { ContributorsProvider } from "@/components/contributors-provider";
 import { I18nProvider } from "@/components/i18n-provider";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { allResourcesQuery } from "@/sanity/lib/queries";
@@ -27,12 +28,14 @@ export default async function SiteLayout({
     <I18nProvider>
       <AuthProvider>
         <ClickCountsProvider>
+          <ContributorsProvider>
           <div className="flex min-h-screen flex-col">
             <SiteHeader />
             <CommandPalette resources={resources} />
             <main className="flex-1 pt-6">{children}</main>
             <SiteFooter />
           </div>
+          </ContributorsProvider>
         </ClickCountsProvider>
       </AuthProvider>
     </I18nProvider>

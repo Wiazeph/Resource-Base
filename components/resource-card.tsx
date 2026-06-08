@@ -5,9 +5,11 @@ import Link from "next/link";
 import { ArrowUpRight, Star, TrendingUp, TriangleAlert } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useFavorites } from "@/lib/favorites";
 import { useClickCounts } from "@/components/click-counts-provider";
+import { useContributors } from "@/components/contributors-provider";
 import { useAuth } from "@/components/auth/auth-provider";
 import type { Resource } from "@/lib/types";
 
@@ -25,12 +27,21 @@ export function ResourceCard({ resource }: { resource: Resource }) {
   const { t } = useTranslation();
   const { has, toggle } = useFavorites();
   const { get, bump } = useClickCounts();
+  const { register, get: getContributor } = useContributors();
   const { user, openAuth } = useAuth();
   const counted = useRef(false);
   const fav = has(resource._id);
   const icon = favicon(resource.url);
   const broken = resource.linkStatus === "broken";
   const clicks = get(resource._id);
+
+  // Resolve the contributor (if a community member submitted this).
+  useEffect(() => {
+    if (resource.submittedBy) register(resource.submittedBy);
+  }, [resource.submittedBy, register]);
+  const contributor = resource.submittedBy
+    ? getContributor(resource.submittedBy)
+    : undefined;
 
   // Fire-and-forget click increment via our API (server-side IP debounce
   // guards against repeat/refresh spam). The link opens in a new tab, so
@@ -145,6 +156,23 @@ export function ResourceCard({ resource }: { resource: Resource }) {
           </span>
         )}
       </div>
+
+      {contributor && (
+        <Link
+          href={`/profile/${contributor.username}`}
+          className="relative z-10 mt-3 inline-flex w-fit items-center gap-1.5 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+        >
+          {contributor.avatar_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={contributor.avatar_url}
+              alt=""
+              className="size-4 rounded-full object-cover"
+            />
+          ) : null}
+          {t("card.addedBy", { username: contributor.username })}
+        </Link>
+      )}
     </div>
   );
 }

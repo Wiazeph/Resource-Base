@@ -29,6 +29,7 @@ export const tr = {
   },
 
   nav: {
+    profile: "Profil",
     categories: "Kategoriler",
     notifications: "Bildirimler",
     favorites: "Favoriler",
@@ -65,6 +66,7 @@ export const tr = {
   languages: { en: "İngilizce", tr: "Türkçe" },
 
   card: {
+    addedBy: "@{{username}} ekledi",
     by: "{{author}} tarafından",
     broken: "kırık",
     addFavorite: "Favorilere ekle",

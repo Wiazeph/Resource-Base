@@ -29,6 +29,7 @@ export const fr = {
   },
 
   nav: {
+    profile: "Profil",
     categories: "Catégories",
     notifications: "Notifications",
     favorites: "Favoris",
@@ -65,6 +66,7 @@ export const fr = {
   languages: { en: "Anglais", tr: "Turc" },
 
   card: {
+    addedBy: "ajouté par @{{username}}",
     by: "par {{author}}",
     broken: "lien mort",
     addFavorite: "Ajouter aux favoris",
