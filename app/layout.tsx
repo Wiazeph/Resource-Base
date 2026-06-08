@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Resource Directory",
-    template: "%s · Resource Directory",
+    default: "Resource Base — Curated free resources for builders",
+    template: "%s · Resource Base",
   },
   description:
     "A curated, searchable directory of the best free resources across development, design, and beyond.",

@@ -21,7 +21,7 @@ export function SiteFooter() {
             Submit a resource
           </Link>
           <a
-            href="https://github.com/Wiazeph/Front-End-Development-Resources"
+            href="https://github.com/Wiazeph/Resource-Base"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-foreground"
