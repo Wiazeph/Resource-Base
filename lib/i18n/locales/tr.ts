@@ -1,5 +1,20 @@
 export const tr = {
 
+  profile: {
+    editTitle: "Profili düzenle",
+    signInPrompt: "Profilini düzenlemek için giriş yap.",
+    username: "Kullanıcı adı",
+    fullName: "Ad soyad",
+    bio: "Biyografi",
+    portfolio: "Portfolyo",
+    save: "Profili kaydet",
+    saved: "Profil kaydedildi.",
+    saveError: "Kaydedilemedi. Lütfen tekrar dene.",
+    usernameTaken: "Bu kullanıcı adı alınmış.",
+    contributions: "Katkılar ({{count}})",
+    noContributions: "Henüz katkı yok.",
+  },
+
   categories: {
     title: "Kategoriler",
     subtitle: "Saçma yan projelerden ciddi bilime kadar — tüm dizini kategorilere göre keşfet.",

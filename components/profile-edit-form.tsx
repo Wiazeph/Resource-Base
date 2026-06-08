@@ -1,0 +1,138 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/components/auth/auth-provider";
+import { useProfile } from "@/lib/profile";
+
+export function ProfileEditForm() {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const { user, loading: authLoading, openAuth } = useAuth();
+  const { profile, loading, update, setUsername } = useProfile();
+  const [pending, setPending] = useState(false);
+  const [username, setUsernameInput] = useState("");
+
+  useEffect(() => {
+    if (profile?.username) setUsernameInput(profile.username);
+  }, [profile?.username]);
+
+  if (!authLoading && !user) {
+    return (
+      <div className="py-20 text-center">
+        <p className="text-muted-foreground">{t("profile.signInPrompt")}</p>
+        <Button className="mt-4" onClick={openAuth}>
+          {t("header.signIn")}
+        </Button>
+      </div>
+    );
+  }
+
+  if (loading || !profile) {
+    return (
+      <div className="py-20 text-center text-muted-foreground">
+        <Loader2 className="mx-auto size-5 animate-spin" />
+      </div>
+    );
+  }
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
+    setPending(true);
+    try {
+      // Username goes through the validated RPC if it changed.
+      const nextUsername = username.trim().toLowerCase();
+      if (nextUsername && nextUsername !== profile!.username) {
+        const { error } = await setUsername(nextUsername);
+        if (error) {
+          toast.error(
+            error === "username_taken"
+              ? t("profile.usernameTaken")
+              : error === "invalid_username"
+                ? t("auth.usernameInvalid")
+                : error,
+          );
+          setPending(false);
+          return;
+        }
+      }
+      const { error } = await update({
+        full_name: data.full_name || null,
+        bio: data.bio || null,
+        portfolio_url: data.portfolio_url || null,
+        github_url: data.github_url || null,
+        twitter_url: data.twitter_url || null,
+        instagram_url: data.instagram_url || null,
+        dribbble_url: data.dribbble_url || null,
+      });
+      if (error) throw new Error(error);
+      toast.success(t("profile.saved"));
+      router.push(`/profile/${nextUsername || profile!.username}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("profile.saveError"));
+    } finally {
+      setPending(false);
+    }
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="space-y-4">
+      <h1 className="text-3xl font-bold tracking-tight">{t("profile.editTitle")}</h1>
+
+      <Field label={t("profile.username")}>
+        <Input
+          value={username}
+          onChange={(e) => setUsernameInput(e.target.value)}
+          required
+          minLength={3}
+          maxLength={20}
+          pattern="[a-zA-Z0-9_\-]{3,20}"
+          placeholder={t("auth.usernamePlaceholder")}
+        />
+      </Field>
+      <Field label={t("profile.fullName")}>
+        <Input name="full_name" defaultValue={profile.full_name ?? ""} />
+      </Field>
+      <Field label={t("profile.bio")}>
+        <Textarea name="bio" rows={3} defaultValue={profile.bio ?? ""} maxLength={280} />
+      </Field>
+      <Field label={t("profile.portfolio")}>
+        <Input name="portfolio_url" type="url" defaultValue={profile.portfolio_url ?? ""} placeholder="https://…" />
+      </Field>
+      <Field label="GitHub">
+        <Input name="github_url" type="url" defaultValue={profile.github_url ?? ""} placeholder="https://github.com/…" />
+      </Field>
+      <Field label="X (Twitter)">
+        <Input name="twitter_url" type="url" defaultValue={profile.twitter_url ?? ""} placeholder="https://x.com/…" />
+      </Field>
+      <Field label="Instagram">
+        <Input name="instagram_url" type="url" defaultValue={profile.instagram_url ?? ""} placeholder="https://instagram.com/…" />
+      </Field>
+      <Field label="Dribbble">
+        <Input name="dribbble_url" type="url" defaultValue={profile.dribbble_url ?? ""} placeholder="https://dribbble.com/…" />
+      </Field>
+
+      <Button type="submit" disabled={pending} className="w-full">
+        {pending && <Loader2 className="size-4 animate-spin" />}
+        {t("profile.save")}
+      </Button>
+    </form>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="mb-1.5 block text-sm font-medium">{label}</label>
+      {children}
+    </div>
+  );
+}

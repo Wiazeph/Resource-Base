@@ -1,5 +1,20 @@
 export const de = {
 
+  profile: {
+    editTitle: "Profil bearbeiten",
+    signInPrompt: "Melde dich an, um dein Profil zu bearbeiten.",
+    username: "Benutzername",
+    fullName: "Vollständiger Name",
+    bio: "Bio",
+    portfolio: "Portfolio",
+    save: "Profil speichern",
+    saved: "Profil gespeichert.",
+    saveError: "Speichern fehlgeschlagen. Bitte erneut versuchen.",
+    usernameTaken: "Dieser Benutzername ist vergeben.",
+    contributions: "Beiträge ({{count}})",
+    noContributions: "Noch keine Beiträge.",
+  },
+
   categories: {
     title: "Kategorien",
     subtitle: "Von verrückten Nebenprojekten bis zur ernsthaften Wissenschaft — durchstöbere das gesamte Verzeichnis nach Kategorie.",

@@ -1,5 +1,20 @@
 export const en = {
 
+  profile: {
+    editTitle: "Edit profile",
+    signInPrompt: "Sign in to edit your profile.",
+    username: "Username",
+    fullName: "Full name",
+    bio: "Bio",
+    portfolio: "Portfolio",
+    save: "Save profile",
+    saved: "Profile saved.",
+    saveError: "Could not save. Please try again.",
+    usernameTaken: "That username is taken.",
+    contributions: "Contributions ({{count}})",
+    noContributions: "No contributions yet.",
+  },
+
   categories: {
     title: "Categories",
     subtitle: "From silly side-projects to serious science — explore the full directory by category.",
