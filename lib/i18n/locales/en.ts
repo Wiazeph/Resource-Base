@@ -27,7 +27,7 @@ export const en = {
     titleLead: "Find your next",
     titleHighlight: "resource.",
     subtitle:
-      "Search and filter the best free tools, libraries, courses and assets for developers and designers.",
+      "Thousands of free resources for everything — from quirky web toys to serious science. Search it all in one place.",
   },
 
   browse: {
@@ -124,7 +124,7 @@ export const en = {
 
   footer: {
     tagline:
-      "A curated, searchable directory of the best free resources for developers and designers.",
+      "A curated, searchable directory of free resources for everything — from quirky web toys to serious science.",
     source: "Source",
     reportIssue: "Report an issue",
     sponsor: "Sponsor",

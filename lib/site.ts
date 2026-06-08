@@ -5,4 +5,4 @@ export const siteUrl =
 
 export const siteName = "Resource Base";
 export const siteDescription =
-  "A curated, searchable directory of the best free resources across development, design, and beyond.";
+  "A curated, searchable directory of free resources for everything — from quirky web toys to serious science.";

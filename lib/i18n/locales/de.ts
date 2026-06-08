@@ -27,7 +27,7 @@ export const de = {
     titleLead: "Finde deine nächste",
     titleHighlight: "Ressource.",
     subtitle:
-      "Durchsuche und filtere die besten kostenlosen Tools, Bibliotheken, Kurse und Assets für Entwickler und Designer.",
+      "Tausende kostenlose Ressourcen für alles — von schrägen Web-Spielereien bis zur ernsthaften Wissenschaft. Alles an einem Ort durchsuchen.",
   },
 
   browse: {
@@ -124,7 +124,7 @@ export const de = {
 
   footer: {
     tagline:
-      "Ein kuratiertes, durchsuchbares Verzeichnis der besten kostenlosen Ressourcen für Entwickler und Designer.",
+      "Ein kuratiertes, durchsuchbares Verzeichnis kostenloser Ressourcen für alles — von schrägen Web-Spielereien bis zur ernsthaften Wissenschaft.",
     source: "Quellcode",
     reportIssue: "Problem melden",
     sponsor: "Sponsor werden",

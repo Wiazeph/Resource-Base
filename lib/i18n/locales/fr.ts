@@ -27,7 +27,7 @@ export const fr = {
     titleLead: "Trouvez votre prochaine",
     titleHighlight: "ressource.",
     subtitle:
-      "Recherchez et filtrez les meilleurs outils, bibliothèques, cours et ressources gratuits pour les développeurs et les designers.",
+      "Des milliers de ressources gratuites pour tout — des gadgets web farfelus à la science sérieuse. Cherchez tout au même endroit.",
   },
 
   browse: {
@@ -124,7 +124,7 @@ export const fr = {
 
   footer: {
     tagline:
-      "Un répertoire organisé et consultable des meilleures ressources gratuites pour les développeurs et les designers.",
+      "Un répertoire organisé et consultable de ressources gratuites pour tout — des gadgets web farfelus à la science sérieuse.",
     source: "Code source",
     reportIssue: "Signaler un problème",
     sponsor: "Devenir sponsor",

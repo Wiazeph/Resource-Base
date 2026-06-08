@@ -27,7 +27,7 @@ export const es = {
     titleLead: "Encuentra tu próximo",
     titleHighlight: "recurso.",
     subtitle:
-      "Busca y filtra las mejores herramientas, bibliotecas, cursos y recursos gratuitos para desarrolladores y diseñadores.",
+      "Miles de recursos gratuitos para todo — desde juguetes web peculiares hasta ciencia seria. Búscalo todo en un solo lugar.",
   },
 
   browse: {
@@ -124,7 +124,7 @@ export const es = {
 
   footer: {
     tagline:
-      "Un directorio curado y con búsqueda de los mejores recursos gratuitos para desarrolladores y diseñadores.",
+      "Un directorio curado y con búsqueda de recursos gratuitos para todo — desde juguetes web peculiares hasta ciencia seria.",
     source: "Código fuente",
     reportIssue: "Reportar un problema",
     sponsor: "Patrocinar",

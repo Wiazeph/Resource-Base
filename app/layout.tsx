@@ -29,11 +29,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Resource Base — Curated free resources for builders",
+    default: "Resource Base — Free resources for everything",
     template: "%s · Resource Base",
   },
   description:
-    "A curated, searchable directory of the best free resources across development, design, and beyond.",
+    "A curated, searchable directory of free resources for everything — from quirky web toys to serious science.",
 };
 
 export default function RootLayout({

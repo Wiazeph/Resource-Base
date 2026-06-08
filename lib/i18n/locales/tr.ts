@@ -27,7 +27,7 @@ export const tr = {
     titleLead: "Bir sonraki",
     titleHighlight: "kaynağını bul.",
     subtitle:
-      "Geliştiriciler ve tasarımcılar için en iyi ücretsiz araçları, kütüphaneleri, kursları ve materyalleri ara ve filtrele.",
+      "Her şey için binlerce ücretsiz kaynak — tuhaf web araçlarından ciddi bilime. Hepsini tek yerde ara.",
   },
 
   browse: {
@@ -124,7 +124,7 @@ export const tr = {
 
   footer: {
     tagline:
-      "Geliştiriciler ve tasarımcılar için en iyi ücretsiz kaynakların özenle seçilmiş, aranabilir bir dizini.",
+      "Her şey için ücretsiz kaynakların özenle seçilmiş, aranabilir bir dizini — tuhaf web araçlarından ciddi bilime.",
     source: "Kaynak kod",
     reportIssue: "Sorun bildir",
     sponsor: "Sponsor ol",
