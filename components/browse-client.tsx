@@ -27,10 +27,18 @@ export function BrowseClient({
   resources,
   categories,
   tags,
+  basePath = "/browse",
+  heading = "Browse resources",
+  intro,
 }: {
   resources: Resource[];
   categories: Category[];
   tags: Tag[];
+  /** Path the filter state syncs to (so the homepage stays on "/"). */
+  basePath?: string;
+  heading?: string;
+  /** Optional intro node rendered above the search bar (used on the homepage). */
+  intro?: React.ReactNode;
 }) {
   const router = useRouter();
   const params = useSearchParams();
@@ -57,8 +65,8 @@ export function BrowseClient({
     if (pricing) sp.set("pricing", pricing);
     if (sort !== "featured") sp.set("sort", sort);
     const qs = sp.toString();
-    router.replace(qs ? `/browse?${qs}` : "/browse", { scroll: false });
-  }, [q, cat, activeTags, lang, pricing, sort, router]);
+    router.replace(qs ? `${basePath}?${qs}` : basePath, { scroll: false });
+  }, [q, cat, activeTags, lang, pricing, sort, router, basePath]);
 
   const fuse = useMemo(
     () =>
@@ -131,12 +139,15 @@ export function BrowseClient({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">Browse resources</h1>
-        <p className="mt-1 text-muted-foreground">
-          {resources.length} resources across {topCategories.length} categories.
-        </p>
-      </div>
+      {intro ?? (
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold tracking-tight">{heading}</h1>
+          <p className="mt-1 text-muted-foreground">
+            {resources.length} resources across {topCategories.length}{" "}
+            categories.
+          </p>
+        </div>
+      )}
 
       {/* Search + sort bar */}
       <div className="sticky top-16 z-30 -mx-4 mb-6 border-b border-border/60 bg-background/90 px-4 py-3 backdrop-blur-xl">
