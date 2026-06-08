@@ -24,6 +24,14 @@ export const submission = defineType({
     defineField({ name: 'note', type: 'text', rows: 3 }),
     defineField({ name: 'email', type: 'string' }),
     defineField({
+      name: 'submittedBy',
+      title: 'Submitted by (Supabase user id)',
+      type: 'string',
+      description:
+        'Set automatically when a signed-in user submits. Used to notify them on approval.',
+      readOnly: true,
+    }),
+    defineField({
       name: 'status',
       type: 'string',
       options: {

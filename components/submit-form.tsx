@@ -6,9 +6,11 @@ import { Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/components/auth/auth-provider";
 import type { Category } from "@/lib/types";
 
 export function SubmitForm({ categories }: { categories: Category[] }) {
+  const { user } = useAuth();
   const [pending, setPending] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -23,7 +25,12 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
       const res = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        // Attach the signed-in user's id + email so we can notify them on approval.
+        body: JSON.stringify({
+          ...data,
+          userId: user?.id ?? null,
+          email: data.email || user?.email || "",
+        }),
       });
       if (!res.ok) throw new Error(await res.text());
       toast.success("Thanks! Your suggestion is in the review queue.");
