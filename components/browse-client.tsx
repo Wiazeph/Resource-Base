@@ -27,7 +27,7 @@ export function BrowseClient({
   resources,
   categories,
   tags,
-  basePath = "/browse",
+  basePath = "/",
   heading = "Browse resources",
   intro,
 }: {

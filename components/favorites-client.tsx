@@ -24,7 +24,7 @@ export function FavoritesClient({ resources }: { resources: Resource[] }) {
             You haven&apos;t saved any resources yet.
           </p>
           <Button asChild className="mt-4">
-            <Link href="/browse">Browse resources</Link>
+            <Link href="/">Browse resources</Link>
           </Button>
         </div>
       ) : (

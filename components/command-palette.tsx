@@ -108,7 +108,7 @@ export function CommandPalette({ resources }: { resources: Resource[] }) {
           ))}
         </CommandGroup>
         <CommandGroup heading="Go to">
-          <CommandItem value="browse-all" onSelect={() => go("/browse")}>
+          <CommandItem value="browse-all" onSelect={() => go("/")}>
             <Hash className="size-4 opacity-60" />
             Browse all resources
           </CommandItem>

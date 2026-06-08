@@ -85,8 +85,8 @@ export default async function CategoryPage({
       />
 
       <nav className="mb-6 flex items-center gap-1 text-sm text-muted-foreground">
-        <Link href="/browse" className="hover:text-foreground">
-          Browse
+        <Link href="/" className="hover:text-foreground">
+          Home
         </Link>
         {parent && (
           <>
