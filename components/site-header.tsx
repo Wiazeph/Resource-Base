@@ -23,7 +23,7 @@ export function SiteHeader() {
       {/* Opaque strip masking content that scrolls beneath the floating header. */}
       <div className="pointer-events-none fixed inset-x-0 top-0 z-30 h-20 bg-background" />
       <header className="sticky top-3 z-40 px-3">
-        <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 rounded-2xl border border-border/70 bg-background/95 px-3 shadow-lg shadow-black/5 ring-1 ring-black/[0.03] backdrop-blur-xl supports-[backdrop-filter]:bg-background/85 sm:px-4">
+        <div className="mx-auto flex h-14 max-w-5xl items-center rounded-2xl border border-border/70 bg-background/95 px-3 shadow-lg shadow-black/5 ring-1 ring-black/[0.03] backdrop-blur-xl supports-[backdrop-filter]:bg-background/85 sm:px-4">
         <Link
           href="/"
           className="flex items-center gap-2 font-semibold transition-opacity hover:opacity-80"
@@ -34,7 +34,7 @@ export function SiteHeader() {
           <span className="hidden sm:inline">Resource Base</span>
         </Link>
 
-        <span aria-hidden className="hidden text-border md:inline">
+        <span aria-hidden className="hidden text-border md:inline pl-3 pr-1">
           •
         </span>
 

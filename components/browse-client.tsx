@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import Fuse from "fuse.js";
@@ -148,6 +148,16 @@ export function BrowseClient({
     currentPage * pageSize,
   );
 
+  // Anchor at the top of the results so page changes always scroll there,
+  // regardless of how page heights differ (window-top scroll was unreliable).
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const goToPage = (p: number) => {
+    setPage(p);
+    requestAnimationFrame(() => {
+      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
   const topCategories = categories
     .filter((c) => !c.parentSlug)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -294,6 +304,7 @@ export function BrowseClient({
       </div>
 
       {/* Results */}
+      <div ref={resultsRef} className="scroll-mt-28" />
       {filtered.length === 0 ? (
         <div className="py-20 text-center text-muted-foreground">
           {t("browse.empty")}
@@ -310,10 +321,7 @@ export function BrowseClient({
             <Pagination
               page={currentPage}
               totalPages={totalPages}
-              onChange={(p) => {
-                setPage(p);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
+              onChange={goToPage}
               prevLabel={t("browse.prev")}
               nextLabel={t("browse.next")}
               firstLabel={t("browse.first")}
