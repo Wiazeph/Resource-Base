@@ -123,8 +123,23 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Subtle violet ambiance anchored at the top of the page. */
+    background-image: radial-gradient(
+      60rem 30rem at 50% -10rem,
+      oklch(0.54 0.22 285 / 0.06),
+      transparent 70%
+    );
+    background-repeat: no-repeat;
+    background-attachment: fixed;
   }
   html {
-    @apply font-sans;
+    @apply font-sans scroll-smooth;
+  }
+}
+
+@layer components {
+  /* Soft lift used by resource cards and category tiles. */
+  .card-hover {
+    @apply transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5;
   }
 }

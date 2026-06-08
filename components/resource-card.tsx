@@ -50,12 +50,12 @@ export function ResourceCard({ resource }: { resource: Resource }) {
   return (
     <div
       className={cn(
-        "group relative flex flex-col rounded-xl border border-border bg-card p-4 transition-all hover:border-primary/40 hover:shadow-md",
+        "card-hover group relative flex flex-col rounded-xl border border-border bg-card p-4",
         broken && "opacity-70",
       )}
     >
       <div className="flex items-start gap-3">
-        <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-muted/50">
+        <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-muted/50 transition-colors group-hover:border-primary/30 group-hover:bg-primary/5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {icon ? (
             <img src={icon} alt="" className="size-5" loading="lazy" />
