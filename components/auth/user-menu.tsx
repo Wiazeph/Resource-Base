@@ -81,6 +81,11 @@ export function UserMenu() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
+          <Link href="/favorites">
+            <Star className="size-4" /> {t("nav.favorites")}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <Link href="/notifications">
             <Bell className="size-4" /> {t("nav.notifications")}
             {unread > 0 && (
@@ -88,11 +93,6 @@ export function UserMenu() {
                 {unread}
               </span>
             )}
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/favorites">
-            <Star className="size-4" /> {t("nav.favorites")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
