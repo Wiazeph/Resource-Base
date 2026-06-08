@@ -40,6 +40,7 @@ export const tr = {
     results: "{{count}} sonuç",
     clear: "Temizle",
     empty: "Filtrelerinize uygun kaynak yok.",
+    first: "İlk sayfa",
     prev: "Önceki",
     next: "Sonraki",
     page: "Sayfa {{page}} / {{total}}",
@@ -100,7 +101,7 @@ export const tr = {
   },
 
   auth: {
-    title: "Resource Base'e hoş geldin",
+    title: "Hoş geldin 👋",
     subtitle: "Favori kaydetmek ve kaynak önermek için giriş yap.",
     google: "Google ile devam et",
     github: "GitHub ile devam et",

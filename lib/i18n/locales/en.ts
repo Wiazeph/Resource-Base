@@ -40,6 +40,7 @@ export const en = {
     results: "{{count}} results",
     clear: "Clear",
     empty: "No resources match your filters.",
+    first: "First page",
     prev: "Previous",
     next: "Next",
     page: "Page {{page}} of {{total}}",
@@ -100,7 +101,7 @@ export const en = {
   },
 
   auth: {
-    title: "Welcome to Resource Base",
+    title: "Welcome 👋",
     subtitle: "Sign in to save favorites and submit resources.",
     google: "Continue with Google",
     github: "Continue with GitHub",

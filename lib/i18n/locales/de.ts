@@ -40,6 +40,7 @@ export const de = {
     results: "{{count}} Ergebnisse",
     clear: "Zurücksetzen",
     empty: "Keine Ressourcen entsprechen deinen Filtern.",
+    first: "Erste Seite",
     prev: "Zurück",
     next: "Weiter",
     page: "Seite {{page}} von {{total}}",
@@ -100,7 +101,7 @@ export const de = {
   },
 
   auth: {
-    title: "Willkommen bei Resource Base",
+    title: "Willkommen 👋",
     subtitle: "Melde dich an, um Favoriten zu speichern und Ressourcen einzureichen.",
     google: "Mit Google fortfahren",
     github: "Mit GitHub fortfahren",
