@@ -1,3 +1,6 @@
+# Not a monorepo — empty packages keeps pnpm@9 (Vercel) from treating this as a
+# workspace root and erroring with "packages field missing".
+packages: []
 onlyBuiltDependencies:
   - esbuild
 ignoredBuiltDependencies:
