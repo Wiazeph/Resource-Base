@@ -43,7 +43,7 @@ export function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="relative grid size-9 place-items-center overflow-hidden rounded-full border border-border bg-muted text-sm"
+          className="relative grid size-9 cursor-pointer place-items-center overflow-hidden rounded-full border border-border bg-muted text-sm"
           aria-label="Account menu"
         >
           {avatar ? (

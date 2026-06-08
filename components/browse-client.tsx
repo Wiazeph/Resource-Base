@@ -155,8 +155,8 @@ export function BrowseClient({
         </div>
       )}
 
-      {/* Search + sort bar */}
-      <div className="sticky top-20 z-30 -mx-4 mb-6 border-b border-border/60 bg-background/90 px-4 py-3 backdrop-blur-xl">
+      {/* Search + sort bar — floating island that docks under the header */}
+      <div className="sticky top-[4.75rem] z-30 mb-6 rounded-2xl border border-border/70 bg-background/95 p-3 shadow-md shadow-black/5 ring-1 ring-black/[0.03] backdrop-blur-xl supports-[backdrop-filter]:bg-background/85">
         <div className="flex gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -178,7 +178,7 @@ export function BrowseClient({
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as Sort)}
-            className="rounded-md border border-border bg-background px-3 text-sm"
+            className="cursor-pointer rounded-md border border-border bg-background px-3 text-sm"
             aria-label={t("browse.sort.featured")}
           >
             <option value="featured">{t("browse.sort.featured")}</option>
@@ -223,7 +223,7 @@ export function BrowseClient({
                     key={tag._id}
                     onClick={() => toggleTag(tag.slug)}
                     className={cn(
-                      "rounded-full border px-2.5 py-0.5 text-xs transition-colors",
+                      "cursor-pointer rounded-full border px-2.5 py-0.5 text-xs transition-colors",
                       activeTags.includes(tag.slug)
                         ? "border-primary bg-primary text-primary-foreground"
                         : "border-border bg-background hover:bg-muted",
@@ -296,7 +296,7 @@ function Facet({
             key={o.value}
             onClick={() => onChange(o.value)}
             className={cn(
-              "rounded-full border px-2.5 py-0.5 text-xs transition-colors",
+              "cursor-pointer rounded-full border px-2.5 py-0.5 text-xs transition-colors",
               value === o.value
                 ? "border-primary bg-primary text-primary-foreground"
                 : "border-border bg-background hover:bg-muted",

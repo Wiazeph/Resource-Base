@@ -99,7 +99,7 @@ export function ResourceCard({ resource }: { resource: Resource }) {
                 ? t("card.removeFavorite")
                 : t("card.addFavorite")
           }
-          className="relative z-10 -m-1 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
+          className="relative z-10 -m-1 cursor-pointer rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
         >
           <Star
             className={cn("size-4", fav && "fill-primary text-primary")}

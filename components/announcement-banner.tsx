@@ -32,7 +32,7 @@ export function AnnouncementBanner() {
             setShow(false);
           }}
           aria-label="Dismiss announcement"
-          className="shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground"
+          className="shrink-0 cursor-pointer rounded-md p-1 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground"
         >
           <X className="size-4" />
         </button>
