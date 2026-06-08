@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Boxes, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -14,6 +15,9 @@ function openSearch() {
 
 export function SiteHeader() {
   const { t } = useTranslation();
+  const pathname = usePathname();
+  // The homepage already has a big inline search, so hide the header one there.
+  const showSearch = pathname !== "/";
   return (
     <>
       {/* Opaque strip masking content that scrolls beneath the floating header. */}
@@ -30,26 +34,34 @@ export function SiteHeader() {
           <span className="hidden sm:inline">Resource Base</span>
         </Link>
 
-        <nav className="ml-2 hidden md:flex">
+        <span aria-hidden className="hidden text-border md:inline">
+          •
+        </span>
+
+        <nav className="hidden md:flex">
           <Link
             href="/categories"
-            className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="rounded-md px-2 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             {t("nav.categories")}
           </Link>
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          <button
-            onClick={openSearch}
-            className="group flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:bg-muted hover:text-foreground"
-          >
-            <Search className="size-4 transition-transform group-hover:scale-110" />
-            <span className="hidden sm:inline">{t("header.searchPlaceholder")}</span>
-            <kbd className="ml-2 hidden rounded border border-border bg-background px-1.5 font-mono text-[10px] sm:inline">
-              ⌘K
-            </kbd>
-          </button>
+          {showSearch && (
+            <button
+              onClick={openSearch}
+              className="group flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:bg-muted hover:text-foreground"
+            >
+              <Search className="size-4 transition-transform group-hover:scale-110" />
+              <span className="hidden sm:inline">
+                {t("header.searchPlaceholder")}
+              </span>
+              <kbd className="ml-2 hidden rounded border border-border bg-background px-1.5 font-mono text-[10px] sm:inline">
+                ⌘K
+              </kbd>
+            </button>
+          )}
 
           <LanguageToggle />
           <ThemeToggle />
