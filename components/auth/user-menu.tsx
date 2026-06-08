@@ -14,11 +14,13 @@ import {
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useNotifications } from "@/lib/notifications";
+import { useProfile } from "@/lib/profile";
 
 export function UserMenu() {
   const { t } = useTranslation();
   const { user, loading, openAuth, signOut } = useAuth();
   const { unread } = useNotifications();
+  const { profile } = useProfile();
 
   if (loading) {
     return <div className="size-9 animate-pulse rounded-full bg-muted" />;
@@ -32,12 +34,18 @@ export function UserMenu() {
     );
   }
 
+  // Prefer the edited DB name; fall back to the OAuth provider name, then email.
   const name =
+    profile?.full_name ||
     (user.user_metadata?.full_name as string) ||
     (user.user_metadata?.name as string) ||
     user.email ||
     "Account";
-  const avatar = user.user_metadata?.avatar_url as string | undefined;
+  const avatar =
+    profile?.avatar_url || (user.user_metadata?.avatar_url as string | undefined);
+  const profileHref = profile?.username
+    ? `/profile/${profile.username}`
+    : "/profile/edit";
 
   return (
     <DropdownMenu>
@@ -58,8 +66,20 @@ export function UserMenu() {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="truncate">{name}</DropdownMenuLabel>
+        <DropdownMenuLabel className="truncate">
+          {name}
+          {profile?.username && (
+            <span className="block text-xs font-normal text-muted-foreground">
+              @{profile.username}
+            </span>
+          )}
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href={profileHref}>
+            <UserIcon className="size-4" /> {t("nav.profile")}
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/notifications">
             <Bell className="size-4" /> {t("nav.notifications")}

@@ -1,8 +1,11 @@
 "use client";
 
-import { Globe, User as UserIcon } from "lucide-react";
+import Link from "next/link";
+import { Globe, Pencil, User as UserIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
 import { ResourceGrid } from "@/components/resource-grid";
+import { useAuth } from "@/components/auth/auth-provider";
 import type { PublicProfile, Resource } from "@/lib/types";
 
 // Lucide 1.x dropped brand marks — inline brand SVGs for recognizable icons.
@@ -81,6 +84,8 @@ export function PublicProfileView({
   resources: Resource[];
 }) {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const isOwner = user?.id === profile.id;
   const name = profile.full_name || `@${profile.username}`;
 
   return (
@@ -99,6 +104,13 @@ export function PublicProfileView({
           <h1 className="text-2xl font-bold tracking-tight">{name}</h1>
           <p className="text-muted-foreground">@{profile.username}</p>
         </div>
+        {isOwner && (
+          <Button asChild size="sm" variant="outline">
+            <Link href="/profile/edit">
+              <Pencil className="size-3.5" /> {t("profile.editTitle")}
+            </Link>
+          </Button>
+        )}
         {profile.bio && (
           <p className="max-w-md text-balance text-sm text-muted-foreground">
             {profile.bio}
