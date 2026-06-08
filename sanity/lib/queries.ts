@@ -13,6 +13,7 @@ const RESOURCE_FIELDS = groq`
   featured,
   addedAt,
   linkStatus,
+  submittedBy,
   "categories": categories[]->{ _id, title, "slug": slug.current, domain },
   "tags": tags[]->{ _id, title, "slug": slug.current, kind }
 `

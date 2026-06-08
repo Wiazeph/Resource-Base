@@ -5,6 +5,25 @@ export type Pricing = 'free' | 'freemium' | 'paid'
 export type Domain = 'developer' | 'designer' | 'general'
 export type TagKind = 'tech' | 'topic' | 'language' | 'general'
 
+/** Public profile fields (from the public_profiles Supabase view). */
+export interface PublicProfile {
+  id: string
+  username: string
+  full_name: string | null
+  avatar_url: string | null
+  bio: string | null
+  portfolio_url: string | null
+  github_url: string | null
+  twitter_url: string | null
+  instagram_url: string | null
+  dribbble_url: string | null
+}
+
+/** The signed-in user's own editable profile (private columns included). */
+export interface Profile extends PublicProfile {
+  email: string | null
+}
+
 export interface CategoryRef {
   _id: string
   title: string
@@ -31,6 +50,8 @@ export interface Resource {
   featured?: boolean
   addedAt?: string
   linkStatus?: LinkStatus
+  /** Supabase user id of the community member who submitted it (if any). */
+  submittedBy?: string
   categories: CategoryRef[]
   tags: TagRef[]
 }
