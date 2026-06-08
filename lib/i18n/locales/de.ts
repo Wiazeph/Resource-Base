@@ -122,6 +122,8 @@ export const de = {
 
   auth: {
     title: "Willkommen 👋",
+    requiredTitle: "Anmeldung erforderlich",
+    requiredBody: "Du musst angemeldet sein, um diese Seite zu sehen.",
     subtitle: "Melde dich an, um Favoriten zu speichern und Ressourcen einzureichen.",
     google: "Mit Google fortfahren",
     github: "Mit GitHub fortfahren",

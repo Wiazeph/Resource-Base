@@ -122,6 +122,8 @@ export const es = {
 
   auth: {
     title: "Bienvenido 👋",
+    requiredTitle: "Inicio de sesión requerido",
+    requiredBody: "Debes iniciar sesión para ver esta página.",
     subtitle: "Inicia sesión para guardar favoritos y enviar recursos.",
     google: "Continuar con Google",
     github: "Continuar con GitHub",

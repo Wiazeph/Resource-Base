@@ -122,6 +122,8 @@ export const en = {
 
   auth: {
     title: "Welcome 👋",
+    requiredTitle: "Sign in required",
+    requiredBody: "You need to be signed in to view this page.",
     subtitle: "Sign in to save favorites and submit resources.",
     google: "Continue with Google",
     github: "Continue with GitHub",

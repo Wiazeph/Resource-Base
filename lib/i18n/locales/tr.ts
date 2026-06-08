@@ -122,6 +122,8 @@ export const tr = {
 
   auth: {
     title: "Hoş geldin 👋",
+    requiredTitle: "Giriş yapmanız gerekiyor",
+    requiredBody: "Bu sayfayı görüntülemek için giriş yapmalısınız.",
     subtitle: "Favori kaydetmek ve kaynak önermek için giriş yap.",
     google: "Google ile devam et",
     github: "GitHub ile devam et",

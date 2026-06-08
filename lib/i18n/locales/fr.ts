@@ -122,6 +122,8 @@ export const fr = {
 
   auth: {
     title: "Bienvenue 👋",
+    requiredTitle: "Connexion requise",
+    requiredBody: "Vous devez être connecté pour voir cette page.",
     subtitle: "Connectez-vous pour enregistrer des favoris et proposer des ressources.",
     google: "Continuer avec Google",
     github: "Continuer avec GitHub",

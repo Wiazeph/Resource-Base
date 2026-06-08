@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CommandPalette } from "@/components/command-palette";
 import { AuthProvider } from "@/components/auth/auth-provider";
+import { AuthRequiredPrompt } from "@/components/auth/auth-required-prompt";
 import { ClickCountsProvider } from "@/components/click-counts-provider";
 import { ContributorsProvider } from "@/components/contributors-provider";
 import { FavoritesProvider } from "@/components/favorites-provider";
@@ -34,6 +36,9 @@ export default async function SiteLayout({
           <div className="flex min-h-screen flex-col">
             <SiteHeader />
             <CommandPalette resources={resources} />
+            <Suspense>
+              <AuthRequiredPrompt />
+            </Suspense>
             <main className="flex-1 pt-6">{children}</main>
             <SiteFooter />
           </div>
