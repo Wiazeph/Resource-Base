@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useFavorites } from "@/lib/favorites";
+import { useFavorites } from "@/components/favorites-provider";
 import { useClickCounts } from "@/components/click-counts-provider";
 import { useContributors } from "@/components/contributors-provider";
 import { useAuth } from "@/components/auth/auth-provider";

@@ -89,6 +89,7 @@ export const en = {
   tag: { home: "Home", resources: "{{count}} resources" },
 
   favorites: {
+    signInPrompt: "Sign in to see your favorites.",
     title: "Your favorites",
     empty: "You haven't saved any resources yet.",
     browse: "Browse resources",

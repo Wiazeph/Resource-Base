@@ -89,6 +89,7 @@ export const tr = {
   tag: { home: "Anasayfa", resources: "{{count}} kaynak" },
 
   favorites: {
+    signInPrompt: "Favorilerini görmek için giriş yap.",
     title: "Favorilerin",
     empty: "Henüz hiç kaynak kaydetmedin.",
     browse: "Kaynaklara göz at",

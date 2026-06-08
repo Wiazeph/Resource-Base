@@ -89,6 +89,7 @@ export const es = {
   tag: { home: "Inicio", resources: "{{count}} recursos" },
 
   favorites: {
+    signInPrompt: "Inicia sesión para ver tus favoritos.",
     title: "Tus favoritos",
     empty: "Aún no has guardado ningún recurso.",
     browse: "Explorar recursos",

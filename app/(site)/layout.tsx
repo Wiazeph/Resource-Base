@@ -4,6 +4,7 @@ import { CommandPalette } from "@/components/command-palette";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { ClickCountsProvider } from "@/components/click-counts-provider";
 import { ContributorsProvider } from "@/components/contributors-provider";
+import { FavoritesProvider } from "@/components/favorites-provider";
 import { I18nProvider } from "@/components/i18n-provider";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { allResourcesQuery } from "@/sanity/lib/queries";
@@ -27,6 +28,7 @@ export default async function SiteLayout({
   return (
     <I18nProvider>
       <AuthProvider>
+        <FavoritesProvider>
         <ClickCountsProvider>
           <ContributorsProvider>
           <div className="flex min-h-screen flex-col">
@@ -37,6 +39,7 @@ export default async function SiteLayout({
           </div>
           </ContributorsProvider>
         </ClickCountsProvider>
+        </FavoritesProvider>
       </AuthProvider>
     </I18nProvider>
   );

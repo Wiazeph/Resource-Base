@@ -89,6 +89,7 @@ export const de = {
   tag: { home: "Startseite", resources: "{{count}} Ressourcen" },
 
   favorites: {
+    signInPrompt: "Melde dich an, um deine Favoriten zu sehen.",
     title: "Deine Favoriten",
     empty: "Du hast noch keine Ressourcen gespeichert.",
     browse: "Ressourcen durchsuchen",

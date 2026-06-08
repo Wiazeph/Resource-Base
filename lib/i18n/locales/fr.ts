@@ -89,6 +89,7 @@ export const fr = {
   tag: { home: "Accueil", resources: "{{count}} ressources" },
 
   favorites: {
+    signInPrompt: "Connectez-vous pour voir vos favoris.",
     title: "Vos favoris",
     empty: "Vous n'avez encore enregistré aucune ressource.",
     browse: "Parcourir les ressources",
