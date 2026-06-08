@@ -110,6 +110,8 @@ export const de = {
     url: "URL",
     category: "Kategorie",
     selectCategory: "Kategorie auswählen…",
+    otherCategory: "Andere…",
+    customCategoryPlaceholder: "Kategorie eingeben",
     note: "Notiz",
     notePlaceholder: "Warum ist diese Ressource großartig?",
     email: "Deine E-Mail (optional)",

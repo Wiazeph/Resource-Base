@@ -10,17 +10,26 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/components/auth/auth-provider";
 import type { Category } from "@/lib/types";
 
+const OTHER = "__other__";
+
 export function SubmitForm({ categories }: { categories: Category[] }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [pending, setPending] = useState(false);
+  const [categoryChoice, setCategoryChoice] = useState("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
-    const data = Object.fromEntries(new FormData(form));
+    const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
     // Honeypot: bots fill hidden fields.
     if (data.company) return;
+
+    // "Other" → use the free-text category the user typed.
+    const suggestedCategory =
+      data.categoryChoice === OTHER
+        ? (data.customCategory ?? "").trim()
+        : (data.categoryChoice ?? "");
 
     setPending(true);
     try {
@@ -29,7 +38,10 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
         headers: { "Content-Type": "application/json" },
         // Attach the signed-in user's id + email so we can notify them on approval.
         body: JSON.stringify({
-          ...data,
+          name: data.name,
+          url: data.url,
+          suggestedCategory,
+          note: data.note,
           userId: user?.id ?? null,
           email: data.email || user?.email || "",
         }),
@@ -37,6 +49,7 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
       if (!res.ok) throw new Error(await res.text());
       toast.success(t("submit.success"));
       form.reset();
+      setCategoryChoice("");
     } catch {
       toast.error(t("submit.error"));
     } finally {
@@ -69,9 +82,10 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
           {t("submit.category")}
         </label>
         <select
-          name="suggestedCategory"
-          className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm"
-          defaultValue=""
+          name="categoryChoice"
+          value={categoryChoice}
+          onChange={(e) => setCategoryChoice(e.target.value)}
+          className="h-9 w-full cursor-pointer rounded-md border border-border bg-background px-3 text-sm"
         >
           <option value="">{t("submit.selectCategory")}</option>
           {categories
@@ -81,7 +95,18 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
                 {c.title}
               </option>
             ))}
+          <option value={OTHER}>{t("submit.otherCategory")}</option>
         </select>
+        {categoryChoice === OTHER && (
+          <Input
+            name="customCategory"
+            className="mt-2"
+            required
+            maxLength={60}
+            placeholder={t("submit.customCategoryPlaceholder")}
+            autoFocus
+          />
+        )}
       </div>
       <div>
         <label className="mb-1.5 block text-sm font-medium">

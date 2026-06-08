@@ -110,6 +110,8 @@ export const tr = {
     url: "URL",
     category: "Kategori",
     selectCategory: "Bir kategori seç…",
+    otherCategory: "Diğer…",
+    customCategoryPlaceholder: "Bir kategori yaz",
     note: "Not",
     notePlaceholder: "Bu kaynak neden harika?",
     email: "E-postan (opsiyonel)",
