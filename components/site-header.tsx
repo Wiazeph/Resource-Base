@@ -15,8 +15,11 @@ function openSearch() {
 export function SiteHeader() {
   const { t } = useTranslation();
   return (
-    <header className="sticky top-3 z-40 px-3">
-      <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 rounded-2xl border border-border/60 bg-background/70 px-3 shadow-lg shadow-black/5 ring-1 ring-black/[0.02] backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 sm:px-4">
+    <>
+      {/* Opaque strip masking content that scrolls beneath the floating header. */}
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-30 h-20 bg-background" />
+      <header className="sticky top-3 z-40 px-3">
+        <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 rounded-2xl border border-border/70 bg-background/95 px-3 shadow-lg shadow-black/5 ring-1 ring-black/[0.03] backdrop-blur-xl supports-[backdrop-filter]:bg-background/85 sm:px-4">
         <Link
           href="/"
           className="flex items-center gap-2 font-semibold transition-opacity hover:opacity-80"
@@ -30,7 +33,7 @@ export function SiteHeader() {
         <div className="ml-auto flex items-center gap-2">
           <button
             onClick={openSearch}
-            className="group flex h-9 items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:bg-muted hover:text-foreground"
+            className="group flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:bg-muted hover:text-foreground"
           >
             <Search className="size-4 transition-transform group-hover:scale-110" />
             <span className="hidden sm:inline">{t("header.searchPlaceholder")}</span>
@@ -44,6 +47,7 @@ export function SiteHeader() {
           <UserMenu />
         </div>
       </div>
-    </header>
+      </header>
+    </>
   );
 }
