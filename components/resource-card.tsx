@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useFavorites } from "@/lib/favorites";
 import { useClickCounts } from "@/components/click-counts-provider";
-import { createClient } from "@/lib/supabase/client";
 import type { Resource } from "@/lib/types";
 
 /** Favicon via Google's service — zero-config thumbnails for any URL. */
@@ -29,15 +28,19 @@ export function ResourceCard({ resource }: { resource: Resource }) {
   const broken = resource.linkStatus === "broken";
   const clicks = get(resource._id);
 
-  // Fire-and-forget click increment. The link opens in a new tab, so there's
-  // no navigation race — we don't preventDefault.
+  // Fire-and-forget click increment via our API (server-side IP debounce
+  // guards against repeat/refresh spam). The link opens in a new tab, so
+  // there's no navigation race — we don't preventDefault.
   function registerClick() {
     if (counted.current) return;
     counted.current = true;
     bump(resource._id);
-    createClient()
-      .rpc("increment_click", { rid: resource._id })
-      .then(() => {});
+    fetch("/api/click", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ resourceId: resource._id }),
+      keepalive: true,
+    }).catch(() => {});
   }
 
   return (
