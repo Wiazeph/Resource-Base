@@ -4,15 +4,22 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import Fuse from "fuse.js";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ResourceCard } from "@/components/resource-card";
+import { useClickCounts } from "@/components/click-counts-provider";
 import { cn } from "@/lib/utils";
 import type { Category, Resource, Tag } from "@/lib/types";
 
-type Sort = "featured" | "name" | "recent";
+type Sort = "featured" | "popular" | "name" | "recent";
 
 const PRICING_VALUES = ["free", "freemium", "paid"] as const;
 const LANG_VALUES = ["en", "tr"] as const;
@@ -33,6 +40,7 @@ export function BrowseClient({
   intro?: React.ReactNode;
 }) {
   const { t } = useTranslation();
+  const { get: getClicks } = useClickCounts();
   const router = useRouter();
   const params = useSearchParams();
 
@@ -56,6 +64,17 @@ export function BrowseClient({
     (params.get("sort") as Sort) ?? "featured",
   );
   const [showFilters, setShowFilters] = useState(false);
+
+  // Pagination — 90 per page on desktop (30×3), 30 on mobile.
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(90);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 640px)");
+    const apply = () => setPageSize(mq.matches ? 90 : 30);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
 
   // Keep the URL in sync so filtered views are shareable.
   useEffect(() => {
@@ -106,13 +125,27 @@ export function BrowseClient({
         list.sort((a, b) =>
           (b.addedAt ?? "").localeCompare(a.addedAt ?? ""),
         );
+      else if (sort === "popular")
+        list.sort((a, b) => getClicks(b._id) - getClicks(a._id));
       else
         list.sort(
           (a, b) => Number(b.featured ?? 0) - Number(a.featured ?? 0),
         );
     }
     return list;
-  }, [q, cat, activeTags, lang, pricing, sort, fuse, resources]);
+  }, [q, cat, activeTags, lang, pricing, sort, fuse, resources, getClicks]);
+
+  // Reset to the first page whenever the result set changes.
+  useEffect(() => {
+    setPage(1);
+  }, [q, cat, activeTags, lang, pricing, sort]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const paged = filtered.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
 
   const topCategories = categories
     .filter((c) => !c.parentSlug)
@@ -182,6 +215,7 @@ export function BrowseClient({
             aria-label={t("browse.sort.featured")}
           >
             <option value="featured">{t("browse.sort.featured")}</option>
+            <option value="popular">{t("browse.sort.popular")}</option>
             <option value="name">{t("browse.sort.name")}</option>
             <option value="recent">{t("browse.sort.recent")}</option>
           </select>
@@ -264,11 +298,30 @@ export function BrowseClient({
           {t("browse.empty")}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((r) => (
-            <ResourceCard key={r._id} resource={r} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {paged.map((r) => (
+              <ResourceCard key={r._id} resource={r} />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <Pagination
+              page={currentPage}
+              totalPages={totalPages}
+              onChange={(p) => {
+                setPage(p);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              prevLabel={t("browse.prev")}
+              nextLabel={t("browse.next")}
+              pageLabel={t("browse.page", {
+                page: currentPage,
+                total: totalPages,
+              })}
+            />
+          )}
+        </>
       )}
     </div>
   );
@@ -306,6 +359,48 @@ function Facet({
           </button>
         ))}
       </div>
+    </div>
+  );
+}
+
+function Pagination({
+  page,
+  totalPages,
+  onChange,
+  prevLabel,
+  nextLabel,
+  pageLabel,
+}: {
+  page: number;
+  totalPages: number;
+  onChange: (page: number) => void;
+  prevLabel: string;
+  nextLabel: string;
+  pageLabel: string;
+}) {
+  return (
+    <div className="mt-10 flex items-center justify-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={page <= 1}
+        onClick={() => onChange(page - 1)}
+      >
+        <ChevronLeft className="size-4" />
+        {prevLabel}
+      </Button>
+      <span className="px-3 text-sm text-muted-foreground tabular-nums">
+        {pageLabel}
+      </span>
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={page >= totalPages}
+        onClick={() => onChange(page + 1)}
+      >
+        {nextLabel}
+        <ChevronRight className="size-4" />
+      </Button>
     </div>
   );
 }
