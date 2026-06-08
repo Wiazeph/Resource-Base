@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useFavorites } from "@/lib/favorites";
 import { useClickCounts } from "@/components/click-counts-provider";
+import { useAuth } from "@/components/auth/auth-provider";
 import type { Resource } from "@/lib/types";
 
 /** Favicon via Google's service — zero-config thumbnails for any URL. */
@@ -22,6 +23,7 @@ function favicon(url: string) {
 export function ResourceCard({ resource }: { resource: Resource }) {
   const { has, toggle } = useFavorites();
   const { get, bump } = useClickCounts();
+  const { user, openAuth } = useAuth();
   const counted = useRef(false);
   const fav = has(resource._id);
   const icon = favicon(resource.url);
@@ -81,9 +83,20 @@ export function ResourceCard({ resource }: { resource: Resource }) {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
+            // Favorites are account-only — prompt sign-in for guests.
+            if (!user) {
+              openAuth();
+              return;
+            }
             toggle(resource._id);
           }}
-          aria-label={fav ? "Remove favorite" : "Add favorite"}
+          aria-label={
+            !user
+              ? "Sign in to save"
+              : fav
+                ? "Remove favorite"
+                : "Add favorite"
+          }
           className="relative z-10 -m-1 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
         >
           <Star

@@ -11,7 +11,6 @@ import {
 import type { Session, User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { AuthDialog } from "@/components/auth/auth-dialog";
-import { migrateLocalFavorites } from "@/lib/favorites";
 
 type AuthContextValue = {
   user: User | null;
@@ -47,8 +46,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (event === "SIGNED_IN" && session?.user) {
-        // One-time: pull any anonymous localStorage favorites into the account.
-        migrateLocalFavorites(supabase, session.user.id);
         setDialogOpen(false);
       }
     });
