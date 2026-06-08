@@ -8,7 +8,7 @@ import type { Category } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Submit a resource",
-  description: "Suggest a free resource to add to the directory.",
+  description: "Suggest a resource to add to the directory.",
 };
 
 export default async function SubmitPage() {

@@ -17,7 +17,7 @@ export const es = {
 
   categories: {
     title: "Categorías",
-    subtitle: "Desde proyectos absurdos hasta ciencia seria — explora todo el directorio por categoría.",
+    subtitle: "Explora todo el directorio por categoría — recursos para todo.",
     count: "{{count}} recursos",
     domain: { developer: "Desarrollo", designer: "Diseño", general: "General" },
   },
@@ -39,11 +39,11 @@ export const es = {
   },
 
   home: {
-    badge: "{{count}}+ recursos gratuitos seleccionados",
+    badge: "{{count}}+ recursos seleccionados",
     titleLead: "Encuentra tu próximo",
     titleHighlight: "recurso.",
     subtitle:
-      "Miles de recursos gratuitos para todo — desde juguetes web peculiares hasta ciencia seria. Búscalo todo en un solo lugar.",
+      "Todos los recursos que necesitarás — para todo, en un solo lugar!",
   },
 
   browse: {
@@ -105,7 +105,7 @@ export const es = {
   submit: {
     title: "Sugerir un recurso",
     subtitle:
-      "¿Conoces un gran recurso gratuito que falta? Sugiérelo — revisamos cada propuesta antes de publicarla.",
+      "¿Conoces un gran recurso que falta? Sugiérelo — revisamos cada propuesta antes de publicarla.",
     name: "Nombre",
     url: "URL",
     category: "Categoría",
@@ -148,7 +148,7 @@ export const es = {
 
   footer: {
     tagline:
-      "Un directorio curado y con búsqueda de recursos gratuitos para todo — desde juguetes web peculiares hasta ciencia seria.",
+      "Recursos para todo — en un solo lugar!",
     source: "Código fuente",
     reportIssue: "Reportar un problema",
     sponsor: "Patrocinar",

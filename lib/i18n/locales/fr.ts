@@ -17,7 +17,7 @@ export const fr = {
 
   categories: {
     title: "Catégories",
-    subtitle: "Des projets farfelus à la science sérieuse — explorez tout le répertoire par catégorie.",
+    subtitle: "Explorez tout le répertoire par catégorie — des ressources pour tout.",
     count: "{{count}} ressources",
     domain: { developer: "Développement", designer: "Design", general: "Général" },
   },
@@ -39,11 +39,11 @@ export const fr = {
   },
 
   home: {
-    badge: "{{count}}+ ressources gratuites triées sur le volet",
+    badge: "{{count}}+ ressources triées sur le volet",
     titleLead: "Trouvez votre prochaine",
     titleHighlight: "ressource.",
     subtitle:
-      "Des milliers de ressources gratuites pour tout — des gadgets web farfelus à la science sérieuse. Cherchez tout au même endroit.",
+      "Toutes les ressources dont vous aurez besoin — pour tout, au même endroit !",
   },
 
   browse: {
@@ -105,7 +105,7 @@ export const fr = {
   submit: {
     title: "Proposer une ressource",
     subtitle:
-      "Vous connaissez une superbe ressource gratuite qui manque ? Proposez-la — nous examinons chaque proposition avant publication.",
+      "Vous connaissez une superbe ressource qui manque ? Proposez-la — nous examinons chaque proposition avant publication.",
     name: "Nom",
     url: "URL",
     category: "Catégorie",
@@ -148,7 +148,7 @@ export const fr = {
 
   footer: {
     tagline:
-      "Un répertoire organisé et consultable de ressources gratuites pour tout — des gadgets web farfelus à la science sérieuse.",
+      "Des ressources pour tout — au même endroit !",
     source: "Code source",
     reportIssue: "Signaler un problème",
     sponsor: "Devenir sponsor",

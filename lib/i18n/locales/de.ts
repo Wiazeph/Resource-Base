@@ -17,7 +17,7 @@ export const de = {
 
   categories: {
     title: "Kategorien",
-    subtitle: "Von verrückten Nebenprojekten bis zur ernsthaften Wissenschaft — durchstöbere das gesamte Verzeichnis nach Kategorie.",
+    subtitle: "Durchstöbere das gesamte Verzeichnis nach Kategorie — Ressourcen für alles.",
     count: "{{count}} Ressourcen",
     domain: { developer: "Entwicklung", designer: "Design", general: "Allgemein" },
   },
@@ -39,11 +39,11 @@ export const de = {
   },
 
   home: {
-    badge: "{{count}}+ handverlesene kostenlose Ressourcen",
+    badge: "{{count}}+ handverlesene Ressourcen",
     titleLead: "Finde deine nächste",
     titleHighlight: "Ressource.",
     subtitle:
-      "Tausende kostenlose Ressourcen für alles — von schrägen Web-Spielereien bis zur ernsthaften Wissenschaft. Alles an einem Ort durchsuchen.",
+      "Jede Ressource, die du je brauchst — für alles, an einem Ort!",
   },
 
   browse: {
@@ -105,7 +105,7 @@ export const de = {
   submit: {
     title: "Ressource vorschlagen",
     subtitle:
-      "Kennst du eine großartige kostenlose Ressource, die fehlt? Schlage sie vor — wir prüfen jeden Vorschlag, bevor er live geht.",
+      "Kennst du eine großartige Ressource, die fehlt? Schlage sie vor — wir prüfen jeden Vorschlag, bevor er live geht.",
     name: "Name",
     url: "URL",
     category: "Kategorie",
@@ -148,7 +148,7 @@ export const de = {
 
   footer: {
     tagline:
-      "Ein kuratiertes, durchsuchbares Verzeichnis kostenloser Ressourcen für alles — von schrägen Web-Spielereien bis zur ernsthaften Wissenschaft.",
+      "Ressourcen für alles — alles an einem Ort!",
     source: "Quellcode",
     reportIssue: "Problem melden",
     sponsor: "Sponsor werden",

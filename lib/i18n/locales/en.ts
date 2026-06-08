@@ -17,7 +17,7 @@ export const en = {
 
   categories: {
     title: "Categories",
-    subtitle: "From silly side-projects to serious science — explore the full directory by category.",
+    subtitle: "Explore the full directory by category — resources for anything and everything.",
     count: "{{count}} resources",
     domain: { developer: "Development", designer: "Design", general: "General" },
   },
@@ -39,11 +39,11 @@ export const en = {
   },
 
   home: {
-    badge: "{{count}}+ hand-picked free resources",
+    badge: "{{count}}+ hand-picked resources",
     titleLead: "Find your next",
     titleHighlight: "resource.",
     subtitle:
-      "Thousands of free resources for everything — from quirky web toys to serious science. Search it all in one place.",
+      "Every resource you could ever need — for anything and everything, all in one place!",
   },
 
   browse: {
@@ -105,7 +105,7 @@ export const en = {
   submit: {
     title: "Submit a resource",
     subtitle:
-      "Know a great free resource that's missing? Suggest it — we review every submission before it goes live.",
+      "Know a great resource that’s missing? Suggest it — we review every submission before it goes live.",
     name: "Name",
     url: "URL",
     category: "Category",
@@ -148,7 +148,7 @@ export const en = {
 
   footer: {
     tagline:
-      "A curated, searchable directory of free resources for everything — from quirky web toys to serious science.",
+      "Resources for anything and everything — all in one place!",
     source: "Source",
     reportIssue: "Report an issue",
     sponsor: "Sponsor",

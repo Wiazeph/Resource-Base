@@ -17,7 +17,7 @@ export const tr = {
 
   categories: {
     title: "Kategoriler",
-    subtitle: "Saçma yan projelerden ciddi bilime kadar — tüm dizini kategorilere göre keşfet.",
+    subtitle: "Tüm dizini kategorilere göre keşfet — her şey için kaynaklar.",
     count: "{{count}} kaynak",
     domain: { developer: "Geliştirme", designer: "Tasarım", general: "Genel" },
   },
@@ -39,11 +39,11 @@ export const tr = {
   },
 
   home: {
-    badge: "{{count}}+ özenle seçilmiş ücretsiz kaynak",
+    badge: "{{count}}+ özenle seçilmiş kaynak",
     titleLead: "Bir sonraki",
     titleHighlight: "kaynağını bul.",
     subtitle:
-      "Her şey için binlerce ücretsiz kaynak — tuhaf web araçlarından ciddi bilime. Hepsini tek yerde ara.",
+      "İhtiyacın olabilecek her kaynak — her şey için, hepsi tek bir yerde!",
   },
 
   browse: {
@@ -105,7 +105,7 @@ export const tr = {
   submit: {
     title: "Kaynak öner",
     subtitle:
-      "Eksik olan harika bir ücretsiz kaynak mı biliyorsun? Öner — her öneriyi yayına almadan önce inceliyoruz.",
+      "Eksik olan harika bir kaynak mı biliyorsun? Öner — her öneriyi yayına almadan önce inceliyoruz.",
     name: "İsim",
     url: "URL",
     category: "Kategori",
@@ -148,7 +148,7 @@ export const tr = {
 
   footer: {
     tagline:
-      "Her şey için ücretsiz kaynakların özenle seçilmiş, aranabilir bir dizini — tuhaf web araçlarından ciddi bilime.",
+      "Her şey için kaynaklar — hepsi tek bir yerde!",
     source: "Kaynak kod",
     reportIssue: "Sorun bildir",
     sponsor: "Sponsor ol",
