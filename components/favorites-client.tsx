@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { Star } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { ResourceGrid } from "@/components/resource-grid";
 import { Button } from "@/components/ui/button";
 import { useFavorites } from "@/lib/favorites";
 import type { Resource } from "@/lib/types";
 
 export function FavoritesClient({ resources }: { resources: Resource[] }) {
+  const { t } = useTranslation();
   const { ids } = useFavorites();
   const favorites = resources.filter((r) => ids.includes(r._id));
 
@@ -15,16 +17,16 @@ export function FavoritesClient({ resources }: { resources: Resource[] }) {
     <div className="mx-auto max-w-6xl px-4 py-10">
       <div className="mb-8 flex items-center gap-3">
         <Star className="size-6 text-primary" />
-        <h1 className="text-3xl font-bold tracking-tight">Your favorites</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {t("favorites.title")}
+        </h1>
       </div>
 
       {favorites.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border py-20 text-center">
-          <p className="text-muted-foreground">
-            You haven&apos;t saved any resources yet.
-          </p>
+          <p className="text-muted-foreground">{t("favorites.empty")}</p>
           <Button asChild className="mt-4">
-            <Link href="/">Browse resources</Link>
+            <Link href="/">{t("favorites.browse")}</Link>
           </Button>
         </div>
       ) : (

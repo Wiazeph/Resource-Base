@@ -1,4 +1,7 @@
+"use client";
+
 import { Boxes, CircleDot, Globe, Heart, Mail } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const REPO_URL = "https://github.com/Wiazeph/Resource-Base";
 const ISSUES_URL = "https://github.com/Wiazeph/Resource-Base/issues";
@@ -33,6 +36,7 @@ const linkClass =
   "inline-flex items-center gap-2 rounded-md px-2 py-1 outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring";
 
 export function SiteFooter() {
+  const { t } = useTranslation();
   return (
     <footer className="px-4 pb-8 pt-4">
       <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-3 rounded-2xl border border-border/60 bg-card/40 px-4 py-8 text-sm text-muted-foreground backdrop-blur-sm sm:px-6">
@@ -44,8 +48,7 @@ export function SiteFooter() {
           <span className="font-semibold">Resource Base</span>
         </div>
         <p className="max-w-md text-center text-xs text-muted-foreground/80">
-          A curated, searchable directory of the best free resources for
-          developers and designers.
+          {t("footer.tagline")}
         </p>
 
         {/* Row 1 — contact + personal site */}
@@ -75,7 +78,7 @@ export function SiteFooter() {
             className={linkClass}
           >
             <GithubIcon />
-            <span>Source</span>
+            <span>{t("footer.source")}</span>
           </a>
           <Dot />
           <a
@@ -85,7 +88,7 @@ export function SiteFooter() {
             className={linkClass}
           >
             <CircleDot className="size-4" aria-hidden="true" />
-            <span>Report an issue</span>
+            <span>{t("footer.reportIssue")}</span>
           </a>
           <Dot />
           <a
@@ -95,7 +98,7 @@ export function SiteFooter() {
             className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 font-medium text-primary outline-none transition-colors hover:bg-primary/20 focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Heart className="size-4 fill-current" aria-hidden="true" />
-            <span>Sponsor</span>
+            <span>{t("footer.sponsor")}</span>
           </a>
         </div>
       </div>

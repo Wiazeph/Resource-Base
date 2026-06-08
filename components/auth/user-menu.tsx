@@ -11,10 +11,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useNotifications } from "@/lib/notifications";
 
 export function UserMenu() {
+  const { t } = useTranslation();
   const { user, loading, openAuth, signOut } = useAuth();
   const { unread } = useNotifications();
 
@@ -25,7 +27,7 @@ export function UserMenu() {
   if (!user) {
     return (
       <Button size="sm" variant="outline" onClick={openAuth}>
-        Sign in
+        {t("header.signIn")}
       </Button>
     );
   }
@@ -60,7 +62,7 @@ export function UserMenu() {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/notifications">
-            <Bell className="size-4" /> Notifications
+            <Bell className="size-4" /> {t("nav.notifications")}
             {unread > 0 && (
               <span className="ml-auto rounded-full bg-primary px-1.5 text-[11px] font-medium text-primary-foreground">
                 {unread}
@@ -70,17 +72,17 @@ export function UserMenu() {
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/favorites">
-            <Star className="size-4" /> Favorites
+            <Star className="size-4" /> {t("nav.favorites")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/submit">
-            <Plus className="size-4" /> Submit a resource
+            <Plus className="size-4" /> {t("nav.submit")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signOut()}>
-          <LogOut className="size-4" /> Sign out
+          <LogOut className="size-4" /> {t("nav.signOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { Construction, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 // Bump this key when you want the banner to re-appear for everyone who
 // previously dismissed it (e.g. for a new announcement).
 const DISMISS_KEY = "rb:announcement:relaunch-2026-06";
 
 export function AnnouncementBanner() {
+  const { t } = useTranslation();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -21,11 +23,8 @@ export function AnnouncementBanner() {
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2.5 text-sm">
         <Construction className="size-4 shrink-0 text-primary" />
         <p className="flex-1 text-foreground/90">
-          <span className="font-medium">Resource Base is being renewed 🚧</span>{" "}
-          <span className="text-muted-foreground">
-            We&apos;re actively rebuilding and improving the site — things may
-            change or break while we work. Thanks for your patience 💜
-          </span>
+          <span className="font-medium">{t("banner.title")}</span>{" "}
+          <span className="text-muted-foreground">{t("banner.body")}</span>
         </p>
         <button
           onClick={() => {

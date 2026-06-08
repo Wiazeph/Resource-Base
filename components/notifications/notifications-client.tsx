@@ -3,12 +3,14 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { Bell } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useNotifications } from "@/lib/notifications";
 import { cn } from "@/lib/utils";
 
 export function NotificationsClient() {
+  const { t } = useTranslation();
   const { user, loading, openAuth } = useAuth();
   const { items, markAllRead } = useNotifications();
 
@@ -22,9 +24,9 @@ export function NotificationsClient() {
     return (
       <div className="mx-auto max-w-2xl px-4 py-20 text-center">
         <Bell className="mx-auto mb-4 size-8 text-muted-foreground" />
-        <p className="text-muted-foreground">Sign in to see your notifications.</p>
+        <p className="text-muted-foreground">{t("notifications.signInPrompt")}</p>
         <Button className="mt-4" onClick={openAuth}>
-          Sign in
+          {t("header.signIn")}
         </Button>
       </div>
     );
@@ -34,12 +36,14 @@ export function NotificationsClient() {
     <div className="mx-auto max-w-2xl px-4 py-10">
       <div className="mb-8 flex items-center gap-3">
         <Bell className="size-6 text-primary" />
-        <h1 className="text-3xl font-bold tracking-tight">Notifications</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {t("notifications.title")}
+        </h1>
       </div>
 
       {items.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border py-20 text-center text-muted-foreground">
-          No notifications yet.
+          {t("notifications.empty")}
         </div>
       ) : (
         <ul className="space-y-2">
@@ -74,7 +78,7 @@ export function NotificationsClient() {
 
       <div className="mt-8 text-center">
         <Button asChild variant="ghost" size="sm">
-          <Link href="/">Back to home</Link>
+          <Link href="/">{t("notifications.back")}</Link>
         </Button>
       </div>
     </div>

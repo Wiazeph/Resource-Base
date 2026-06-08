@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowUpRight, Star, TrendingUp, TriangleAlert } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 import { useFavorites } from "@/lib/favorites";
 import { useClickCounts } from "@/components/click-counts-provider";
 import { useAuth } from "@/components/auth/auth-provider";
@@ -21,6 +22,7 @@ function favicon(url: string) {
 }
 
 export function ResourceCard({ resource }: { resource: Resource }) {
+  const { t } = useTranslation();
   const { has, toggle } = useFavorites();
   const { get, bump } = useClickCounts();
   const { user, openAuth } = useAuth();
@@ -74,7 +76,7 @@ export function ResourceCard({ resource }: { resource: Resource }) {
           </a>
           {resource.author && (
             <p className="truncate text-xs text-muted-foreground">
-              by {resource.author}
+              {t("card.by", { author: resource.author })}
             </p>
           )}
         </div>
@@ -92,10 +94,10 @@ export function ResourceCard({ resource }: { resource: Resource }) {
           }}
           aria-label={
             !user
-              ? "Sign in to save"
+              ? t("card.signInToSave")
               : fav
-                ? "Remove favorite"
-                : "Add favorite"
+                ? t("card.removeFavorite")
+                : t("card.addFavorite")
           }
           className="relative z-10 -m-1 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
         >
@@ -114,7 +116,7 @@ export function ResourceCard({ resource }: { resource: Resource }) {
       <div className="mt-3 flex flex-wrap items-center gap-1.5">
         {broken && (
           <Badge variant="destructive" className="gap-1">
-            <TriangleAlert className="size-3" /> broken
+            <TriangleAlert className="size-3" /> {t("card.broken")}
           </Badge>
         )}
         {resource.language?.includes("tr") && (
@@ -123,17 +125,17 @@ export function ResourceCard({ resource }: { resource: Resource }) {
           </Badge>
         )}
         {resource.pricing && resource.pricing !== "free" && (
-          <Badge variant="secondary" className="text-[10px] capitalize">
-            {resource.pricing === "freemium" ? "free option" : resource.pricing}
+          <Badge variant="secondary" className="text-[10px]">
+            {t(`pricing.${resource.pricing}`)}
           </Badge>
         )}
-        {resource.tags?.slice(0, 3).map((t) => (
+        {resource.tags?.slice(0, 3).map((tag) => (
           <Link
-            key={t._id}
-            href={`/tag/${t.slug}`}
+            key={tag._id}
+            href={`/tag/${tag.slug}`}
             className="relative z-10 rounded-full bg-accent px-2 py-0.5 text-[11px] text-accent-foreground transition-colors hover:bg-accent/70"
           >
-            {t.title}
+            {tag.title}
           </Link>
         ))}
         {clicks >= 1 && (

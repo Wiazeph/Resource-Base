@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import Fuse from "fuse.js";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -13,22 +14,14 @@ import type { Category, Resource, Tag } from "@/lib/types";
 
 type Sort = "featured" | "name" | "recent";
 
-const PRICING = [
-  { value: "free", label: "Free" },
-  { value: "freemium", label: "Free option" },
-  { value: "paid", label: "Paid" },
-];
-const LANGS = [
-  { value: "en", label: "English" },
-  { value: "tr", label: "Turkish" },
-];
+const PRICING_VALUES = ["free", "freemium", "paid"] as const;
+const LANG_VALUES = ["en", "tr"] as const;
 
 export function BrowseClient({
   resources,
   categories,
   tags,
   basePath = "/",
-  heading = "Browse resources",
   intro,
 }: {
   resources: Resource[];
@@ -36,12 +29,21 @@ export function BrowseClient({
   tags: Tag[];
   /** Path the filter state syncs to (so the homepage stays on "/"). */
   basePath?: string;
-  heading?: string;
   /** Optional intro node rendered above the search bar (used on the homepage). */
   intro?: React.ReactNode;
 }) {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useSearchParams();
+
+  const PRICING = PRICING_VALUES.map((value) => ({
+    value,
+    label: t(`pricing.${value}`),
+  }));
+  const LANGS = LANG_VALUES.map((value) => ({
+    value,
+    label: t(`languages.${value}`),
+  }));
 
   const [q, setQ] = useState(params.get("q") ?? "");
   const [cat, setCat] = useState(params.get("category") ?? "");
@@ -141,10 +143,14 @@ export function BrowseClient({
     <div className="mx-auto max-w-6xl px-4 py-10">
       {intro ?? (
         <div className="mb-6">
-          <h1 className="text-3xl font-bold tracking-tight">{heading}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {t("browse.heading")}
+          </h1>
           <p className="mt-1 text-muted-foreground">
-            {resources.length} resources across {topCategories.length}{" "}
-            categories.
+            {t("browse.summary", {
+              resources: resources.length,
+              categories: topCategories.length,
+            })}
           </p>
         </div>
       )}
@@ -157,7 +163,7 @@ export function BrowseClient({
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search by name, tag, description…"
+              placeholder={t("browse.searchPlaceholder")}
               className="pl-9"
             />
           </div>
@@ -167,24 +173,24 @@ export function BrowseClient({
             className={cn(showFilters && "border-primary text-primary")}
           >
             <SlidersHorizontal className="size-4" />
-            Filters
+            {t("browse.filters")}
           </Button>
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as Sort)}
             className="rounded-md border border-border bg-background px-3 text-sm"
-            aria-label="Sort"
+            aria-label={t("browse.sort.featured")}
           >
-            <option value="featured">Featured</option>
-            <option value="name">Name A→Z</option>
-            <option value="recent">Recently added</option>
+            <option value="featured">{t("browse.sort.featured")}</option>
+            <option value="name">{t("browse.sort.name")}</option>
+            <option value="recent">{t("browse.sort.recent")}</option>
           </select>
         </div>
 
         {showFilters && (
           <div className="mt-3 space-y-3 rounded-lg border border-border bg-card p-4">
             <Facet
-              label="Category"
+              label={t("browse.facet.category")}
               options={[
                 ...topCategories.map((c) => ({ value: c.slug, label: c.title })),
                 ...subCategories.map((c) => ({
@@ -196,35 +202,35 @@ export function BrowseClient({
               onChange={(v) => setCat(v === cat ? "" : v)}
             />
             <Facet
-              label="Pricing"
+              label={t("browse.facet.pricing")}
               options={PRICING}
               value={pricing}
               onChange={(v) => setPricing(v === pricing ? "" : v)}
             />
             <Facet
-              label="Language"
+              label={t("browse.facet.language")}
               options={LANGS}
               value={lang}
               onChange={(v) => setLang(v === lang ? "" : v)}
             />
             <div>
               <p className="mb-1.5 text-xs font-medium text-muted-foreground">
-                Tags
+                {t("browse.facet.tags")}
               </p>
               <div className="flex flex-wrap gap-1.5">
-                {popularTags.map((t) => (
+                {popularTags.map((tag) => (
                   <button
-                    key={t._id}
-                    onClick={() => toggleTag(t.slug)}
+                    key={tag._id}
+                    onClick={() => toggleTag(tag.slug)}
                     className={cn(
                       "rounded-full border px-2.5 py-0.5 text-xs transition-colors",
-                      activeTags.includes(t.slug)
+                      activeTags.includes(tag.slug)
                         ? "border-primary bg-primary text-primary-foreground"
                         : "border-border bg-background hover:bg-muted",
                     )}
                   >
-                    {t.title}
-                    <span className="ml-1 opacity-60">{t.count}</span>
+                    {tag.title}
+                    <span className="ml-1 opacity-60">{tag.count}</span>
                   </button>
                 ))}
               </div>
@@ -234,18 +240,18 @@ export function BrowseClient({
 
         {hasFilters && (
           <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-            <span>{filtered.length} results</span>
+            <span>{t("browse.results", { count: filtered.length })}</span>
             <Button variant="ghost" size="sm" onClick={reset} className="h-7">
-              <X className="size-3.5" /> Clear
+              <X className="size-3.5" /> {t("browse.clear")}
             </Button>
-            {activeTags.map((t) => (
+            {activeTags.map((slug) => (
               <Badge
-                key={t}
+                key={slug}
                 variant="secondary"
                 className="cursor-pointer"
-                onClick={() => toggleTag(t)}
+                onClick={() => toggleTag(slug)}
               >
-                {tags.find((x) => x.slug === t)?.title ?? t} ×
+                {tags.find((x) => x.slug === slug)?.title ?? slug} ×
               </Badge>
             ))}
           </div>
@@ -255,7 +261,7 @@ export function BrowseClient({
       {/* Results */}
       {filtered.length === 0 ? (
         <div className="py-20 text-center text-muted-foreground">
-          No resources match your filters.
+          {t("browse.empty")}
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

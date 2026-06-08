@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { Boxes, Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LanguageToggle } from "@/components/language-toggle";
 import { OPEN_COMMAND_EVENT } from "@/components/command-palette";
 import { UserMenu } from "@/components/auth/user-menu";
 
@@ -11,6 +13,7 @@ function openSearch() {
 }
 
 export function SiteHeader() {
+  const { t } = useTranslation();
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4">
@@ -27,12 +30,13 @@ export function SiteHeader() {
             className="group flex h-9 items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 text-sm text-muted-foreground transition-colors hover:bg-muted"
           >
             <Search className="size-4" />
-            <span className="hidden sm:inline">Search…</span>
+            <span className="hidden sm:inline">{t("header.searchPlaceholder")}</span>
             <kbd className="ml-2 hidden rounded border border-border bg-background px-1.5 font-mono text-[10px] sm:inline">
               ⌘K
             </kbd>
           </button>
 
+          <LanguageToggle />
           <ThemeToggle />
           <UserMenu />
         </div>

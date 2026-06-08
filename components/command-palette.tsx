@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import Fuse from "fuse.js";
 import { ArrowUpRight, Hash, Search } from "lucide-react";
 import {
@@ -19,6 +20,7 @@ import type { Resource } from "@/lib/types";
 export const OPEN_COMMAND_EVENT = "open-command-palette";
 
 export function CommandPalette({ resources }: { resources: Resource[] }) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -77,18 +79,18 @@ export function CommandPalette({ resources }: { resources: Resource[] }) {
     <CommandDialog
       open={open}
       onOpenChange={setOpen}
-      title="Search resources"
-      description="Search across every resource, category and tag."
+      title={t("command.title")}
+      description={t("command.description")}
     >
       <Command shouldFilter={false}>
         <CommandInput
-          placeholder="Search resources, tags, categories…"
+          placeholder={t("command.placeholder")}
           value={query}
           onValueChange={setQuery}
         />
         <CommandList>
-        <CommandEmpty>No matching resources.</CommandEmpty>
-        <CommandGroup heading={query ? "Results" : "Featured"}>
+        <CommandEmpty>{t("command.empty")}</CommandEmpty>
+        <CommandGroup heading={query ? t("command.results") : t("command.featured")}>
           {results.map((r) => (
             <CommandItem
               key={r._id}
@@ -107,10 +109,10 @@ export function CommandPalette({ resources }: { resources: Resource[] }) {
             </CommandItem>
           ))}
         </CommandGroup>
-        <CommandGroup heading="Go to">
+        <CommandGroup heading={t("command.goTo")}>
           <CommandItem value="browse-all" onSelect={() => go("/")}>
             <Hash className="size-4 opacity-60" />
-            Browse all resources
+            {t("command.browseAll")}
           </CommandItem>
         </CommandGroup>
         </CommandList>

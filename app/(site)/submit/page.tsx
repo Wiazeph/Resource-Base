@@ -17,14 +17,7 @@ export default async function SubmitPage() {
 
   return (
     <div className="mx-auto max-w-xl px-4 py-12">
-      <h1 className="text-3xl font-bold tracking-tight">Submit a resource</h1>
-      <p className="mt-2 text-muted-foreground">
-        Know a great free resource that&apos;s missing? Suggest it — we review
-        every submission before it goes live.
-      </p>
-      <div className="mt-8">
-        <SubmitForm categories={categories} />
-      </div>
+      <SubmitForm categories={categories} />
     </div>
   );
 }

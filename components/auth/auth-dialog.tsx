@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +23,7 @@ export function AuthDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { t } = useTranslation();
   const supabase = useMemo(() => createClient(), []);
   const [pending, setPending] = useState(false);
 
@@ -54,18 +56,18 @@ export function AuthDialog({
           options: { emailRedirectTo: callbackUrl },
         });
         if (error) throw error;
-        toast.success("Check your email to confirm your account.");
+        toast.success(t("auth.confirmEmail"));
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
-        toast.success("Welcome back!");
+        toast.success(t("auth.welcomeBack"));
         onOpenChange(false);
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Authentication failed");
+      toast.error(err instanceof Error ? err.message : t("auth.failed"));
     } finally {
       setPending(false);
     }
@@ -75,10 +77,8 @@ export function AuthDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Welcome to Resource Base</DialogTitle>
-          <DialogDescription>
-            Sign in to save favorites and submit resources.
-          </DialogDescription>
+          <DialogTitle>{t("auth.title")}</DialogTitle>
+          <DialogDescription>{t("auth.subtitle")}</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-2">
@@ -87,26 +87,26 @@ export function AuthDialog({
             disabled={pending}
             onClick={() => oauth("google")}
           >
-            Continue with Google
+            {t("auth.google")}
           </Button>
           <Button
             variant="outline"
             disabled={pending}
             onClick={() => oauth("github")}
           >
-            Continue with GitHub
+            {t("auth.github")}
           </Button>
         </div>
 
         <div className="relative my-1 text-center text-xs text-muted-foreground">
-          <span className="relative z-10 bg-background px-2">or</span>
+          <span className="relative z-10 bg-background px-2">{t("auth.or")}</span>
           <span className="absolute inset-x-0 top-1/2 -z-0 h-px bg-border" />
         </div>
 
         <Tabs defaultValue="signin">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="signin">Sign in</TabsTrigger>
-            <TabsTrigger value="signup">Sign up</TabsTrigger>
+            <TabsTrigger value="signin">{t("auth.signIn")}</TabsTrigger>
+            <TabsTrigger value="signup">{t("auth.signUp")}</TabsTrigger>
           </TabsList>
 
           {(["signin", "signup"] as const).map((mode) => (
@@ -122,18 +122,20 @@ export function AuthDialog({
                   name="email"
                   type="email"
                   required
-                  placeholder="you@example.com"
+                  placeholder={t("auth.emailPlaceholder")}
                 />
                 <Input
                   name="password"
                   type="password"
                   required
                   minLength={6}
-                  placeholder="Password"
+                  placeholder={t("auth.passwordPlaceholder")}
                 />
                 <Button type="submit" disabled={pending}>
                   {pending && <Loader2 className="size-4 animate-spin" />}
-                  {mode === "signin" ? "Sign in" : "Create account"}
+                  {mode === "signin"
+                    ? t("auth.signIn")
+                    : t("auth.createAccount")}
                 </Button>
               </form>
             </TabsContent>
