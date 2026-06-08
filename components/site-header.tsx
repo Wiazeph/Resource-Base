@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Boxes, Plus, Search, Star } from "lucide-react";
+import { Boxes, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { OPEN_COMMAND_EVENT } from "@/components/command-palette";
+import { UserMenu } from "@/components/auth/user-menu";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 
 function openSearch() {
   window.dispatchEvent(new Event(OPEN_COMMAND_EVENT));
@@ -48,12 +50,6 @@ export function SiteHeader() {
             </kbd>
           </button>
 
-          <Button asChild size="sm" variant="ghost" className="hidden sm:flex">
-            <Link href="/favorites" aria-label="Favorites">
-              <Star className="size-4" />
-            </Link>
-          </Button>
-
           <Button asChild size="sm" className="hidden sm:flex">
             <Link href="/submit">
               <Plus className="size-4" />
@@ -61,6 +57,8 @@ export function SiteHeader() {
             </Link>
           </Button>
 
+          <NotificationBell />
+          <UserMenu />
           <ThemeToggle />
         </div>
       </div>

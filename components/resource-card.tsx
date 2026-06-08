@@ -1,10 +1,13 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Star, TriangleAlert } from "lucide-react";
+import { ArrowUpRight, Star, TrendingUp, TriangleAlert } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useFavorites } from "@/lib/favorites";
+import { useClickCounts } from "@/components/click-counts-provider";
+import { createClient } from "@/lib/supabase/client";
 import type { Resource } from "@/lib/types";
 
 /** Favicon via Google's service — zero-config thumbnails for any URL. */
@@ -19,9 +22,23 @@ function favicon(url: string) {
 
 export function ResourceCard({ resource }: { resource: Resource }) {
   const { has, toggle } = useFavorites();
+  const { get, bump } = useClickCounts();
+  const counted = useRef(false);
   const fav = has(resource._id);
   const icon = favicon(resource.url);
   const broken = resource.linkStatus === "broken";
+  const clicks = get(resource._id);
+
+  // Fire-and-forget click increment. The link opens in a new tab, so there's
+  // no navigation race — we don't preventDefault.
+  function registerClick() {
+    if (counted.current) return;
+    counted.current = true;
+    bump(resource._id);
+    createClient()
+      .rpc("increment_click", { rid: resource._id })
+      .then(() => {});
+  }
 
   return (
     <div
@@ -43,6 +60,8 @@ export function ResourceCard({ resource }: { resource: Resource }) {
             href={resource.url}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={registerClick}
+            onAuxClick={registerClick}
             className="flex items-center gap-1 font-medium leading-tight after:absolute after:inset-0"
           >
             <span className="truncate">{resource.name}</span>
@@ -101,6 +120,12 @@ export function ResourceCard({ resource }: { resource: Resource }) {
             {t.title}
           </Link>
         ))}
+        {clicks >= 1 && (
+          <span className="ml-auto inline-flex items-center gap-0.5 text-[11px] text-muted-foreground">
+            <TrendingUp className="size-3" />
+            {clicks}
+          </span>
+        )}
       </div>
     </div>
   );
