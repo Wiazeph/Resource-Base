@@ -74,6 +74,16 @@ export const tr = {
     signInToSave: "Kaydetmek için giriş yap",
   },
 
+  modal: {
+    close: "Kapat",
+    open: "Kaynağı aç",
+    viewDetails: "Detayları gör",
+    noDescription: "Açıklama bulunmuyor.",
+    categories: "Kategoriler",
+    tags: "Etiketler",
+    addedOn: "{{date}} tarihinde eklendi",
+  },
+
   command: {
     title: "Kaynaklarda ara",
     description: "Tüm kaynaklarda, kategorilerde ve etiketlerde ara.",

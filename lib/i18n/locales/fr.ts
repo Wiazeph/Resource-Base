@@ -74,6 +74,16 @@ export const fr = {
     signInToSave: "Connectez-vous pour enregistrer",
   },
 
+  modal: {
+    close: "Fermer",
+    open: "Ouvrir la ressource",
+    viewDetails: "Voir les détails",
+    noDescription: "Aucune description disponible.",
+    categories: "Catégories",
+    tags: "Tags",
+    addedOn: "Ajouté le {{date}}",
+  },
+
   command: {
     title: "Rechercher des ressources",
     description: "Recherchez dans toutes les ressources, catégories et tags.",

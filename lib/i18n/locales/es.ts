@@ -74,6 +74,16 @@ export const es = {
     signInToSave: "Inicia sesión para guardar",
   },
 
+  modal: {
+    close: "Cerrar",
+    open: "Abrir recurso",
+    viewDetails: "Ver detalles",
+    noDescription: "Sin descripción disponible.",
+    categories: "Categorías",
+    tags: "Etiquetas",
+    addedOn: "Añadido el {{date}}",
+  },
+
   command: {
     title: "Buscar recursos",
     description: "Busca en todos los recursos, categorías y etiquetas.",

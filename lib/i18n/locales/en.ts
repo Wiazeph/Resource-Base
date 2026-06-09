@@ -74,6 +74,16 @@ export const en = {
     signInToSave: "Sign in to save",
   },
 
+  modal: {
+    close: "Close",
+    open: "Open resource",
+    viewDetails: "View details",
+    noDescription: "No description available.",
+    categories: "Categories",
+    tags: "Tags",
+    addedOn: "Added {{date}}",
+  },
+
   command: {
     title: "Search resources",
     description: "Search across every resource, category and tag.",

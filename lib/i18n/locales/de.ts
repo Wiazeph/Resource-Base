@@ -74,6 +74,16 @@ export const de = {
     signInToSave: "Zum Speichern anmelden",
   },
 
+  modal: {
+    close: "Schließen",
+    open: "Ressource öffnen",
+    viewDetails: "Details anzeigen",
+    noDescription: "Keine Beschreibung verfügbar.",
+    categories: "Kategorien",
+    tags: "Tags",
+    addedOn: "Hinzugefügt am {{date}}",
+  },
+
   command: {
     title: "Ressourcen durchsuchen",
     description: "Durchsuche alle Ressourcen, Kategorien und Tags.",
