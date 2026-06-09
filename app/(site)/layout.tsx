@@ -7,6 +7,7 @@ import { AuthRequiredPrompt } from "@/components/auth/auth-required-prompt";
 import { ClickCountsProvider } from "@/components/click-counts-provider";
 import { ContributorsProvider } from "@/components/contributors-provider";
 import { FavoritesProvider } from "@/components/favorites-provider";
+import { FavoriteCountsProvider } from "@/components/favorite-counts-provider";
 import { I18nProvider } from "@/components/i18n-provider";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { allResourcesQuery } from "@/sanity/lib/queries";
@@ -30,6 +31,7 @@ export default async function SiteLayout({
   return (
     <I18nProvider>
       <AuthProvider>
+        <FavoriteCountsProvider>
         <FavoritesProvider>
         <ClickCountsProvider>
           <ContributorsProvider>
@@ -45,6 +47,7 @@ export default async function SiteLayout({
           </ContributorsProvider>
         </ClickCountsProvider>
         </FavoritesProvider>
+        </FavoriteCountsProvider>
       </AuthProvider>
     </I18nProvider>
   );

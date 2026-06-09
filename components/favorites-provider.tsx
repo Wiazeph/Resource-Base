@@ -10,6 +10,7 @@ import {
 } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/components/auth/auth-provider";
+import { useFavoriteCounts } from "@/components/favorite-counts-provider";
 
 type FavoritesValue = {
   ids: string[];
@@ -27,6 +28,7 @@ const FavoritesContext = createContext<FavoritesValue | null>(null);
  */
 export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
+  const { bump } = useFavoriteCounts();
   const supabase = useMemo(() => createClient(), []);
   const [ids, setIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,6 +60,8 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
       const isFav = ids.includes(id);
       // Optimistic — instant across all consumers via shared context.
       setIds((prev) => (isFav ? prev.filter((x) => x !== id) : [...prev, id]));
+      // Keep the public favorite count in sync optimistically too.
+      bump(id, isFav ? -1 : 1);
       if (isFav) {
         await supabase
           .from("favorites")
@@ -70,7 +74,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
           .insert({ user_id: user.id, resource_id: id });
       }
     },
-    [user, ids, supabase],
+    [user, ids, supabase, bump],
   );
 
   const value = useMemo<FavoritesValue>(
