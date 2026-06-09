@@ -4,7 +4,7 @@ import { useRef } from "react";
 import Link from "next/link";
 import { ArrowUpRight, Star, TrendingUp, TriangleAlert } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { cn, favicon } from "@/lib/utils";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useFavorites } from "@/components/favorites-provider";
@@ -12,16 +12,6 @@ import { useClickCounts } from "@/components/click-counts-provider";
 import { useContributors } from "@/components/contributors-provider";
 import { useAuth } from "@/components/auth/auth-provider";
 import type { Resource } from "@/lib/types";
-
-/** Favicon via Google's service — zero-config thumbnails for any URL. */
-function favicon(url: string) {
-  try {
-    const host = new URL(url).hostname;
-    return `https://www.google.com/s2/favicons?domain=${host}&sz=64`;
-  } catch {
-    return undefined;
-  }
-}
 
 export function ResourceCard({ resource }: { resource: Resource }) {
   const { t } = useTranslation();
