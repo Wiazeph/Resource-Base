@@ -159,7 +159,7 @@ export const tr = {
   footer: {
     tagline:
       "Her şey için kaynaklar — hepsi tek bir yerde!",
-    source: "Kaynak kod",
+    source: "GitHub'da yıldızla",
     reportIssue: "Sorun bildir",
     sponsor: "Sponsor ol",
   },

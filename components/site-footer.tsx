@@ -75,7 +75,7 @@ export function SiteFooter() {
             href={REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className={linkClass}
+            className={`${linkClass} text-primary`}
           >
             <GithubIcon />
             <span>{t("footer.source")}</span>

@@ -159,7 +159,7 @@ export const en = {
   footer: {
     tagline:
       "Resources for anything and everything — all in one place!",
-    source: "Source",
+    source: "Star on GitHub",
     reportIssue: "Report an issue",
     sponsor: "Sponsor",
   },

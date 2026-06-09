@@ -159,7 +159,7 @@ export const de = {
   footer: {
     tagline:
       "Ressourcen für alles — alles an einem Ort!",
-    source: "Quellcode",
+    source: "Auf GitHub bewerten",
     reportIssue: "Problem melden",
     sponsor: "Sponsor werden",
   },
