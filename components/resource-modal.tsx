@@ -5,25 +5,25 @@ import Link from "next/link";
 import { ArrowUpRight, Star, TrendingUp, TriangleAlert } from "lucide-react";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CategoryIcon } from "@/components/category-icon";
-import { favicon } from "@/lib/utils";
+import { cn, favicon } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { useFavorites } from "@/components/favorites-provider";
 import { useClickCounts } from "@/components/click-counts-provider";
 import { useFavoriteCounts } from "@/components/favorite-counts-provider";
 import { useContributors } from "@/components/contributors-provider";
+import { useAuth } from "@/components/auth/auth-provider";
 import type { Resource } from "@/lib/types";
 
 /** Pill shared with the resource card — accent background, rounded, hover. */
 const PILL =
-  "inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[11px] text-accent-foreground transition-colors hover:bg-accent/70";
+  "inline-flex items-center gap-1.5 rounded-full bg-accent px-2.5 py-1 text-xs text-accent-foreground transition-colors hover:bg-accent/70";
 
 /**
  * Detail view for a single resource, opened when the card body (not the title
@@ -32,7 +32,7 @@ const PILL =
  *
  * Navigation to the resource is funnelled through `onNavigate` (the card's
  * click-tracking) so opening the modal never counts as a click — only the
- * title link and the footer button do.
+ * title link and the action button do.
  */
 export function ResourceModal({
   resource,
@@ -46,11 +46,14 @@ export function ResourceModal({
   onNavigate: () => void;
 }) {
   const { t, i18n } = useTranslation();
+  const { has, toggle } = useFavorites();
   const { get } = useClickCounts();
   const { get: getFavorites } = useFavoriteCounts();
   const { register, get: getContributor } = useContributors();
+  const { user, openAuth } = useAuth();
   const icon = favicon(resource.url);
   const broken = resource.linkStatus === "broken";
+  const fav = has(resource._id);
   const clicks = get(resource._id);
   const favorites = getFavorites(resource._id);
 
@@ -71,30 +74,31 @@ export function ResourceModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] gap-3 overflow-y-auto sm:max-w-md">
-        <DialogHeader className="flex-row items-start gap-3 pr-6">
-          <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-muted/50">
+      <DialogContent className="max-h-[85vh] gap-6 overflow-y-auto p-6 sm:max-w-md">
+        {/* Header — icon top-aligned so long, wrapping names read naturally */}
+        <DialogHeader className="flex-row items-start gap-3.5 pr-6">
+          <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-xl border border-border bg-muted/50">
             {icon ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={icon} alt="" className="size-5" loading="lazy" />
+              <img src={icon} alt="" className="size-6" loading="lazy" />
             ) : null}
           </span>
           <div className="min-w-0 flex-1">
-            <DialogTitle>
+            <DialogTitle className="text-base leading-snug">
               <a
                 href={resource.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={onNavigate}
                 onAuxClick={onNavigate}
-                className="inline-flex items-center gap-1 hover:underline"
+                className="hover:underline"
               >
-                <span className="truncate">{resource.name}</span>
-                <ArrowUpRight className="size-3.5 shrink-0 opacity-60" />
+                {resource.name}
+                <ArrowUpRight className="ml-1 inline size-3.5 shrink-0 align-baseline opacity-60" />
               </a>
             </DialogTitle>
             {resource.author && (
-              <p className="mt-1 truncate text-xs text-muted-foreground">
+              <p className="mt-0.5 truncate text-xs text-muted-foreground">
                 {t("card.by", { author: resource.author })}
               </p>
             )}
@@ -102,21 +106,18 @@ export function ResourceModal({
         </DialogHeader>
 
         {/* Status / language / pricing badges */}
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="-mt-2 flex flex-wrap items-center gap-2">
           {broken && (
             <Badge variant="destructive" className="gap-1">
               <TriangleAlert className="size-3" /> {t("card.broken")}
             </Badge>
           )}
           {resource.language?.includes("tr") && (
-            <Badge variant="outline" className="text-[10px]">
-              TR
-            </Badge>
+            <Badge variant="outline">TR</Badge>
           )}
           {resource.pricing && (
             <Badge
               variant={resource.pricing === "free" ? "outline" : "secondary"}
-              className="text-[10px]"
             >
               {t(`pricing.${resource.pricing}`)}
             </Badge>
@@ -124,17 +125,17 @@ export function ResourceModal({
         </div>
 
         {/* Description */}
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm leading-relaxed text-muted-foreground">
           {resource.description || t("modal.noDescription")}
         </p>
 
         {/* Categories */}
         {resource.categories?.length > 0 && (
-          <div className="flex flex-col gap-1.5">
-            <p className="text-xs font-medium text-foreground">
+          <div className="flex flex-col gap-2">
+            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
               {t("modal.categories")}
             </p>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {resource.categories.map((cat) => (
                 <Link
                   key={cat._id}
@@ -142,7 +143,7 @@ export function ResourceModal({
                   onClick={() => onOpenChange(false)}
                   className={PILL}
                 >
-                  <CategoryIcon className="size-3" />
+                  <CategoryIcon className="size-3.5" />
                   {cat.title}
                 </Link>
               ))}
@@ -152,11 +153,11 @@ export function ResourceModal({
 
         {/* Tags */}
         {resource.tags?.length > 0 && (
-          <div className="flex flex-col gap-1.5">
-            <p className="text-xs font-medium text-foreground">
+          <div className="flex flex-col gap-2">
+            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
               {t("modal.tags")}
             </p>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {resource.tags.map((tag) => (
                 <Link
                   key={tag._id}
@@ -171,17 +172,17 @@ export function ResourceModal({
           </div>
         )}
 
-        {/* Meta: click count, added date, contributor */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-muted-foreground">
+        {/* Meta: click count, favorite count, added date, contributor */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border pt-4 text-xs text-muted-foreground">
           {clicks >= 1 && (
-            <span className="inline-flex items-center gap-0.5">
-              <TrendingUp className="size-3" />
+            <span className="inline-flex items-center gap-1">
+              <TrendingUp className="size-3.5" />
               {clicks}
             </span>
           )}
           {favorites >= 1 && (
-            <span className="inline-flex items-center gap-0.5">
-              <Star className="size-3" />
+            <span className="inline-flex items-center gap-1">
+              <Star className="size-3.5" />
               {favorites}
             </span>
           )}
@@ -205,11 +206,30 @@ export function ResourceModal({
           )}
         </div>
 
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">{t("modal.close")}</Button>
-          </DialogClose>
-          <Button asChild>
+        {/* Actions — favorite toggle + open, no footer bar */}
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon-lg"
+            onClick={() => {
+              // Favorites are account-only — prompt sign-in for guests.
+              if (!user) {
+                openAuth();
+                return;
+              }
+              toggle(resource._id);
+            }}
+            aria-label={
+              !user
+                ? t("card.signInToSave")
+                : fav
+                  ? t("card.removeFavorite")
+                  : t("card.addFavorite")
+            }
+          >
+            <Star className={cn(fav && "fill-primary text-primary")} />
+          </Button>
+          <Button asChild className="flex-1">
             <a
               href={resource.url}
               target="_blank"
@@ -221,7 +241,7 @@ export function ResourceModal({
               <ArrowUpRight />
             </a>
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
