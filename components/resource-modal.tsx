@@ -1,25 +1,26 @@
 "use client";
 
-import { useEffect } from "react";
-import Link from "next/link";
-import { ArrowUpRight, Star, TrendingUp, TriangleAlert } from "lucide-react";
+import { useAuth } from "@/components/auth/auth-provider";
+import { CategoryIcon } from "@/components/category-icon";
+import { useClickCounts } from "@/components/click-counts-provider";
+import { useContributors } from "@/components/contributors-provider";
+import { useFavoriteCounts } from "@/components/favorite-counts-provider";
+import { useFavorites } from "@/components/favorites-provider";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { CategoryIcon } from "@/components/category-icon";
-import { cn, favicon } from "@/lib/utils";
-import { useTranslation } from "react-i18next";
-import { useFavorites } from "@/components/favorites-provider";
-import { useClickCounts } from "@/components/click-counts-provider";
-import { useFavoriteCounts } from "@/components/favorite-counts-provider";
-import { useContributors } from "@/components/contributors-provider";
-import { useAuth } from "@/components/auth/auth-provider";
 import type { Resource } from "@/lib/types";
+import { cn, favicon } from "@/lib/utils";
+import { ArrowUpRight, Star, TrendingUp, TriangleAlert } from "lucide-react";
+import Link from "next/link";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { Separator } from "./ui/separator";
 
 /** Pill shared with the resource card — accent background, rounded, hover. */
 const PILL =
@@ -66,17 +67,17 @@ export function ResourceModal({
 
   const addedOn = resource.addedAt
     ? new Intl.DateTimeFormat(i18n.language, {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }).format(new Date(resource.addedAt))
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(new Date(resource.addedAt))
     : undefined;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] gap-6 overflow-y-auto p-6 sm:max-w-md">
+      <DialogContent className="max-h-[85vh] gap-6 overflow-y-auto p-4 sm:max-w-md">
         {/* Header — icon top-aligned so long, wrapping names read naturally */}
-        <DialogHeader className="flex-row items-start gap-3.5 pr-6">
+        <DialogHeader className="flex-row items-start gap-3.5 pr-6 items-center">
           <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-xl border border-border bg-muted/50">
             {icon ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -172,75 +173,79 @@ export function ResourceModal({
           </div>
         )}
 
-        {/* Meta: click count, favorite count, added date, contributor */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border pt-4 text-xs text-muted-foreground">
-          {clicks >= 1 && (
-            <span className="inline-flex items-center gap-1">
-              <TrendingUp className="size-3.5" />
-              {clicks}
-            </span>
-          )}
-          {favorites >= 1 && (
-            <span className="inline-flex items-center gap-1">
-              <Star className="size-3.5" />
-              {favorites}
-            </span>
-          )}
-          {addedOn && <span>{t("modal.addedOn", { date: addedOn })}</span>}
-          {contributor && (
-            <Link
-              href={`/profile/${contributor.username}`}
-              onClick={() => onOpenChange(false)}
-              className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
-            >
-              {contributor.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={contributor.avatar_url}
-                  alt=""
-                  className="size-4 rounded-full object-cover"
-                />
-              ) : null}
-              {t("card.addedBy", { username: contributor.username })}
-            </Link>
-          )}
-        </div>
+        <div className="flex flex-col gap-y-4">
+          <Separator />
 
-        {/* Actions — favorite toggle + open, no footer bar */}
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon-lg"
-            onClick={() => {
-              // Favorites are account-only — prompt sign-in for guests.
-              if (!user) {
-                openAuth();
-                return;
+          {/* Meta: click count, favorite count, added date, contributor */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
+            {favorites >= 1 && (
+              <span className="inline-flex items-center gap-1">
+                <Star className="size-3.5" />
+                {favorites}
+              </span>
+            )}
+            {clicks >= 1 && (
+              <span className="inline-flex items-center gap-1">
+                <TrendingUp className="size-3.5" />
+                {clicks}
+              </span>
+            )}
+            {addedOn && <span>{t("modal.addedOn", { date: addedOn })}</span>}
+            {contributor && (
+              <Link
+                href={`/profile/${contributor.username}`}
+                onClick={() => onOpenChange(false)}
+                className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+              >
+                {contributor.avatar_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={contributor.avatar_url}
+                    alt=""
+                    className="size-4 rounded-full object-cover"
+                  />
+                ) : null}
+                {t("card.addedBy", { username: contributor.username })}
+              </Link>
+            )}
+          </div>
+
+          {/* Actions — favorite toggle + open, no footer bar */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon-lg"
+              onClick={() => {
+                // Favorites are account-only — prompt sign-in for guests.
+                if (!user) {
+                  openAuth();
+                  return;
+                }
+                toggle(resource._id);
+              }}
+              aria-label={
+                !user
+                  ? t("card.signInToSave")
+                  : fav
+                    ? t("card.removeFavorite")
+                    : t("card.addFavorite")
               }
-              toggle(resource._id);
-            }}
-            aria-label={
-              !user
-                ? t("card.signInToSave")
-                : fav
-                  ? t("card.removeFavorite")
-                  : t("card.addFavorite")
-            }
-          >
-            <Star className={cn(fav && "fill-primary text-primary")} />
-          </Button>
-          <Button asChild className="flex-1">
-            <a
-              href={resource.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={onNavigate}
-              onAuxClick={onNavigate}
             >
-              {t("modal.open")}
-              <ArrowUpRight />
-            </a>
-          </Button>
+              <Star className={cn(fav && "fill-primary text-primary")} />
+            </Button>
+            <Button asChild className="flex-1">
+              <a
+                href={resource.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={onNavigate}
+                onAuxClick={onNavigate}
+              >
+                {t("modal.open")}
+                <ArrowUpRight />
+              </a>
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
