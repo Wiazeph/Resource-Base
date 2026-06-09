@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Construction, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 // Bump this key when you want the banner to re-appear for everyone who
@@ -20,12 +20,11 @@ export function AnnouncementBanner() {
 
   return (
     <div className="relative overflow-hidden border-b border-primary/20 bg-primary/10">
-      <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2.5 text-sm">
-        <Construction className="size-4 shrink-0 text-primary" />
-        <p className="flex-1 text-foreground/90">
-          <span className="font-medium">{t("banner.title")}</span>{" "}
-          <span className="text-muted-foreground">{t("banner.body")}</span>
-        </p>
+      <div className="mx-auto flex max-w-6xl justify-center items-center gap-3 px-4 py-2.5 text-sm">
+        <div className="flex flex-col text-foreground/90 items-center">
+          <div className="flex items-center gap-x-1 font-medium"><Construction className="size-4 shrink-0 text-primary" /> {t("banner.title")}</div>
+          <div className="text-muted-foreground text-center">{t("banner.body")}</div>
+        </div>
         <button
           onClick={() => {
             localStorage.setItem(DISMISS_KEY, "1");
