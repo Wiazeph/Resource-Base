@@ -17,10 +17,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ResourceCard } from "@/components/resource-card";
 import { useClickCounts } from "@/components/click-counts-provider";
+import { useFavoriteCounts } from "@/components/favorite-counts-provider";
 import { cn } from "@/lib/utils";
 import type { Category, Resource, Tag } from "@/lib/types";
 
-type Sort = "featured" | "popular" | "name" | "recent";
+type Sort = "featured" | "popular" | "favorites" | "name" | "recent";
 
 const PRICING_VALUES = ["free", "freemium", "paid"] as const;
 const LANG_VALUES = ["en", "tr"] as const;
@@ -42,6 +43,7 @@ export function BrowseClient({
 }) {
   const { t } = useTranslation();
   const { get: getClicks } = useClickCounts();
+  const { get: getFavorites } = useFavoriteCounts();
   const router = useRouter();
   const params = useSearchParams();
 
@@ -128,13 +130,26 @@ export function BrowseClient({
         );
       else if (sort === "popular")
         list.sort((a, b) => getClicks(b._id) - getClicks(a._id));
+      else if (sort === "favorites")
+        list.sort((a, b) => getFavorites(b._id) - getFavorites(a._id));
       else
         list.sort(
           (a, b) => Number(b.featured ?? 0) - Number(a.featured ?? 0),
         );
     }
     return list;
-  }, [q, cat, activeTags, lang, pricing, sort, fuse, resources, getClicks]);
+  }, [
+    q,
+    cat,
+    activeTags,
+    lang,
+    pricing,
+    sort,
+    fuse,
+    resources,
+    getClicks,
+    getFavorites,
+  ]);
 
   // Reset to the first page whenever the result set changes.
   useEffect(() => {
@@ -227,6 +242,7 @@ export function BrowseClient({
           >
             <option value="featured">{t("browse.sort.featured")}</option>
             <option value="popular">{t("browse.sort.popular")}</option>
+            <option value="favorites">{t("browse.sort.favorites")}</option>
             <option value="name">{t("browse.sort.name")}</option>
             <option value="recent">{t("browse.sort.recent")}</option>
           </select>
