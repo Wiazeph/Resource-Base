@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useProfile } from "@/lib/profile";
 
@@ -18,10 +19,14 @@ export function ProfileEditForm() {
   const { profile, loading, update, setUsername } = useProfile();
   const [pending, setPending] = useState(false);
   const [username, setUsernameInput] = useState("");
+  const [showEmail, setShowEmail] = useState(false);
 
   useEffect(() => {
     if (profile?.username) setUsernameInput(profile.username);
   }, [profile?.username]);
+  useEffect(() => {
+    setShowEmail(!!profile?.show_email);
+  }, [profile?.show_email]);
 
   if (!authLoading && !user) {
     return (
@@ -72,6 +77,7 @@ export function ProfileEditForm() {
         twitter_url: data.twitter_url || null,
         instagram_url: data.instagram_url || null,
         dribbble_url: data.dribbble_url || null,
+        show_email: showEmail,
       });
       if (error) throw new Error(error);
       toast.success(t("profile.saved"));
@@ -86,6 +92,31 @@ export function ProfileEditForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <h1 className="text-3xl font-bold tracking-tight">{t("profile.editTitle")}</h1>
+
+      {/* Email is read-only (managed by auth) with a public-visibility toggle. */}
+      <Field label={t("profile.email")}>
+        <div className="flex items-center gap-2">
+          <div className="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-md border border-border bg-muted/40 px-3 text-sm text-muted-foreground">
+            <Mail className="size-4 shrink-0" />
+            <span className="truncate">{profile.email}</span>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setShowEmail((v) => !v)}
+            className={cn(showEmail && "border-primary text-primary")}
+            aria-pressed={showEmail}
+          >
+            {showEmail ? (
+              <Eye className="size-4" />
+            ) : (
+              <EyeOff className="size-4" />
+            )}
+            {showEmail ? t("profile.emailPublic") : t("profile.emailHidden")}
+          </Button>
+        </div>
+      </Field>
 
       <Field label={t("profile.username")}>
         <Input

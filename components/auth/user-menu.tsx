@@ -61,7 +61,7 @@ export function UserMenu() {
             <UserIcon className="size-4" />
           )}
           {unread > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-primary ring-2 ring-background" />
+            <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-emerald-500 ring-2 ring-background" />
           )}
         </button>
       </DropdownMenuTrigger>

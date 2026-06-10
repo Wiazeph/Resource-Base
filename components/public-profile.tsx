@@ -1,12 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Globe, Pencil, Send, User as UserIcon } from "lucide-react";
+import { Eye, EyeOff, Globe, Mail, Pencil, Send, User as UserIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ResourceGrid } from "@/components/resource-grid";
 import { MySubmissions } from "@/components/my-submissions";
 import { useAuth } from "@/components/auth/auth-provider";
+import { fetchPublicEmail } from "@/lib/profile";
 import type { Category, PublicProfile, Resource } from "@/lib/types";
 
 // Lucide 1.x dropped brand marks — inline brand SVGs for recognizable icons.
@@ -91,6 +93,17 @@ export function PublicProfileView({
   const isOwner = user?.id === profile.id;
   const name = profile.full_name || `@${profile.username}`;
 
+  // Email display: the owner always sees their own (from the session) with an
+  // eye/eye-off marking whether it's public; other visitors see it only if the
+  // owner opted in (fetched via the public_email RPC, never the raw column).
+  const [publicEmail, setPublicEmail] = useState<string | null>(null);
+  useEffect(() => {
+    if (!isOwner && profile.show_email) {
+      fetchPublicEmail(profile.id).then(setPublicEmail);
+    }
+  }, [isOwner, profile.show_email, profile.id]);
+  const email = isOwner ? (user?.email ?? null) : publicEmail;
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       {/* Header */}
@@ -106,6 +119,28 @@ export function PublicProfileView({
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{name}</h1>
           <p className="text-muted-foreground">@{profile.username}</p>
+          {email && (
+            <p
+              className="mt-1 inline-flex items-center gap-1.5 text-sm text-muted-foreground"
+              title={
+                isOwner
+                  ? profile.show_email
+                    ? t("profile.emailPublic")
+                    : t("profile.emailHidden")
+                  : undefined
+              }
+            >
+              {/* The eye marker is only meaningful to the owner. */}
+              {isOwner &&
+                (profile.show_email ? (
+                  <Eye className="size-3.5" />
+                ) : (
+                  <EyeOff className="size-3.5" />
+                ))}
+              {!isOwner && <Mail className="size-3.5" />}
+              {email}
+            </p>
+          )}
         </div>
         {isOwner && (
           <Button asChild size="sm" variant="outline">

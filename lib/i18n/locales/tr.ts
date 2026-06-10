@@ -3,6 +3,9 @@ export const tr = {
   profile: {
     editTitle: "Profili düzenle",
     signInPrompt: "Profilini düzenlemek için giriş yap.",
+    email: "E-posta",
+    emailPublic: "Herkese açık",
+    emailHidden: "Gizli",
     username: "Kullanıcı adı",
     fullName: "Ad soyad",
     bio: "Biyografi",

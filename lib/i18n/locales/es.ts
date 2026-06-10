@@ -3,6 +3,9 @@ export const es = {
   profile: {
     editTitle: "Editar perfil",
     signInPrompt: "Inicia sesión para editar tu perfil.",
+    email: "Correo",
+    emailPublic: "Público",
+    emailHidden: "Oculto",
     username: "Nombre de usuario",
     fullName: "Nombre completo",
     bio: "Biografía",

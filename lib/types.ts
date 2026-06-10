@@ -17,6 +17,8 @@ export interface PublicProfile {
   twitter_url: string | null
   instagram_url: string | null
   dribbble_url: string | null
+  /** Whether the user opted to show their email publicly. */
+  show_email: boolean
 }
 
 /** The signed-in user's own editable profile (private columns included). */

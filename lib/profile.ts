@@ -13,6 +13,7 @@ const EDITABLE_COLUMNS = [
   "twitter_url",
   "instagram_url",
   "dribbble_url",
+  "show_email",
 ] as const;
 
 export type EditableProfile = Pick<
@@ -38,7 +39,7 @@ export function useProfile() {
     const { data } = await supabase
       .from("profiles")
       .select(
-        "id, username, full_name, avatar_url, bio, portfolio_url, github_url, twitter_url, instagram_url, dribbble_url",
+        "id, username, full_name, avatar_url, bio, portfolio_url, github_url, twitter_url, instagram_url, dribbble_url, show_email",
       )
       .eq("id", user.id)
       .single();
@@ -119,4 +120,15 @@ export async function fetchProfilesByIds(
   const map: Record<string, PublicProfile> = {};
   for (const row of (data ?? []) as PublicProfile[]) map[row.id] = row;
   return map;
+}
+
+/**
+ * Public email for a user — returned only if they opted in (show_email). Goes
+ * through the security-definer public_email RPC; the email column itself is
+ * never directly readable by anon/authenticated.
+ */
+export async function fetchPublicEmail(userId: string): Promise<string | null> {
+  const supabase = createClient();
+  const { data } = await supabase.rpc("public_email", { uid: userId });
+  return (data as string | null) ?? null;
 }
