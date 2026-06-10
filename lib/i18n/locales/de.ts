@@ -130,6 +130,18 @@ export const de = {
     error: "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
   },
 
+  submissions: {
+    title: "Meine Einreichungen",
+    empty: "Du hast noch keine Ressourcen eingereicht.",
+    status: { pending: "Ausstehend", approved: "Genehmigt", rejected: "Abgelehnt" },
+    reasonLabel: "Grund",
+    noReason: "Diese Einreichung wurde nicht genehmigt.",
+    editResubmit: "Bearbeiten & erneut senden",
+    resubmit: "Erneut senden",
+    resubmitSuccess: "Erneut gesendet! Wieder in der Prüfung.",
+    resubmitError: "Erneutes Senden fehlgeschlagen. Bitte erneut versuchen.",
+  },
+
   auth: {
     title: "Willkommen 👋",
     requiredTitle: "Anmeldung erforderlich",

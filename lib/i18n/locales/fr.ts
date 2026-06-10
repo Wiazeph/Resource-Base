@@ -130,6 +130,18 @@ export const fr = {
     error: "Une erreur s'est produite. Veuillez réessayer.",
   },
 
+  submissions: {
+    title: "Mes propositions",
+    empty: "Vous n'avez encore proposé aucune ressource.",
+    status: { pending: "En attente", approved: "Approuvée", rejected: "Refusée" },
+    reasonLabel: "Motif",
+    noReason: "Cette proposition n'a pas été approuvée.",
+    editResubmit: "Modifier et renvoyer",
+    resubmit: "Renvoyer",
+    resubmitSuccess: "Renvoyée ! Elle est de nouveau en cours d'examen.",
+    resubmitError: "Échec du renvoi. Veuillez réessayer.",
+  },
+
   auth: {
     title: "Bienvenue 👋",
     requiredTitle: "Connexion requise",

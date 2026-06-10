@@ -130,6 +130,18 @@ export const en = {
     error: "Something went wrong. Please try again.",
   },
 
+  submissions: {
+    title: "My submissions",
+    empty: "You haven't submitted any resources yet.",
+    status: { pending: "Pending", approved: "Approved", rejected: "Rejected" },
+    reasonLabel: "Reason",
+    noReason: "This submission wasn't approved.",
+    editResubmit: "Edit & resubmit",
+    resubmit: "Resubmit",
+    resubmitSuccess: "Resubmitted! It's back in the review queue.",
+    resubmitError: "Couldn't resubmit. Please try again.",
+  },
+
   auth: {
     title: "Welcome 👋",
     requiredTitle: "Sign in required",

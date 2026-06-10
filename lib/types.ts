@@ -76,6 +76,22 @@ export interface Tag {
   count: number
 }
 
+export type SubmissionStatus = 'pending' | 'approved' | 'rejected'
+
+/** A user's own submission row (public.submissions mirror, RLS read-own). */
+export interface Submission {
+  id: string
+  sanity_submission_id: string | null
+  name: string | null
+  url: string | null
+  status: SubmissionStatus
+  suggested_category: string | null
+  note: string | null
+  rejection_reason: string | null
+  created_at: string
+  updated_at: string | null
+}
+
 /** A category with its resolved resource list (detail page query). */
 export interface CategoryWithResources extends Omit<Category, 'count' | 'parentSlug'> {
   resources: Resource[]

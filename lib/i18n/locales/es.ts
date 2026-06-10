@@ -130,6 +130,18 @@ export const es = {
     error: "Algo salió mal. Inténtalo de nuevo.",
   },
 
+  submissions: {
+    title: "Mis propuestas",
+    empty: "Aún no has propuesto ningún recurso.",
+    status: { pending: "Pendiente", approved: "Aprobada", rejected: "Rechazada" },
+    reasonLabel: "Motivo",
+    noReason: "Esta propuesta no fue aprobada.",
+    editResubmit: "Editar y reenviar",
+    resubmit: "Reenviar",
+    resubmitSuccess: "¡Reenviada! Está de nuevo en revisión.",
+    resubmitError: "No se pudo reenviar. Inténtalo de nuevo.",
+  },
+
   auth: {
     title: "Bienvenido 👋",
     requiredTitle: "Inicio de sesión requerido",

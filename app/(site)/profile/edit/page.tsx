@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { ProfileEditForm } from "@/components/profile-edit-form";
+import { MySubmissionsSection } from "@/components/my-submissions-section";
 import { AuthGate } from "@/components/auth/auth-gate";
 import { createClient } from "@/lib/supabase/server";
+import { sanityFetch } from "@/sanity/lib/fetch";
+import { allCategoriesQuery } from "@/sanity/lib/queries";
+import type { Category } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Edit profile",
@@ -14,9 +18,23 @@ export default async function ProfileEditPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    return (
+      <div className="mx-auto max-w-xl px-4 py-12">
+        <AuthGate>{null}</AuthGate>
+      </div>
+    );
+  }
+
+  const categories = await sanityFetch<Category[]>({
+    query: allCategoriesQuery,
+    tags: ["category"],
+  });
+
   return (
     <div className="mx-auto max-w-xl px-4 py-12">
-      {user ? <ProfileEditForm /> : <AuthGate>{null}</AuthGate>}
+      <ProfileEditForm />
+      <MySubmissionsSection categories={categories} />
     </div>
   );
 }

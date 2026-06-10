@@ -130,6 +130,18 @@ export const tr = {
     error: "Bir şeyler ters gitti. Lütfen tekrar dene.",
   },
 
+  submissions: {
+    title: "Gönderilerim",
+    empty: "Henüz hiç kaynak göndermedin.",
+    status: { pending: "Beklemede", approved: "Onaylandı", rejected: "Reddedildi" },
+    reasonLabel: "Gerekçe",
+    noReason: "Bu gönderi onaylanmadı.",
+    editResubmit: "Düzenle ve tekrar gönder",
+    resubmit: "Tekrar gönder",
+    resubmitSuccess: "Tekrar gönderildi! İnceleme sırasına alındı.",
+    resubmitError: "Tekrar gönderilemedi. Lütfen tekrar dene.",
+  },
+
   auth: {
     title: "Hoş geldin 👋",
     requiredTitle: "Giriş yapmanız gerekiyor",
