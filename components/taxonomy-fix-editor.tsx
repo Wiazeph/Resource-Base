@@ -78,6 +78,8 @@ export function TaxonomyFixEditor({
           kind: "taxonomy",
           targetResourceId: resource._id,
           name: resource.name,
+          // Carry the resource URL so the submission detail can link to it.
+          url: resource.url,
           // Send slugs for existing, raw title for free-text — the webhook
           // resolves either against slug or title on approval.
           proposedCategories: cats.map((c) => c.slug),

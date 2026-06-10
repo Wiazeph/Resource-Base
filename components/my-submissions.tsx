@@ -29,6 +29,17 @@ import type { Category, Submission, SubmissionStatus } from "@/lib/types";
 
 const OTHER = "__other__";
 
+/** True only for real http(s) links — taxonomy fixes have no URL of their own. */
+function isHttpUrl(url: string | null): boolean {
+  if (!url) return false;
+  try {
+    const u = new URL(url);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 const STATUS_STYLE: Record<SubmissionStatus, string> = {
   pending: "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400",
   approved: "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
@@ -229,15 +240,19 @@ function SubmissionDialog({
                 ) : null}
               </span>
               <DialogTitle className="min-w-0 flex-1 text-base leading-snug">
-                <a
-                  href={s.url ?? "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline"
-                >
-                  {s.name}
-                  <ArrowUpRight className="ml-1 inline size-3.5 align-baseline opacity-60" />
-                </a>
+                {isHttpUrl(s.url) ? (
+                  <a
+                    href={s.url!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    {s.name}
+                    <ArrowUpRight className="ml-1 inline size-3.5 align-baseline opacity-60" />
+                  </a>
+                ) : (
+                  s.name
+                )}
               </DialogTitle>
               <StatusBadge status={s.status} />
             </DialogHeader>

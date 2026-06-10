@@ -29,18 +29,23 @@ export function TaxonomyProposal({
   resolveTag?: (slug: string) => string;
 }) {
   const { t } = useTranslation();
+  // Older submissions (created before we snapshotted the original taxonomy)
+  // have no baseline to diff against — don't falsely mark everything as new.
+  const hasBaseline =
+    originalCategories.length > 0 || originalTags.length > 0;
   const origCats = new Set(originalCategories);
   const origTags = new Set(originalTags);
+  const isNewCat = (c: string) => hasBaseline && !origCats.has(c);
+  const isNewTag = (tg: string) => hasBaseline && !origTags.has(tg);
   const anyNew =
-    proposedCategories.some((c) => !origCats.has(c)) ||
-    proposedTags.some((tg) => !origTags.has(tg));
+    proposedCategories.some(isNewCat) || proposedTags.some(isNewTag);
 
   return (
     <div className="flex flex-col gap-3">
       {proposedCategories.length > 0 && (
         <Section label={categoriesLabel}>
           {proposedCategories.map((c) => (
-            <Chip key={c} isNew={!origCats.has(c)}>
+            <Chip key={c} isNew={isNewCat(c)}>
               {resolveCategory(c)}
             </Chip>
           ))}
@@ -49,7 +54,7 @@ export function TaxonomyProposal({
       {proposedTags.length > 0 && (
         <Section label={tagsLabel}>
           {proposedTags.map((tg) => (
-            <Chip key={tg} isNew={!origTags.has(tg)}>
+            <Chip key={tg} isNew={isNewTag(tg)}>
               {resolveTag(tg)}
             </Chip>
           ))}
