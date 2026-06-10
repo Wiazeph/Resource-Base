@@ -6,34 +6,41 @@ import { cn } from "@/lib/utils";
 import type { Pricing } from "@/lib/types";
 
 /**
- * Pricing chooser as toggle chips (not a dropdown), with the project's
- * combination rules:
- *   - "Free" is standalone — picking it clears the others.
- *   - "Free option" (freemium tier) and "Paid" can be combined.
- *   - "Free option" alone, or "Free option" + "Paid", both mean `freemium`
- *     (a product with a free tier and a paid tier).
+ * Pricing chooser as toggle chips (not a dropdown). The whole selection is one
+ * enum value (free | freemium | paid); the chips are just how it's expressed:
+ *   - "Free" is standalone.
+ *   - "Free option" means `freemium` — a free tier AND a paid tier — so picking
+ *     it lights up both "Free option" and "Paid" automatically.
+ *   - "Paid" alone is `paid`; adding "Free option" to it makes `freemium`.
  *
- * The three chips are presentational; the resolved single enum value is written
- * to a hidden input named `pricing`, so form submission stays unchanged.
+ * The resolved enum is written to a hidden input named `pricing`, so form
+ * submission stays unchanged. `value`/`onChange` make it controllable (the
+ * submit form clears it after a successful submit).
  */
-export function PricingSelect({ defaultValue }: { defaultValue?: Pricing }) {
+export function PricingSelect({
+  defaultValue,
+  value: controlled,
+  onChange,
+}: {
+  defaultValue?: Pricing;
+  value?: Pricing | "";
+  onChange?: (v: Pricing | "") => void;
+}) {
   const { t } = useTranslation();
-  // Seed the chips from the stored enum.
-  const [free, setFree] = useState(defaultValue === "free");
-  const [option, setOption] = useState(defaultValue === "freemium");
-  const [paid, setPaid] = useState(defaultValue === "paid");
+  const [internal, setInternal] = useState<Pricing | "">(defaultValue ?? "");
+  const value = controlled ?? internal;
 
-  // Resolve chips → the single enum the backend stores.
-  const value: Pricing | "" = free
-    ? "free"
-    : option
-      ? "freemium" // "free option" (with or without paid) = freemium
-      : paid
-        ? "paid"
-        : "";
+  const set = (next: Pricing | "") => {
+    if (onChange) onChange(next);
+    else setInternal(next);
+  };
+
+  const isFree = value === "free";
+  const isFreemium = value === "freemium";
+  const isPaid = value === "paid";
 
   const chips: {
-    key: "free" | "option" | "paid";
+    key: string;
     label: string;
     active: boolean;
     disabled: boolean;
@@ -42,34 +49,28 @@ export function PricingSelect({ defaultValue }: { defaultValue?: Pricing }) {
     {
       key: "free",
       label: t("pricing.free"),
-      active: free,
-      // Free is mutually exclusive with the combinable pair.
-      disabled: option || paid,
-      onToggle: () => {
-        setFree((v) => !v);
-        setOption(false);
-        setPaid(false);
-      },
+      active: isFree,
+      // Free is standalone — unavailable once a paid-side option is chosen.
+      disabled: isFreemium || isPaid,
+      onToggle: () => set(isFree ? "" : "free"),
     },
     {
-      key: "option",
+      key: "freemium",
       label: t("pricing.freemium"),
-      active: option,
-      disabled: free,
-      onToggle: () => {
-        setOption((v) => !v);
-        setFree(false);
-      },
+      // Freemium implies a paid tier, so this lights up whenever value=freemium.
+      active: isFreemium,
+      disabled: isFree,
+      // Picking "free option" = freemium (paid auto-included); toggling it off
+      // when already freemium drops the free tier back to plain paid.
+      onToggle: () => set(isFreemium ? "paid" : "freemium"),
     },
     {
       key: "paid",
       label: t("pricing.paid"),
-      active: paid,
-      disabled: free,
-      onToggle: () => {
-        setPaid((v) => !v);
-        setFree(false);
-      },
+      // Active for plain paid AND freemium (freemium has a paid tier).
+      active: isPaid || isFreemium,
+      disabled: isFree,
+      onToggle: () => set(isPaid || isFreemium ? "" : "paid"),
     },
   ];
 

@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { PricingSelect } from "@/components/pricing-select";
 import { useProfile } from "@/lib/profile";
-import type { Category } from "@/lib/types";
+import type { Category, Pricing } from "@/lib/types";
 
 const OTHER = "__other__";
 
@@ -19,6 +19,7 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
   const { profile } = useProfile();
   const [pending, setPending] = useState(false);
   const [categoryChoice, setCategoryChoice] = useState("");
+  const [pricing, setPricing] = useState<Pricing | "">("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -53,6 +54,7 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
       toast.success(t("submit.success"));
       form.reset();
       setCategoryChoice("");
+      setPricing("");
     } catch {
       toast.error(t("submit.error"));
     } finally {
@@ -129,7 +131,7 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
         <label className="mb-1.5 block text-sm font-medium">
           {t("submit.pricing")}
         </label>
-        <PricingSelect />
+        <PricingSelect value={pricing} onChange={setPricing} />
       </div>
       <div>
         <label className="mb-1.5 block text-sm font-medium">
