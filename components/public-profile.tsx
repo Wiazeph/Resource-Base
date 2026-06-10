@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Globe, Pencil, User as UserIcon } from "lucide-react";
+import { Globe, Pencil, Send, User as UserIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ResourceGrid } from "@/components/resource-grid";
+import { MySubmissions } from "@/components/my-submissions";
 import { useAuth } from "@/components/auth/auth-provider";
-import type { PublicProfile, Resource } from "@/lib/types";
+import type { Category, PublicProfile, Resource } from "@/lib/types";
 
 // Lucide 1.x dropped brand marks — inline brand SVGs for recognizable icons.
 function GithubIcon() {
@@ -79,9 +80,11 @@ function SocialLink({
 export function PublicProfileView({
   profile,
   resources,
+  categories,
 }: {
   profile: PublicProfile;
   resources: Resource[];
+  categories: Category[];
 }) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -158,6 +161,20 @@ export function PublicProfileView({
           <ResourceGrid resources={resources} />
         )}
       </div>
+
+      {/* My submissions — owner only, so users can track pending/rejected
+          items and resubmit, right where they look for their own activity. */}
+      {isOwner && (
+        <div className="mt-12">
+          <div className="mb-4 flex items-center gap-2">
+            <Send className="size-5 text-primary" />
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              {t("submissions.title")}
+            </h2>
+          </div>
+          <MySubmissions categories={categories} />
+        </div>
+      )}
     </div>
   );
 }

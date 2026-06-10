@@ -124,7 +124,6 @@ export const fr = {
     customCategoryPlaceholder: "Saisir une catégorie",
     note: "Note",
     notePlaceholder: "Pourquoi cette ressource est-elle géniale ?",
-    email: "Votre e-mail (facultatif)",
     submit: "Envoyer la ressource",
     success: "Merci ! Votre proposition est en cours d'examen.",
     error: "Une erreur s'est produite. Veuillez réessayer.",

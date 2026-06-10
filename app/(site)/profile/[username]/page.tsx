@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createPublicClient } from "@/lib/supabase/public";
 import { sanityFetch } from "@/sanity/lib/fetch";
-import { resourcesBySubmitterQuery } from "@/sanity/lib/queries";
+import {
+  allCategoriesQuery,
+  resourcesBySubmitterQuery,
+} from "@/sanity/lib/queries";
 import { PublicProfileView } from "@/components/public-profile";
-import type { PublicProfile, Resource } from "@/lib/types";
+import type { Category, PublicProfile, Resource } from "@/lib/types";
 
 // Profiles are reachable only via resource-card links — keep them out of search.
 export const metadata: Metadata = {
@@ -27,11 +30,22 @@ export default async function PublicProfilePage({
     .maybeSingle<PublicProfile>();
   if (!profile) notFound();
 
-  const resources = await sanityFetch<Resource[]>({
-    query: resourcesBySubmitterQuery,
-    params: { userId: profile.id },
-    tags: ["resource"],
-  });
+  // Both queries are tag-cached + CDN-served, so this stays cheap. Categories
+  // feed the owner-only "My submissions" resubmit modal.
+  const [resources, categories] = await Promise.all([
+    sanityFetch<Resource[]>({
+      query: resourcesBySubmitterQuery,
+      params: { userId: profile.id },
+      tags: ["resource"],
+    }),
+    sanityFetch<Category[]>({ query: allCategoriesQuery, tags: ["category"] }),
+  ]);
 
-  return <PublicProfileView profile={profile} resources={resources} />;
+  return (
+    <PublicProfileView
+      profile={profile}
+      resources={resources}
+      categories={categories}
+    />
+  );
 }

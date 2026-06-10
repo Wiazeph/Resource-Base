@@ -7,14 +7,12 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useAuth } from "@/components/auth/auth-provider";
 import type { Category } from "@/lib/types";
 
 const OTHER = "__other__";
 
 export function SubmitForm({ categories }: { categories: Category[] }) {
   const { t } = useTranslation();
-  const { user } = useAuth();
   const [pending, setPending] = useState(false);
   const [categoryChoice, setCategoryChoice] = useState("");
 
@@ -36,14 +34,13 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
       const res = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // Attach the signed-in user's id + email so we can notify them on approval.
+        // Identity (user id + email) is taken from the verified server session
+        // in /api/submit — never sent from the client.
         body: JSON.stringify({
           name: data.name,
           url: data.url,
           suggestedCategory,
           note: data.note,
-          userId: user?.id ?? null,
-          email: data.email || user?.email || "",
         }),
       });
       if (!res.ok) throw new Error(await res.text());
@@ -117,12 +114,6 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
           rows={3}
           placeholder={t("submit.notePlaceholder")}
         />
-      </div>
-      <div>
-        <label className="mb-1.5 block text-sm font-medium">
-          {t("submit.email")}
-        </label>
-        <Input name="email" type="email" placeholder="you@example.com" />
       </div>
 
       {/* Honeypot — hidden from humans, catches bots. */}

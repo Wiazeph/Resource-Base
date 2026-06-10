@@ -124,7 +124,6 @@ export const tr = {
     customCategoryPlaceholder: "Bir kategori yaz",
     note: "Not",
     notePlaceholder: "Bu kaynak neden harika?",
-    email: "E-postan (opsiyonel)",
     submit: "Kaynağı gönder",
     success: "Teşekkürler! Önerin inceleme sırasında.",
     error: "Bir şeyler ters gitti. Lütfen tekrar dene.",

@@ -124,7 +124,6 @@ export const en = {
     customCategoryPlaceholder: "Type a category",
     note: "Note",
     notePlaceholder: "Why is this resource great?",
-    email: "Your email (optional)",
     submit: "Submit resource",
     success: "Thanks! Your suggestion is in the review queue.",
     error: "Something went wrong. Please try again.",
