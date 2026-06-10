@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useSubmissions } from "@/lib/submissions";
-import { cn } from "@/lib/utils";
+import { cn, favicon } from "@/lib/utils";
 import type { Category, Submission, SubmissionStatus } from "@/lib/types";
 
 const OTHER = "__other__";
@@ -60,30 +60,30 @@ export function MySubmissions({ categories }: { categories: Category[] }) {
 
   return (
     <>
-      <ul className="space-y-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((s) => {
           const Icon = STATUS_ICON[s.status];
+          const icon = s.url ? favicon(s.url) : undefined;
           return (
-            <li
+            <div
               key={s.id}
-              className="rounded-xl border border-border bg-card p-4"
+              className="flex flex-col rounded-xl border border-border bg-card p-4"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0 flex-1">
-                  <a
-                    href={s.url ?? "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="truncate font-medium hover:underline"
-                  >
-                    {s.name}
-                  </a>
-                  {s.suggested_category && (
-                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                      {s.suggested_category}
-                    </p>
-                  )}
-                </div>
+              <div className="flex items-center gap-3">
+                <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-muted/50">
+                  {icon ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={icon} alt="" className="size-5" loading="lazy" />
+                  ) : null}
+                </span>
+                <a
+                  href={s.url ?? "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="min-w-0 flex-1 truncate font-medium leading-tight hover:underline"
+                >
+                  {s.name}
+                </a>
                 <Badge
                   variant="outline"
                   className={cn("gap-1 shrink-0", STATUS_STYLE[s.status])}
@@ -95,18 +95,18 @@ export function MySubmissions({ categories }: { categories: Category[] }) {
 
               {s.status === "rejected" && (
                 <div className="mt-3 rounded-lg border border-destructive/20 bg-destructive/5 p-3">
-                  {s.rejection_reason ? (
-                    <p className="text-sm text-muted-foreground">
-                      <span className="font-medium text-foreground">
-                        {t("submissions.reasonLabel")}:{" "}
-                      </span>
-                      {s.rejection_reason}
-                    </p>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      {t("submissions.noReason")}
-                    </p>
-                  )}
+                  <p className="text-sm text-muted-foreground">
+                    {s.rejection_reason ? (
+                      <>
+                        <span className="font-medium text-foreground">
+                          {t("submissions.reasonLabel")}:{" "}
+                        </span>
+                        {s.rejection_reason}
+                      </>
+                    ) : (
+                      t("submissions.noReason")
+                    )}
+                  </p>
                   <Button
                     size="sm"
                     variant="outline"
@@ -118,10 +118,10 @@ export function MySubmissions({ categories }: { categories: Category[] }) {
                   </Button>
                 </div>
               )}
-            </li>
+            </div>
           );
         })}
-      </ul>
+      </div>
 
       <ResubmitDialog
         submission={editing}
