@@ -35,11 +35,10 @@ export function useNotifications() {
     setItems(data ?? []);
   }, [user, supabase]);
 
+  // Load once when auth resolves; no focus-refetch (it doubled queries on
+  // every tab refocus). New notifications surface on the next navigation.
   useEffect(() => {
     load();
-    const onFocus = () => load();
-    window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
   }, [load]);
 
   const unread = items.filter((n) => !n.read_at).length;

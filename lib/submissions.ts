@@ -51,11 +51,11 @@ export function SubmissionsProvider({ children }: { children: React.ReactNode })
     setLoading(false);
   }, [user, supabase]);
 
+  // Load once when auth resolves. We deliberately don't refetch on window
+  // focus — moderation decisions are rare and already arrive via notifications,
+  // so refetching on every tab refocus only caused redundant queries.
   useEffect(() => {
     load();
-    const onFocus = () => load();
-    window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
   }, [load]);
 
   const value = useMemo<SubmissionsValue>(

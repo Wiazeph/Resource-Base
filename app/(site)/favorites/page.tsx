@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { FavoritesClient } from "@/components/favorites-client";
-import { AuthGate } from "@/components/auth/auth-gate";
-import { createClient } from "@/lib/supabase/server";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { allResourcesQuery } from "@/sanity/lib/queries";
 import type { Resource } from "@/lib/types";
@@ -12,20 +10,10 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+// Auth is enforced in middleware (PROTECTED_PAGES → redirects signed-out
+// visitors home before render), so the page skips a redundant getUser()
+// round-trip. FavoritesClient still renders a sign-in prompt as a UX fallback.
 export default async function FavoritesPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return (
-      <div className="mx-auto max-w-6xl px-4 py-10">
-        <AuthGate>{null}</AuthGate>
-      </div>
-    );
-  }
-
   const resources = await sanityFetch<Resource[]>({
     query: allResourcesQuery,
     tags: ["resource"],

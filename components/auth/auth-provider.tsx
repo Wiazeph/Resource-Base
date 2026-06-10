@@ -42,10 +42,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
-    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (event === "SIGNED_IN" && session?.user) {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, next) => {
+      // On tab refocus Supabase emits TOKEN_REFRESHED (and sometimes SIGNED_IN)
+      // with a fresh token but the SAME user. Updating state every time creates
+      // a new `user` object reference, which cascades a refetch through every
+      // provider that depends on `user` (favorites, submissions, profile,
+      // notifications) — the "double-load". So only update state when the
+      // identity (user id) or the access token actually changed.
+      setSession((prev) => {
+        const sameUser = (prev?.user?.id ?? null) === (next?.user?.id ?? null);
+        const sameToken = prev?.access_token === next?.access_token;
+        if (sameUser && sameToken) return prev;
+        return next;
+      });
+      setUser((prev) => {
+        const sameUser = (prev?.id ?? null) === (next?.user?.id ?? null);
+        return sameUser ? prev : (next?.user ?? null);
+      });
+      if (event === "SIGNED_IN" && next?.user) {
         setDialogOpen(false);
       }
     });
