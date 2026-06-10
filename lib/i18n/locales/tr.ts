@@ -218,4 +218,16 @@ export const tr = {
     accept: "Kabul et",
     decline: "Reddet",
   },
+
+  account: {
+    title: "Verilerin",
+    export: "Verilerimi dışa aktar",
+    delete: "Hesabı sil",
+    deleted: "Hesabın silindi.",
+    deleteError: "Hesabın silinemedi. Lütfen tekrar dene.",
+    deleteTitle: "Hesabını silmek istiyor musun?",
+    deleteWarning:
+      "Bu işlem profilini, favorilerini ve gönderilerini kalıcı olarak siler. Geri alınamaz. Yayındaki kaynaklar kalır ama katkı atfın kaldırılır.",
+    deleteConfirm: "Kalıcı olarak sil",
+  },
 } as const;

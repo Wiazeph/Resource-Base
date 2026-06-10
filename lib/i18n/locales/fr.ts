@@ -218,4 +218,16 @@ export const fr = {
     accept: "Accepter",
     decline: "Refuser",
   },
+
+  account: {
+    title: "Vos données",
+    export: "Exporter mes données",
+    delete: "Supprimer le compte",
+    deleted: "Votre compte a été supprimé.",
+    deleteError: "Impossible de supprimer votre compte. Veuillez réessayer.",
+    deleteTitle: "Supprimer votre compte ?",
+    deleteWarning:
+      "Cela supprime définitivement votre profil, vos favoris et vos propositions. Action irréversible. Les ressources publiées restent mais perdent votre attribution.",
+    deleteConfirm: "Supprimer définitivement",
+  },
 } as const;

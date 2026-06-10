@@ -10,7 +10,7 @@ const PROTECTED_PAGES = [
 ];
 
 /** API routes that require a signed-in user. */
-const PROTECTED_APIS = ["/api/submit"];
+const PROTECTED_APIS = ["/api/submit", "/api/user"];
 
 /**
  * Refreshes the Supabase session cookie AND gates protected routes. Public

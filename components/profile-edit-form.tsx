@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { IconInput } from "@/components/ui/icon-input";
+import { AccountDangerZone } from "@/components/account-danger-zone";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useProfile } from "@/lib/profile";
@@ -90,6 +91,7 @@ export function ProfileEditForm() {
   }
 
   return (
+    <>
     <form onSubmit={onSubmit} className="space-y-4">
       <h1 className="text-3xl font-bold tracking-tight">{t("profile.editTitle")}</h1>
 
@@ -158,7 +160,10 @@ export function ProfileEditForm() {
         {pending && <Loader2 className="size-4 animate-spin" />}
         {t("profile.save")}
       </Button>
-    </form>
+      </form>
+
+      <AccountDangerZone />
+    </>
   );
 }
 

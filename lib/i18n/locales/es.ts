@@ -218,4 +218,16 @@ export const es = {
     accept: "Aceptar",
     decline: "Rechazar",
   },
+
+  account: {
+    title: "Tus datos",
+    export: "Exportar mis datos",
+    delete: "Eliminar cuenta",
+    deleted: "Tu cuenta ha sido eliminada.",
+    deleteError: "No se pudo eliminar tu cuenta. Inténtalo de nuevo.",
+    deleteTitle: "¿Eliminar tu cuenta?",
+    deleteWarning:
+      "Esto elimina permanentemente tu perfil, favoritos y propuestas. No se puede deshacer. Los recursos publicados permanecen pero pierden tu atribución.",
+    deleteConfirm: "Eliminar permanentemente",
+  },
 } as const;

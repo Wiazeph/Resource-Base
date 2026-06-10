@@ -218,4 +218,16 @@ export const en = {
     accept: "Accept",
     decline: "Decline",
   },
+
+  account: {
+    title: "Your data",
+    export: "Export my data",
+    delete: "Delete account",
+    deleted: "Your account has been deleted.",
+    deleteError: "Could not delete your account. Please try again.",
+    deleteTitle: "Delete your account?",
+    deleteWarning:
+      "This permanently deletes your profile, favorites and submissions. This cannot be undone. Published resources stay but lose your attribution.",
+    deleteConfirm: "Permanently delete",
+  },
 } as const;
