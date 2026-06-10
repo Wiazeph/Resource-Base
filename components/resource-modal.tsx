@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TaxonomyFixEditor } from "@/components/taxonomy-fix-editor";
+import { TaxonomyProposal } from "@/components/taxonomy-proposal";
 import {
   Dialog,
   DialogContent,
@@ -284,34 +285,16 @@ export function ResourceModal({
               <Clock className="size-3.5" />
               {t("taxonomy.yourSuggestion")}
             </div>
-            {pendingTaxFix.proposed_categories.length > 0 && (
-              <div className="flex flex-col gap-1.5">
-                <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                  {t("modal.categories")}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {pendingTaxFix.proposed_categories.map((c) => (
-                    <span key={c} className={PILL}>
-                      {titleForCat(c)}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {pendingTaxFix.proposed_tags.length > 0 && (
-              <div className="flex flex-col gap-1.5">
-                <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                  {t("modal.tags")}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {pendingTaxFix.proposed_tags.map((tg) => (
-                    <span key={tg} className={PILL}>
-                      {titleForTag(tg)}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
+            <TaxonomyProposal
+              categoriesLabel={t("modal.categories")}
+              tagsLabel={t("modal.tags")}
+              proposedCategories={pendingTaxFix.proposed_categories}
+              proposedTags={pendingTaxFix.proposed_tags}
+              originalCategories={pendingTaxFix.original_categories}
+              originalTags={pendingTaxFix.original_tags}
+              resolveCategory={titleForCat}
+              resolveTag={titleForTag}
+            />
             <Button
               type="button"
               variant="outline"

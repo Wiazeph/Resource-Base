@@ -94,6 +94,7 @@ export const fr = {
     editCta: "Suggérer une modification",
     pendingSuggestion: "Suggestion en attente",
     yourSuggestion: "Vos catégories et tags suggérés",
+    newLegend: "Nouvellement ajouté",
     addCategory: "Ajouter une catégorie…",
     addTag: "Ajouter un tag…",
     submit: "Envoyer la suggestion",

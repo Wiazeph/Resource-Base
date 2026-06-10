@@ -55,6 +55,22 @@ export const submission = defineType({
       hidden: ({ parent }) => parent?.kind !== 'taxonomy',
     }),
     defineField({
+      name: 'originalCategories',
+      title: 'Original categories (slugs at submit time)',
+      type: 'array',
+      of: [{ type: 'string' }],
+      readOnly: true,
+      hidden: ({ parent }) => parent?.kind !== 'taxonomy',
+    }),
+    defineField({
+      name: 'originalTags',
+      title: 'Original tags (slugs at submit time)',
+      type: 'array',
+      of: [{ type: 'string' }],
+      readOnly: true,
+      hidden: ({ parent }) => parent?.kind !== 'taxonomy',
+    }),
+    defineField({
       name: 'name',
       type: 'string',
       validation: (rule) => rule.required(),

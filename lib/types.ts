@@ -94,6 +94,8 @@ export interface Submission {
   tags: string[]
   proposed_categories: string[]
   proposed_tags: string[]
+  original_categories: string[]
+  original_tags: string[]
   note: string | null
   rejection_reason: string | null
   created_at: string

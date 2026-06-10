@@ -118,6 +118,22 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  // For taxonomy fixes, snapshot the resource's CURRENT taxonomy server-side
+  // (trusted source) so the suggestion view can highlight what's new.
+  let originalCategories: string[] = [];
+  let originalTags: string[] = [];
+  if (kind === "taxonomy") {
+    const snap = await writeClient.fetch<{
+      categories?: string[];
+      tags?: string[];
+    } | null>(
+      `*[_id == $id][0]{ "categories": categories[]->slug.current, "tags": tags[]->slug.current }`,
+      { id: targetResourceId },
+    );
+    originalCategories = (snap?.categories ?? []).filter(Boolean);
+    originalTags = (snap?.tags ?? []).filter(Boolean);
+  }
+
   const fields = {
     name: name.slice(0, 200),
     url,
@@ -197,7 +213,14 @@ export async function POST(req: NextRequest) {
       ...fields,
       kind,
       ...(isFix ? { targetResourceId } : {}),
-      ...(kind === "taxonomy" ? { proposedCategories, proposedTags } : {}),
+      ...(kind === "taxonomy"
+        ? {
+            proposedCategories,
+            proposedTags,
+            originalCategories,
+            originalTags,
+          }
+        : {}),
       email: email.slice(0, 200),
       submittedBy: userId,
       status: "pending",
@@ -219,6 +242,8 @@ export async function POST(req: NextRequest) {
         tags: fields.tags,
         proposed_categories: proposedCategories,
         proposed_tags: proposedTags,
+        original_categories: originalCategories,
+        original_tags: originalTags,
         note: fields.note,
         status: "pending",
       });

@@ -22,6 +22,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { PricingSelect } from "@/components/pricing-select";
+import { TaxonomyProposal } from "@/components/taxonomy-proposal";
 import { useSubmissions } from "@/lib/submissions";
 import { cn, favicon } from "@/lib/utils";
 import type { Category, Submission, SubmissionStatus } from "@/lib/types";
@@ -267,57 +268,32 @@ function SubmissionDialog({
               </form>
             ) : (
               <>
-                {/* Taxonomy fix: show the proposed categories/tags. */}
+                {/* Taxonomy fix: show proposals with new items highlighted. */}
                 {s.kind === "taxonomy" &&
                   (s.proposed_categories.length > 0 ||
                     s.proposed_tags.length > 0) && (
-                    <>
-                      {s.proposed_categories.length > 0 && (
-                        <div className="flex flex-col gap-1.5">
-                          <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                            {t("modal.categories")}
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {s.proposed_categories.map((c) => (
-                              <span key={c} className={PILL}>
-                                {categories.find((x) => x.slug === c)?.title ?? c}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      {s.proposed_tags.length > 0 && (
-                        <div className="flex flex-col gap-1.5">
-                          <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                            {t("modal.tags")}
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {s.proposed_tags.map((tg) => (
-                              <span key={tg} className={PILL}>
-                                {tg}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </>
+                    <TaxonomyProposal
+                      categoriesLabel={t("modal.categories")}
+                      tagsLabel={t("modal.tags")}
+                      proposedCategories={s.proposed_categories}
+                      proposedTags={s.proposed_tags}
+                      originalCategories={s.original_categories}
+                      originalTags={s.original_tags}
+                      resolveCategory={(c) =>
+                        categories.find((x) => x.slug === c)?.title ?? c
+                      }
+                    />
                   )}
 
-                {/* Pricing + tags badges (new-resource submissions) */}
-                {s.kind !== "taxonomy" && (s.pricing || s.tags.length > 0) && (
+                {/* New-resource submissions — mirror the home modal layout:
+                    pricing on its own badge row, tags in a labelled section. */}
+                {s.kind !== "taxonomy" && s.pricing && (
                   <div className="flex flex-wrap items-center gap-2">
-                    {s.pricing && (
-                      <Badge
-                        variant={s.pricing === "free" ? "outline" : "secondary"}
-                      >
-                        {t(`pricing.${s.pricing}`)}
-                      </Badge>
-                    )}
-                    {s.tags.map((tag) => (
-                      <span key={tag} className={PILL}>
-                        {tag}
-                      </span>
-                    ))}
+                    <Badge
+                      variant={s.pricing === "free" ? "outline" : "secondary"}
+                    >
+                      {t(`pricing.${s.pricing}`)}
+                    </Badge>
                   </div>
                 )}
 
@@ -326,6 +302,21 @@ function SubmissionDialog({
                     label={t("submit.category")}
                     value={s.suggested_category}
                   />
+                )}
+
+                {s.kind !== "taxonomy" && s.tags.length > 0 && (
+                  <div className="flex flex-col gap-1.5">
+                    <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                      {t("modal.tags")}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {s.tags.map((tag) => (
+                        <span key={tag} className={PILL}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 )}
                 {s.note && (
                   <DetailRow label={t("submit.note")} value={s.note} />
