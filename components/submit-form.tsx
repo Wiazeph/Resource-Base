@@ -40,6 +40,8 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
           name: data.name,
           url: data.url,
           suggestedCategory,
+          pricing: data.pricing,
+          tags: data.tags,
           note: data.note,
         }),
       });
@@ -104,6 +106,27 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
             autoFocus
           />
         )}
+      </div>
+      <div>
+        <label className="mb-1.5 block text-sm font-medium">
+          {t("submit.pricing")}
+        </label>
+        <select
+          name="pricing"
+          defaultValue=""
+          className="h-9 w-full cursor-pointer rounded-md border border-border bg-background px-3 text-sm"
+        >
+          <option value="">{t("submit.selectPricing")}</option>
+          <option value="free">{t("pricing.free")}</option>
+          <option value="freemium">{t("pricing.freemium")}</option>
+          <option value="paid">{t("pricing.paid")}</option>
+        </select>
+      </div>
+      <div>
+        <label className="mb-1.5 block text-sm font-medium">
+          {t("submit.tags")}
+        </label>
+        <Input name="tags" placeholder={t("submit.tagsPlaceholder")} />
       </div>
       <div>
         <label className="mb-1.5 block text-sm font-medium">

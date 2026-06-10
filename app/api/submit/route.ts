@@ -71,10 +71,24 @@ export async function POST(req: NextRequest) {
   const userId = user.id;
   const email = user.email ?? "";
 
+  const PRICINGS = ["free", "freemium", "paid"];
+  const pricing = PRICINGS.includes(data.pricing) ? data.pricing : undefined;
+  // Tags arrive comma-separated; normalize to a clean, deduped, capped list.
+  const tags = Array.from(
+    new Set(
+      String(data.tags ?? "")
+        .split(",")
+        .map((tg) => tg.trim().slice(0, 40))
+        .filter(Boolean),
+    ),
+  ).slice(0, 10);
+
   const fields = {
     name: name.slice(0, 200),
     url,
     suggestedCategory: (data.suggestedCategory ?? "").slice(0, 100),
+    pricing,
+    tags,
     note: (data.note ?? "").slice(0, 1000),
   };
 
@@ -96,8 +110,10 @@ export async function POST(req: NextRequest) {
       if (!existing || existing.submittedBy !== userId) {
         return new NextResponse("Not found", { status: 404 });
       }
-      if (existing.status !== "rejected") {
-        return new NextResponse("Only rejected submissions can be resubmitted", {
+      // Editing is allowed while a submission is still in the queue (pending)
+      // or was rejected. Approved submissions are live and immutable here.
+      if (existing.status !== "rejected" && existing.status !== "pending") {
+        return new NextResponse("This submission can no longer be edited", {
           status: 409,
         });
       }
@@ -114,6 +130,8 @@ export async function POST(req: NextRequest) {
           name: fields.name,
           url: fields.url,
           suggested_category: fields.suggestedCategory,
+          pricing: fields.pricing ?? null,
+          tags: fields.tags,
           note: fields.note,
           status: "pending",
           rejection_reason: null,
@@ -143,6 +161,8 @@ export async function POST(req: NextRequest) {
         name: fields.name,
         url: fields.url,
         suggested_category: fields.suggestedCategory,
+        pricing: fields.pricing ?? null,
+        tags: fields.tags,
         note: fields.note,
         status: "pending",
       });

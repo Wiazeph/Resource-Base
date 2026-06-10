@@ -21,6 +21,26 @@ export const submission = defineType({
       validation: (rule) => rule.required().uri({ scheme: ['http', 'https'] }),
     }),
     defineField({ name: 'suggestedCategory', type: 'string' }),
+    defineField({
+      name: 'pricing',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Free', value: 'free' },
+          { title: 'Freemium', value: 'freemium' },
+          { title: 'Paid', value: 'paid' },
+        ],
+        layout: 'radio',
+      },
+      description: 'Suggested pricing — the submitter’s hint for the editor.',
+    }),
+    defineField({
+      name: 'tags',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description: 'Free-text tag suggestions; editor maps them to real tags.',
+      options: { layout: 'tags' },
+    }),
     defineField({ name: 'note', type: 'text', rows: 3 }),
     defineField({ name: 'email', type: 'string' }),
     defineField({
