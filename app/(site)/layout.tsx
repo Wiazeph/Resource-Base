@@ -11,6 +11,7 @@ import { FavoriteCountsProvider } from "@/components/favorite-counts-provider";
 import { TaxonomyProvider } from "@/components/taxonomy-provider";
 import { SubmissionsProvider } from "@/lib/submissions";
 import { I18nProvider } from "@/components/i18n-provider";
+import { ConsentGate } from "@/components/consent";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import {
   allCategoriesQuery,
@@ -55,6 +56,7 @@ export default async function SiteLayout({
             <main className="flex-1 pt-6">{children}</main>
             <SiteFooter />
           </div>
+          <ConsentGate gaId={process.env.NEXT_PUBLIC_GA_ID} />
           </ContributorsProvider>
         </ClickCountsProvider>
         </FavoritesProvider>

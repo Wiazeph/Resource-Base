@@ -206,5 +206,16 @@ export const es = {
     source: "Dar estrella en GitHub",
     reportIssue: "Reportar un problema",
     sponsor: "Patrocinar",
+    privacy: "Política de privacidad",
+    terms: "Términos del servicio",
+  },
+
+  legal: { updated: "Última actualización {{date}}" },
+
+  consent: {
+    message:
+      "Usamos cookies para análisis anónimos y mejorar el sitio. Consulta nuestra",
+    accept: "Aceptar",
+    decline: "Rechazar",
   },
 } as const;

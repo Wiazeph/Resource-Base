@@ -206,5 +206,16 @@ export const tr = {
     source: "GitHub'da yıldızla",
     reportIssue: "Sorun bildir",
     sponsor: "Sponsor ol",
+    privacy: "Gizlilik Politikası",
+    terms: "Kullanım Şartları",
+  },
+
+  legal: { updated: "Son güncelleme {{date}}" },
+
+  consent: {
+    message:
+      "Siteyi geliştirmek için anonim analitik amacıyla çerez kullanıyoruz. Ayrıntılar:",
+    accept: "Kabul et",
+    decline: "Reddet",
   },
 } as const;

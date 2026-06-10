@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Boxes, CircleDot, Globe, Heart, Mail } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Separator } from "@/components/ui/separator";
@@ -102,6 +103,17 @@ export function SiteFooter() {
             <Heart className="size-4 fill-current" aria-hidden="true" />
             <span>{t("footer.sponsor")}</span>
           </a>
+        </div>
+
+        {/* Row 3 — legal */}
+        <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs">
+          <Link href="/privacy" className={linkClass}>
+            {t("footer.privacy")}
+          </Link>
+          <Dot />
+          <Link href="/terms" className={linkClass}>
+            {t("footer.terms")}
+          </Link>
         </div>
       </div>
     </footer>

@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
-import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
-
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
 // Inter for body text (crisp, neutral), Plus Jakarta Sans for headings
 // (modern, geometric, distinctive). Geist Mono for code/kbd.
@@ -57,9 +53,7 @@ export default function RootLayout({
           {children}
           <Toaster />
         </ThemeProvider>
-        <Analytics />
       </body>
-      {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
     </html>
   );
 }
