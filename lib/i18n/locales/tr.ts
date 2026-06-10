@@ -139,6 +139,8 @@ export const tr = {
     status: { pending: "Beklemede", approved: "Onaylandı", rejected: "Reddedildi" },
     reasonLabel: "Gerekçe",
     noReason: "Bu gönderi onaylanmadı.",
+    edit: "Düzenle",
+    cancel: "Vazgeç",
     editResubmit: "Düzenle ve tekrar gönder",
     resubmit: "Tekrar gönder",
     resubmitSuccess: "Tekrar gönderildi! İnceleme sırasına alındı.",

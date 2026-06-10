@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, Clock, Loader2, PencilLine, XCircle } from "lucide-react";
+import {
+  ArrowUpRight,
+  CheckCircle2,
+  Clock,
+  Loader2,
+  XCircle,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,15 +38,30 @@ const STATUS_ICON: Record<SubmissionStatus, typeof Clock> = {
   rejected: XCircle,
 };
 
+/** Pill shared with the resource modal. */
+const PILL =
+  "inline-flex items-center gap-1 rounded-full bg-accent px-2.5 py-1 text-xs text-accent-foreground";
+
+function StatusBadge({ status }: { status: SubmissionStatus }) {
+  const { t } = useTranslation();
+  const Icon = STATUS_ICON[status];
+  return (
+    <Badge variant="outline" className={cn("gap-1 shrink-0", STATUS_STYLE[status])}>
+      <Icon className="size-3" />
+      {t(`submissions.status.${status}`)}
+    </Badge>
+  );
+}
+
 /**
- * Owner-only list of the user's submissions with live moderation status.
- * Rejected items surface the editor's reason and an "edit & resubmit" modal
- * that patches the same Sanity doc back to pending (via /api/submit).
+ * Owner-only list of the user's submissions. Each card opens a detail modal
+ * (like the home resource cards) showing status + everything submitted, with
+ * an inline edit/resubmit form for items still in the queue or rejected.
  */
 export function MySubmissions({ categories }: { categories: Category[] }) {
   const { t } = useTranslation();
   const { items, loading, reload } = useSubmissions();
-  const [editing, setEditing] = useState<Submission | null>(null);
+  const [open, setOpen] = useState<Submission | null>(null);
 
   if (loading) {
     return (
@@ -62,73 +83,35 @@ export function MySubmissions({ categories }: { categories: Category[] }) {
     <>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((s) => {
-          const Icon = STATUS_ICON[s.status];
           const icon = s.url ? favicon(s.url) : undefined;
           return (
-            <div
+            <button
               key={s.id}
-              className="flex flex-col rounded-xl border border-border bg-card p-4"
+              type="button"
+              onClick={() => setOpen(s)}
+              className="card-hover group flex items-center gap-3 rounded-xl border border-border bg-card p-4 text-left"
             >
-              <div className="flex items-center gap-3">
-                <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-muted/50">
-                  {icon ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={icon} alt="" className="size-5" loading="lazy" />
-                  ) : null}
-                </span>
-                <a
-                  href={s.url ?? "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="min-w-0 flex-1 truncate font-medium leading-tight hover:underline"
-                >
-                  {s.name}
-                </a>
-                <Badge
-                  variant="outline"
-                  className={cn("gap-1 shrink-0", STATUS_STYLE[s.status])}
-                >
-                  <Icon className="size-3" />
-                  {t(`submissions.status.${s.status}`)}
-                </Badge>
-              </div>
-
-              {s.status === "rejected" && (
-                <div className="mt-3 rounded-lg border border-destructive/20 bg-destructive/5 p-3">
-                  <p className="text-sm text-muted-foreground">
-                    {s.rejection_reason ? (
-                      <>
-                        <span className="font-medium text-foreground">
-                          {t("submissions.reasonLabel")}:{" "}
-                        </span>
-                        {s.rejection_reason}
-                      </>
-                    ) : (
-                      t("submissions.noReason")
-                    )}
-                  </p>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="mt-3"
-                    onClick={() => setEditing(s)}
-                  >
-                    <PencilLine className="size-3.5" />
-                    {t("submissions.editResubmit")}
-                  </Button>
-                </div>
-              )}
-            </div>
+              <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-muted/50">
+                {icon ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={icon} alt="" className="size-5" loading="lazy" />
+                ) : null}
+              </span>
+              <span className="min-w-0 flex-1 truncate font-medium leading-tight group-hover:underline">
+                {s.name}
+              </span>
+              <StatusBadge status={s.status} />
+            </button>
           );
         })}
       </div>
 
-      <ResubmitDialog
-        submission={editing}
+      <SubmissionDialog
+        submission={open}
         categories={categories}
-        onClose={() => setEditing(null)}
+        onClose={() => setOpen(null)}
         onDone={() => {
-          setEditing(null);
+          setOpen(null);
           reload();
         }}
       />
@@ -136,7 +119,7 @@ export function MySubmissions({ categories }: { categories: Category[] }) {
   );
 }
 
-function ResubmitDialog({
+function SubmissionDialog({
   submission,
   categories,
   onClose,
@@ -149,15 +132,21 @@ function ResubmitDialog({
 }) {
   const { t } = useTranslation();
   const [pending, setPending] = useState(false);
-  // Prefill the category select; "Other" when the saved value isn't a known cat.
-  const known = categories.some((c) => c.title === submission?.suggested_category);
+  const [editing, setEditing] = useState(false);
   const [categoryChoice, setCategoryChoice] = useState("");
 
-  // Reset the controlled select whenever a new submission opens.
+  const known = categories.some(
+    (c) => c.title === submission?.suggested_category,
+  );
+  // Live (approved) submissions are read-only; pending/rejected can be edited.
+  const canEdit = submission?.status !== "approved";
+
+  // Reset per-open state whenever a different submission opens.
   const openId = submission?.id ?? null;
   const [seededFor, setSeededFor] = useState<string | null>(null);
   if (openId && openId !== seededFor) {
     setSeededFor(openId);
+    setEditing(false);
     setCategoryChoice(
       submission?.suggested_category
         ? known
@@ -187,6 +176,8 @@ function ResubmitDialog({
           name: data.name,
           url: data.url,
           suggestedCategory,
+          pricing: data.pricing,
+          tags: data.tags,
           note: data.note,
         }),
       });
@@ -200,85 +191,248 @@ function ResubmitDialog({
     }
   }
 
+  const s = submission;
+
   return (
     <Dialog open={!!submission} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[85vh] gap-4 overflow-y-auto p-6 sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>{t("submissions.editResubmit")}</DialogTitle>
-        </DialogHeader>
-        {submission && (
-          <form onSubmit={onSubmit} className="space-y-4">
-            <div>
-              <label className="mb-1.5 block text-sm font-medium">
-                {t("submit.name")} *
-              </label>
-              <Input
-                name="name"
-                required
-                defaultValue={submission.name ?? ""}
-                maxLength={200}
-              />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium">
-                {t("submit.url")} *
-              </label>
-              <Input
-                name="url"
-                type="url"
-                required
-                defaultValue={submission.url ?? ""}
-              />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium">
-                {t("submit.category")}
-              </label>
-              <select
-                name="categoryChoice"
-                value={categoryChoice}
-                onChange={(e) => setCategoryChoice(e.target.value)}
-                className="h-9 w-full cursor-pointer rounded-md border border-border bg-background px-3 text-sm"
-              >
-                <option value="">{t("submit.selectCategory")}</option>
-                {categories
-                  .filter((c) => !c.parentSlug)
-                  .map((c) => (
-                    <option key={c._id} value={c.title}>
-                      {c.title}
-                    </option>
-                  ))}
-                <option value={OTHER}>{t("submit.otherCategory")}</option>
-              </select>
-              {categoryChoice === OTHER && (
-                <Input
-                  name="customCategory"
-                  className="mt-2"
-                  required
-                  maxLength={60}
-                  defaultValue={known ? "" : (submission.suggested_category ?? "")}
-                  placeholder={t("submit.customCategoryPlaceholder")}
+      <DialogContent className="max-h-[85vh] gap-5 overflow-y-auto p-6 sm:max-w-md">
+        {s && (
+          <>
+            <DialogHeader className="flex-row items-center gap-3 pr-6">
+              <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-muted/50">
+                {s.url && favicon(s.url) ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={favicon(s.url)}
+                    alt=""
+                    className="size-5"
+                    loading="lazy"
+                  />
+                ) : null}
+              </span>
+              <DialogTitle className="min-w-0 flex-1 text-base leading-snug">
+                <a
+                  href={s.url ?? "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  {s.name}
+                  <ArrowUpRight className="ml-1 inline size-3.5 align-baseline opacity-60" />
+                </a>
+              </DialogTitle>
+              <StatusBadge status={s.status} />
+            </DialogHeader>
+
+            {editing ? (
+              <form onSubmit={onSubmit} className="space-y-4">
+                <FormFields
+                  submission={s}
+                  categories={categories}
+                  categoryChoice={categoryChoice}
+                  setCategoryChoice={setCategoryChoice}
+                  known={known}
                 />
-              )}
-            </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium">
-                {t("submit.note")}
-              </label>
-              <Textarea
-                name="note"
-                rows={3}
-                defaultValue={submission.note ?? ""}
-                placeholder={t("submit.notePlaceholder")}
-              />
-            </div>
-            <Button type="submit" disabled={pending} className="w-full">
-              {pending && <Loader2 className="size-4 animate-spin" />}
-              {t("submissions.resubmit")}
-            </Button>
-          </form>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setEditing(false)}
+                  >
+                    {t("submissions.cancel")}
+                  </Button>
+                  <Button type="submit" disabled={pending} className="flex-1">
+                    {pending && <Loader2 className="size-4 animate-spin" />}
+                    {t("submissions.resubmit")}
+                  </Button>
+                </div>
+              </form>
+            ) : (
+              <>
+                {/* Pricing + tags badges */}
+                {(s.pricing || s.tags.length > 0) && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {s.pricing && (
+                      <Badge
+                        variant={s.pricing === "free" ? "outline" : "secondary"}
+                      >
+                        {t(`pricing.${s.pricing}`)}
+                      </Badge>
+                    )}
+                    {s.tags.map((tag) => (
+                      <span key={tag} className={PILL}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {s.suggested_category && (
+                  <DetailRow
+                    label={t("submit.category")}
+                    value={s.suggested_category}
+                  />
+                )}
+                {s.note && (
+                  <DetailRow label={t("submit.note")} value={s.note} />
+                )}
+
+                {/* Rejection reason */}
+                {s.status === "rejected" && (
+                  <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-3">
+                    <p className="text-sm text-muted-foreground">
+                      {s.rejection_reason ? (
+                        <>
+                          <span className="font-medium text-foreground">
+                            {t("submissions.reasonLabel")}:{" "}
+                          </span>
+                          {s.rejection_reason}
+                        </>
+                      ) : (
+                        t("submissions.noReason")
+                      )}
+                    </p>
+                  </div>
+                )}
+
+                {canEdit && (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => setEditing(true)}
+                  >
+                    {s.status === "rejected"
+                      ? t("submissions.editResubmit")
+                      : t("submissions.edit")}
+                  </Button>
+                )}
+              </>
+            )}
+          </>
         )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+function DetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+        {label}
+      </p>
+      <p className="mt-1 text-sm leading-relaxed">{value}</p>
+    </div>
+  );
+}
+
+/** Shared edit fields for the resubmit form. */
+function FormFields({
+  submission,
+  categories,
+  categoryChoice,
+  setCategoryChoice,
+  known,
+}: {
+  submission: Submission;
+  categories: Category[];
+  categoryChoice: string;
+  setCategoryChoice: (v: string) => void;
+  known: boolean;
+}) {
+  const { t } = useTranslation();
+  return (
+    <>
+      <div>
+        <label className="mb-1.5 block text-sm font-medium">
+          {t("submit.name")} *
+        </label>
+        <Input
+          name="name"
+          required
+          defaultValue={submission.name ?? ""}
+          maxLength={200}
+        />
+      </div>
+      <div>
+        <label className="mb-1.5 block text-sm font-medium">
+          {t("submit.url")} *
+        </label>
+        <Input
+          name="url"
+          type="url"
+          required
+          defaultValue={submission.url ?? ""}
+        />
+      </div>
+      <div>
+        <label className="mb-1.5 block text-sm font-medium">
+          {t("submit.category")}
+        </label>
+        <select
+          name="categoryChoice"
+          value={categoryChoice}
+          onChange={(e) => setCategoryChoice(e.target.value)}
+          className="h-9 w-full cursor-pointer rounded-md border border-border bg-background px-3 text-sm"
+        >
+          <option value="">{t("submit.selectCategory")}</option>
+          {categories
+            .filter((c) => !c.parentSlug)
+            .map((c) => (
+              <option key={c._id} value={c.title}>
+                {c.title}
+              </option>
+            ))}
+          <option value={OTHER}>{t("submit.otherCategory")}</option>
+        </select>
+        {categoryChoice === OTHER && (
+          <Input
+            name="customCategory"
+            className="mt-2"
+            required
+            maxLength={60}
+            defaultValue={known ? "" : (submission.suggested_category ?? "")}
+            placeholder={t("submit.customCategoryPlaceholder")}
+          />
+        )}
+      </div>
+      <div>
+        <label className="mb-1.5 block text-sm font-medium">
+          {t("submit.pricing")}
+        </label>
+        <select
+          name="pricing"
+          defaultValue={submission.pricing ?? ""}
+          className="h-9 w-full cursor-pointer rounded-md border border-border bg-background px-3 text-sm"
+        >
+          <option value="">{t("submit.selectPricing")}</option>
+          <option value="free">{t("pricing.free")}</option>
+          <option value="freemium">{t("pricing.freemium")}</option>
+          <option value="paid">{t("pricing.paid")}</option>
+        </select>
+      </div>
+      <div>
+        <label className="mb-1.5 block text-sm font-medium">
+          {t("submit.tags")}
+        </label>
+        <Input
+          name="tags"
+          defaultValue={submission.tags.join(", ")}
+          placeholder={t("submit.tagsPlaceholder")}
+        />
+      </div>
+      <div>
+        <label className="mb-1.5 block text-sm font-medium">
+          {t("submit.note")}
+        </label>
+        <Textarea
+          name="note"
+          rows={3}
+          defaultValue={submission.note ?? ""}
+          placeholder={t("submit.notePlaceholder")}
+        />
+      </div>
+    </>
   );
 }

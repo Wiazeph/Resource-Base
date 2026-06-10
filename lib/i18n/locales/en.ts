@@ -139,6 +139,8 @@ export const en = {
     status: { pending: "Pending", approved: "Approved", rejected: "Rejected" },
     reasonLabel: "Reason",
     noReason: "This submission wasn't approved.",
+    edit: "Edit",
+    cancel: "Cancel",
     editResubmit: "Edit & resubmit",
     resubmit: "Resubmit",
     resubmitSuccess: "Resubmitted! It's back in the review queue.",

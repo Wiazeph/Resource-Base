@@ -86,6 +86,8 @@ export interface Submission {
   url: string | null
   status: SubmissionStatus
   suggested_category: string | null
+  pricing: Pricing | null
+  tags: string[]
   note: string | null
   rejection_reason: string | null
   created_at: string

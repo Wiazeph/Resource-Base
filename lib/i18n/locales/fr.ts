@@ -139,6 +139,8 @@ export const fr = {
     status: { pending: "En attente", approved: "Approuvée", rejected: "Refusée" },
     reasonLabel: "Motif",
     noReason: "Cette proposition n'a pas été approuvée.",
+    edit: "Modifier",
+    cancel: "Annuler",
     editResubmit: "Modifier et renvoyer",
     resubmit: "Renvoyer",
     resubmitSuccess: "Renvoyée ! Elle est de nouveau en cours d'examen.",

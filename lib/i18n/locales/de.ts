@@ -139,6 +139,8 @@ export const de = {
     status: { pending: "Ausstehend", approved: "Genehmigt", rejected: "Abgelehnt" },
     reasonLabel: "Grund",
     noReason: "Diese Einreichung wurde nicht genehmigt.",
+    edit: "Bearbeiten",
+    cancel: "Abbrechen",
     editResubmit: "Bearbeiten & erneut senden",
     resubmit: "Erneut senden",
     resubmitSuccess: "Erneut gesendet! Wieder in der Prüfung.",
