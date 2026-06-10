@@ -34,18 +34,33 @@ export function TaxonomyFixEditor({
   const { categories, tags } = useTaxonomy();
   const [pending, setPending] = useState(false);
 
-  const [cats, setCats] = useState<Picked[]>(
-    (resource.categories ?? []).map((c) => ({ slug: c.slug, title: c.title })),
+  // Snapshot the resource's current taxonomy to detect "no change".
+  const initialCats = useMemo(
+    () => (resource.categories ?? []).map((c) => ({ slug: c.slug, title: c.title })),
+    [resource.categories],
   );
-  const [tagList, setTagList] = useState<Picked[]>(
-    (resource.tags ?? []).map((tg) => ({ slug: tg.slug, title: tg.title })),
+  const initialTags = useMemo(
+    () => (resource.tags ?? []).map((tg) => ({ slug: tg.slug, title: tg.title })),
+    [resource.tags],
   );
+  const [cats, setCats] = useState<Picked[]>(initialCats);
+  const [tagList, setTagList] = useState<Picked[]>(initialTags);
   // Uncommitted input text — the user must add (+) or clear it before submitting.
   const [catQuery, setCatQuery] = useState("");
   const [tagQuery, setTagQuery] = useState("");
   const hasPendingText = !!catQuery.trim() || !!tagQuery.trim();
 
+  // Order-independent comparison of slug sets.
+  const sameSet = (a: Picked[], b: Picked[]) => {
+    if (a.length !== b.length) return false;
+    const bs = new Set(b.map((p) => p.slug));
+    return a.every((p) => bs.has(p.slug));
+  };
+  const dirty =
+    !sameSet(cats, initialCats) || !sameSet(tagList, initialTags);
+
   async function submit() {
+    if (!dirty) return;
     if (!cats.length && !tagList.length) {
       toast.error(t("taxonomy.atLeastOne"));
       return;
@@ -116,7 +131,7 @@ export function TaxonomyFixEditor({
           type="button"
           size="sm"
           className="flex-1"
-          disabled={pending || hasPendingText}
+          disabled={pending || hasPendingText || !dirty}
           onClick={submit}
         >
           {pending && <Loader2 className="size-4 animate-spin" />}

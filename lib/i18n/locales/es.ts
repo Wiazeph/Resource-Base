@@ -93,6 +93,7 @@ export const es = {
   taxonomy: {
     editCta: "Sugerir edición",
     pendingSuggestion: "Sugerencia pendiente",
+    yourSuggestion: "Tus categorías y etiquetas sugeridas",
     addCategory: "Añadir categoría…",
     addTag: "Añadir etiqueta…",
     submit: "Enviar sugerencia",

@@ -92,6 +92,8 @@ export interface Submission {
   suggested_category: string | null
   pricing: Pricing | null
   tags: string[]
+  proposed_categories: string[]
+  proposed_tags: string[]
   note: string | null
   rejection_reason: string | null
   created_at: string

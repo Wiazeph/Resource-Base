@@ -9,6 +9,7 @@ import { ContributorsProvider } from "@/components/contributors-provider";
 import { FavoritesProvider } from "@/components/favorites-provider";
 import { FavoriteCountsProvider } from "@/components/favorite-counts-provider";
 import { TaxonomyProvider } from "@/components/taxonomy-provider";
+import { SubmissionsProvider } from "@/lib/submissions";
 import { I18nProvider } from "@/components/i18n-provider";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import {
@@ -39,6 +40,7 @@ export default async function SiteLayout({
   return (
     <I18nProvider>
       <AuthProvider>
+        <SubmissionsProvider>
         <TaxonomyProvider categories={categories} tags={tags}>
         <FavoriteCountsProvider>
         <FavoritesProvider>
@@ -58,6 +60,7 @@ export default async function SiteLayout({
         </FavoritesProvider>
         </FavoriteCountsProvider>
         </TaxonomyProvider>
+        </SubmissionsProvider>
       </AuthProvider>
     </I18nProvider>
   );

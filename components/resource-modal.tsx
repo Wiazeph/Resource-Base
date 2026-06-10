@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useSubmissions } from "@/lib/submissions";
+import { useTaxonomy } from "@/components/taxonomy-provider";
 import type { Resource } from "@/lib/types";
 import { cn, favicon } from "@/lib/utils";
 import {
@@ -65,6 +66,13 @@ export function ResourceModal({
   const { get: getFavorites } = useFavoriteCounts();
   const { register, get: getContributor } = useContributors();
   const { user, openAuth } = useAuth();
+  const { categories: allCats, tags: allTags } = useTaxonomy();
+  // Resolve a proposed slug to its existing title for display (free-text shows
+  // the slug-ish token as-is).
+  const titleForCat = (slug: string) =>
+    allCats.find((c) => c.slug === slug)?.title ?? slug;
+  const titleForTag = (slug: string) =>
+    allTags.find((tg) => tg.slug === slug)?.title ?? slug;
   const icon = favicon(resource.url);
   const broken = resource.linkStatus === "broken";
   const fav = has(resource._id);
@@ -77,10 +85,13 @@ export function ResourceModal({
   const [fixPending, setFixPending] = useState(false);
   // Category/tag fix editor (account-only).
   const [taxOpen, setTaxOpen] = useState(false);
+  // Read-only view of the user's own pending suggestion.
+  const [taxViewOpen, setTaxViewOpen] = useState(false);
 
   // A user may have one open taxonomy suggestion per resource. If a pending one
   // exists, we show it (read-only) instead of letting them suggest again.
-  const { items: mySubmissions, reload: reloadSubmissions } = useSubmissions();
+  const { items: mySubmissions, loading: submissionsLoading, reload: reloadSubmissions } =
+    useSubmissions();
   const pendingTaxFix = user
     ? mySubmissions.find(
         (s) =>
@@ -96,6 +107,7 @@ export function ResourceModal({
       setFixOpen(false);
       setFixUrl("");
       setTaxOpen(false);
+      setTaxViewOpen(false);
     }
   }, [open]);
 
@@ -266,6 +278,49 @@ export function ResourceModal({
               reloadSubmissions();
             }}
           />
+        ) : taxViewOpen && pendingTaxFix ? (
+          <div className="flex flex-col gap-3 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+            <div className="flex items-center gap-2 text-xs font-medium text-amber-600 dark:text-amber-400">
+              <Clock className="size-3.5" />
+              {t("taxonomy.yourSuggestion")}
+            </div>
+            {pendingTaxFix.proposed_categories.length > 0 && (
+              <div className="flex flex-col gap-1.5">
+                <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                  {t("modal.categories")}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {pendingTaxFix.proposed_categories.map((c) => (
+                    <span key={c} className={PILL}>
+                      {titleForCat(c)}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {pendingTaxFix.proposed_tags.length > 0 && (
+              <div className="flex flex-col gap-1.5">
+                <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                  {t("modal.tags")}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {pendingTaxFix.proposed_tags.map((tg) => (
+                    <span key={tg} className={PILL}>
+                      {titleForTag(tg)}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setTaxViewOpen(false)}
+            >
+              {t("submissions.cancel")}
+            </Button>
+          </div>
         ) : (
           (resource.categories?.length > 0 || resource.tags?.length > 0) && (
             <div className="flex flex-col gap-4">
@@ -349,19 +404,28 @@ export function ResourceModal({
               </Link>
             )}
 
-            {/* Taxonomy fix: suggest edit, or show the pending suggestion's
-                status if the user already sent one. Sticks to the right. */}
+            {/* Taxonomy fix: suggest edit, or — if the user already sent one —
+                a clickable "pending" chip that opens the read-only view. While
+                the user's submissions are still loading we show a neutral
+                placeholder so the control never flips from edit → pending. */}
             {!taxOpen &&
+              !taxViewOpen &&
               (resource.categories?.length > 0 ||
                 resource.tags?.length > 0) &&
-              (pendingTaxFix ? (
-                <span
-                  className="ml-auto inline-flex items-center gap-1 text-amber-600 dark:text-amber-400"
+              (user && submissionsLoading ? (
+                <span className="ml-auto inline-flex items-center gap-1 opacity-60">
+                  <Loader2 className="size-3.5 animate-spin" />
+                </span>
+              ) : pendingTaxFix ? (
+                <button
+                  type="button"
+                  onClick={() => setTaxViewOpen(true)}
+                  className="ml-auto inline-flex cursor-pointer items-center gap-1 text-amber-600 transition-opacity hover:opacity-80 dark:text-amber-400"
                   title={t("taxonomy.pendingSuggestion")}
                 >
                   <Clock className="size-3.5" />
                   {t("taxonomy.pendingSuggestion")}
-                </span>
+                </button>
               ) : (
                 <button
                   type="button"

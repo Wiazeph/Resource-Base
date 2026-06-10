@@ -267,8 +267,44 @@ function SubmissionDialog({
               </form>
             ) : (
               <>
-                {/* Pricing + tags badges */}
-                {(s.pricing || s.tags.length > 0) && (
+                {/* Taxonomy fix: show the proposed categories/tags. */}
+                {s.kind === "taxonomy" &&
+                  (s.proposed_categories.length > 0 ||
+                    s.proposed_tags.length > 0) && (
+                    <>
+                      {s.proposed_categories.length > 0 && (
+                        <div className="flex flex-col gap-1.5">
+                          <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                            {t("modal.categories")}
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {s.proposed_categories.map((c) => (
+                              <span key={c} className={PILL}>
+                                {categories.find((x) => x.slug === c)?.title ?? c}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {s.proposed_tags.length > 0 && (
+                        <div className="flex flex-col gap-1.5">
+                          <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                            {t("modal.tags")}
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {s.proposed_tags.map((tg) => (
+                              <span key={tg} className={PILL}>
+                                {tg}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                {/* Pricing + tags badges (new-resource submissions) */}
+                {s.kind !== "taxonomy" && (s.pricing || s.tags.length > 0) && (
                   <div className="flex flex-wrap items-center gap-2">
                     {s.pricing && (
                       <Badge
@@ -285,7 +321,7 @@ function SubmissionDialog({
                   </div>
                 )}
 
-                {s.suggested_category && (
+                {s.kind !== "taxonomy" && s.suggested_category && (
                   <DetailRow
                     label={t("submit.category")}
                     value={s.suggested_category}
