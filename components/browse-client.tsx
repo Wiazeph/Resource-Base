@@ -4,17 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import Fuse from "fuse.js";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  Search,
-  SlidersHorizontal,
-  X,
-} from "lucide-react";
+import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Pagination } from "@/components/pagination";
 import { ResourceCard } from "@/components/resource-card";
 import { useClickCounts } from "@/components/click-counts-provider";
 import { useFavoriteCounts } from "@/components/favorite-counts-provider";
@@ -423,56 +417,3 @@ function Facet({
   );
 }
 
-function Pagination({
-  page,
-  totalPages,
-  onChange,
-  prevLabel,
-  nextLabel,
-  pageLabel,
-  firstLabel,
-}: {
-  page: number;
-  totalPages: number;
-  onChange: (page: number) => void;
-  prevLabel: string;
-  nextLabel: string;
-  pageLabel: string;
-  firstLabel: string;
-}) {
-  return (
-    <div className="mt-10 flex items-center justify-center gap-2">
-      <Button
-        variant="outline"
-        size="sm"
-        disabled={page <= 1}
-        onClick={() => onChange(1)}
-        aria-label={firstLabel}
-        title={firstLabel}
-      >
-        <ChevronsLeft className="size-4" />
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        disabled={page <= 1}
-        onClick={() => onChange(page - 1)}
-      >
-        <ChevronLeft className="size-4" />
-        {prevLabel}
-      </Button>
-      <span className="px-3 text-sm text-muted-foreground tabular-nums">
-        {pageLabel}
-      </span>
-      <Button
-        variant="outline"
-        size="sm"
-        disabled={page >= totalPages}
-        onClick={() => onChange(page + 1)}
-      >
-        {nextLabel}
-        <ChevronRight className="size-4" />
-      </Button>
-    </div>
-  );
-}
