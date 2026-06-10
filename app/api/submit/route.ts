@@ -5,17 +5,24 @@ import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
-// Tiny in-memory rate limit (per warm instance). Good enough to blunt abuse;
-// upgrade to Upstash Redis if it becomes a real target.
+// In-memory rate limit (per warm instance). Keyed by user id — submit is
+// always authenticated, so this can't be bypassed by spoofing IPs or rotating
+// addresses (only by creating many accounts). Cold starts reset the window,
+// which is acceptable for this low-stakes endpoint. For a hard guarantee,
+// swap this for Upstash Redis (Ratelimit.slidingWindow) keyed by the same id.
 const hits = new Map<string, { count: number; resetAt: number }>();
 const WINDOW_MS = 60_000;
 const MAX_PER_WINDOW = 5;
 
-function rateLimited(ip: string): boolean {
+function rateLimited(key: string): boolean {
   const now = Date.now();
-  const entry = hits.get(ip);
+  // Opportunistic cleanup so the map can't grow unbounded across requests.
+  if (hits.size > 5000) {
+    for (const [k, v] of hits) if (now > v.resetAt) hits.delete(k);
+  }
+  const entry = hits.get(key);
   if (!entry || now > entry.resetAt) {
-    hits.set(ip, { count: 1, resetAt: now + WINDOW_MS });
+    hits.set(key, { count: 1, resetAt: now + WINDOW_MS });
     return false;
   }
   entry.count += 1;
@@ -43,9 +50,8 @@ export async function POST(req: NextRequest) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  if (rateLimited(ip)) {
+  // Rate limit per user (more robust than per-IP for an authed endpoint).
+  if (rateLimited(user.id)) {
     return new NextResponse("Too many requests", { status: 429 });
   }
 
@@ -227,10 +233,13 @@ export async function POST(req: NextRequest) {
       createdAt: new Date().toISOString(),
     });
 
-    // Mirror to Supabase so the submission is tied to the user and the
-    // approval notification can find its target. Best-effort.
+    // Mirror to Supabase so the submission is tied to the user and shows up in
+    // "My submissions". If this fails the two stores would diverge (Sanity doc
+    // exists, user can't see/track it), so we roll back the Sanity doc and
+    // report failure instead of silently succeeding.
+    let mirrorError: unknown = null;
     try {
-      await admin.from("submissions").insert({
+      const { error } = await admin.from("submissions").insert({
         user_id: userId,
         sanity_submission_id: created._id,
         kind,
@@ -247,8 +256,20 @@ export async function POST(req: NextRequest) {
         note: fields.note,
         status: "pending",
       });
-    } catch (mirrorErr) {
-      console.error("submission mirror failed", mirrorErr);
+      mirrorError = error;
+    } catch (err) {
+      mirrorError = err;
+    }
+
+    if (mirrorError) {
+      console.error("submission mirror failed", mirrorError);
+      // Roll back the orphaned Sanity doc so the stores stay consistent.
+      try {
+        await writeClient.delete(created._id);
+      } catch (rollbackErr) {
+        console.error("submission rollback failed", rollbackErr);
+      }
+      return new NextResponse("Could not save submission", { status: 500 });
     }
 
     return NextResponse.json({ ok: true });

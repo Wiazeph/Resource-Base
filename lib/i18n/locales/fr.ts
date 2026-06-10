@@ -75,6 +75,7 @@ export const fr = {
     addFavorite: "Ajouter aux favoris",
     removeFavorite: "Retirer des favoris",
     signInToSave: "Connectez-vous pour enregistrer",
+    favoriteError: "Impossible de mettre à jour le favori. Veuillez réessayer.",
   },
 
   modal: {

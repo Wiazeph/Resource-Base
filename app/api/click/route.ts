@@ -41,11 +41,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ counted: false });
   }
 
-  try {
-    await createAdminClient().rpc("increment_click", { rid: resourceId });
-    return NextResponse.json({ counted: true });
-  } catch (err) {
-    console.error("click increment failed", err);
+  const { error } = await createAdminClient().rpc("increment_click", {
+    rid: resourceId,
+  });
+  if (error) {
+    console.error("click increment failed", error);
     return new NextResponse("Server error", { status: 500 });
   }
+  return NextResponse.json({ counted: true });
 }

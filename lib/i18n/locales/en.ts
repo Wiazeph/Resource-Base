@@ -75,6 +75,7 @@ export const en = {
     addFavorite: "Add favorite",
     removeFavorite: "Remove favorite",
     signInToSave: "Sign in to save",
+    favoriteError: "Couldn't update favorite. Please try again.",
   },
 
   modal: {

@@ -8,6 +8,8 @@ import {
   useMemo,
   useState,
 } from "react";
+import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useFavoriteCounts } from "@/components/favorite-counts-provider";
@@ -27,6 +29,7 @@ const FavoritesContext = createContext<FavoritesValue | null>(null);
  * so favoriting on the home page is instantly reflected everywhere (no refresh).
  */
 export function FavoritesProvider({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { bump } = useFavoriteCounts();
   const supabase = useMemo(() => createClient(), []);
@@ -62,19 +65,27 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
       setIds((prev) => (isFav ? prev.filter((x) => x !== id) : [...prev, id]));
       // Keep the public favorite count in sync optimistically too.
       bump(id, isFav ? -1 : 1);
-      if (isFav) {
-        await supabase
-          .from("favorites")
-          .delete()
-          .eq("user_id", user.id)
-          .eq("resource_id", id);
-      } else {
-        await supabase
-          .from("favorites")
-          .insert({ user_id: user.id, resource_id: id });
+
+      const { error } = isFav
+        ? await supabase
+            .from("favorites")
+            .delete()
+            .eq("user_id", user.id)
+            .eq("resource_id", id)
+        : await supabase
+            .from("favorites")
+            .insert({ user_id: user.id, resource_id: id });
+
+      // On failure, revert the optimistic UI so it never lies about state.
+      if (error) {
+        setIds((prev) =>
+          isFav ? [...prev, id] : prev.filter((x) => x !== id),
+        );
+        bump(id, isFav ? 1 : -1);
+        toast.error(t("card.favoriteError"));
       }
     },
-    [user, ids, supabase, bump],
+    [user, ids, supabase, bump, t],
   );
 
   const value = useMemo<FavoritesValue>(

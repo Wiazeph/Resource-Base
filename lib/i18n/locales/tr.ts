@@ -75,6 +75,7 @@ export const tr = {
     addFavorite: "Favorilere ekle",
     removeFavorite: "Favorilerden çıkar",
     signInToSave: "Kaydetmek için giriş yap",
+    favoriteError: "Favori güncellenemedi. Lütfen tekrar dene.",
   },
 
   modal: {
