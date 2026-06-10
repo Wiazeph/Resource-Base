@@ -178,6 +178,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, resubmitted: true });
     }
 
+    // One open taxonomy suggestion per resource per user — block duplicates
+    // (the UI also hides the button, this is the server-side guard).
+    if (kind === "taxonomy") {
+      const dup = await writeClient.fetch<string | null>(
+        `*[_type == "submission" && kind == "taxonomy" && submittedBy == $u && targetResourceId == $r && status == "pending"][0]._id`,
+        { u: userId, r: targetResourceId },
+      );
+      if (dup) {
+        return new NextResponse("You already have a pending suggestion", {
+          status: 409,
+        });
+      }
+    }
+
     const created = await writeClient.create({
       _type: "submission",
       ...fields,

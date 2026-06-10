@@ -92,10 +92,12 @@ export const tr = {
 
   taxonomy: {
     editCta: "Düzenleme öner",
+    pendingSuggestion: "Önerin beklemede",
     addCategory: "Kategori ekle…",
     addTag: "Etiket ekle…",
     submit: "Öneriyi gönder",
     atLeastOne: "En az bir kategori veya etiket ekle.",
+    pendingText: "Önce kutudaki metni ekle veya temizle.",
     success: "Teşekkürler! Önerin inceleme sırasında.",
     error: "Önerin gönderilemedi. Lütfen tekrar dene.",
   },

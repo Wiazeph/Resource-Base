@@ -40,10 +40,18 @@ export function TaxonomyFixEditor({
   const [tagList, setTagList] = useState<Picked[]>(
     (resource.tags ?? []).map((tg) => ({ slug: tg.slug, title: tg.title })),
   );
+  // Uncommitted input text — the user must add (+) or clear it before submitting.
+  const [catQuery, setCatQuery] = useState("");
+  const [tagQuery, setTagQuery] = useState("");
+  const hasPendingText = !!catQuery.trim() || !!tagQuery.trim();
 
   async function submit() {
     if (!cats.length && !tagList.length) {
       toast.error(t("taxonomy.atLeastOne"));
+      return;
+    }
+    if (hasPendingText) {
+      toast.error(t("taxonomy.pendingText"));
       return;
     }
     setPending(true);
@@ -77,6 +85,8 @@ export function TaxonomyFixEditor({
         label={t("modal.categories")}
         picked={cats}
         onChange={setCats}
+        query={catQuery}
+        onQueryChange={setCatQuery}
         options={categories.map((c) => ({ slug: c.slug, title: c.title }))}
         placeholder={t("taxonomy.addCategory")}
       />
@@ -84,9 +94,14 @@ export function TaxonomyFixEditor({
         label={t("modal.tags")}
         picked={tagList}
         onChange={setTagList}
+        query={tagQuery}
+        onQueryChange={setTagQuery}
         options={tags.map((tg) => ({ slug: tg.slug, title: tg.title }))}
         placeholder={t("taxonomy.addTag")}
       />
+      {hasPendingText && (
+        <p className="text-xs text-destructive">{t("taxonomy.pendingText")}</p>
+      )}
       <div className="flex gap-2">
         <Button
           type="button"
@@ -101,7 +116,7 @@ export function TaxonomyFixEditor({
           type="button"
           size="sm"
           className="flex-1"
-          disabled={pending}
+          disabled={pending || hasPendingText}
           onClick={submit}
         >
           {pending && <Loader2 className="size-4 animate-spin" />}
@@ -117,16 +132,20 @@ function TokenField({
   label,
   picked,
   onChange,
+  query,
+  onQueryChange,
   options,
   placeholder,
 }: {
   label: string;
   picked: Picked[];
   onChange: (next: Picked[]) => void;
+  query: string;
+  onQueryChange: (q: string) => void;
   options: Picked[];
   placeholder: string;
 }) {
-  const [query, setQuery] = useState("");
+  const setQuery = onQueryChange;
 
   const pickedSlugs = new Set(picked.map((p) => p.slug));
   const suggestions = useMemo(() => {

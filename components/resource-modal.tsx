@@ -16,10 +16,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useSubmissions } from "@/lib/submissions";
 import type { Resource } from "@/lib/types";
 import { cn, favicon } from "@/lib/utils";
 import {
   ArrowUpRight,
+  Clock,
   Loader2,
   PencilLine,
   Star,
@@ -75,6 +77,18 @@ export function ResourceModal({
   const [fixPending, setFixPending] = useState(false);
   // Category/tag fix editor (account-only).
   const [taxOpen, setTaxOpen] = useState(false);
+
+  // A user may have one open taxonomy suggestion per resource. If a pending one
+  // exists, we show it (read-only) instead of letting them suggest again.
+  const { items: mySubmissions, reload: reloadSubmissions } = useSubmissions();
+  const pendingTaxFix = user
+    ? mySubmissions.find(
+        (s) =>
+          s.kind === "taxonomy" &&
+          s.target_resource_id === resource._id &&
+          s.status === "pending",
+      )
+    : undefined;
 
   // Reset the inline forms whenever the modal closes.
   useEffect(() => {
@@ -242,70 +256,45 @@ export function ResourceModal({
           {resource.description || t("modal.noDescription")}
         </p>
 
-        {/* Categories & tags — with an edit affordance to propose a fix. */}
+        {/* Categories & tags — editable via a taxonomy-fix suggestion. */}
         {taxOpen ? (
           <TaxonomyFixEditor
             resource={resource}
             onCancel={() => setTaxOpen(false)}
-            onDone={() => setTaxOpen(false)}
+            onDone={() => {
+              setTaxOpen(false);
+              reloadSubmissions();
+            }}
           />
         ) : (
           (resource.categories?.length > 0 || resource.tags?.length > 0) && (
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                {resource.categories?.length > 0 && (
-                  <>
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                        {t("modal.categories")}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => (user ? setTaxOpen(true) : openAuth())}
-                        aria-label={t("taxonomy.editCta")}
-                        title={t("taxonomy.editCta")}
-                        className="inline-flex cursor-pointer items-center gap-1 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+              {resource.categories?.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                    {t("modal.categories")}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {resource.categories.map((cat) => (
+                      <Link
+                        key={cat._id}
+                        href={`/category/${cat.slug}`}
+                        onClick={() => onOpenChange(false)}
+                        className={PILL}
                       >
-                        <PencilLine className="size-3" />
-                        {t("taxonomy.editCta")}
-                      </button>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {resource.categories.map((cat) => (
-                        <Link
-                          key={cat._id}
-                          href={`/category/${cat.slug}`}
-                          onClick={() => onOpenChange(false)}
-                          className={PILL}
-                        >
-                          <CategoryIcon className="size-3.5" />
-                          {cat.title}
-                        </Link>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
+                        <CategoryIcon className="size-3.5" />
+                        {cat.title}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {resource.tags?.length > 0 && (
                 <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                      {t("modal.tags")}
-                    </p>
-                    {resource.categories?.length === 0 && (
-                      <button
-                        type="button"
-                        onClick={() => (user ? setTaxOpen(true) : openAuth())}
-                        aria-label={t("taxonomy.editCta")}
-                        title={t("taxonomy.editCta")}
-                        className="inline-flex cursor-pointer items-center gap-1 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
-                      >
-                        <PencilLine className="size-3" />
-                        {t("taxonomy.editCta")}
-                      </button>
-                    )}
-                  </div>
+                  <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                    {t("modal.tags")}
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {resource.tags.map((tag) => (
                       <Link
@@ -359,6 +348,30 @@ export function ResourceModal({
                 {t("card.addedBy", { username: contributor.username })}
               </Link>
             )}
+
+            {/* Taxonomy fix: suggest edit, or show the pending suggestion's
+                status if the user already sent one. Sticks to the right. */}
+            {!taxOpen &&
+              (resource.categories?.length > 0 ||
+                resource.tags?.length > 0) &&
+              (pendingTaxFix ? (
+                <span
+                  className="ml-auto inline-flex items-center gap-1 text-amber-600 dark:text-amber-400"
+                  title={t("taxonomy.pendingSuggestion")}
+                >
+                  <Clock className="size-3.5" />
+                  {t("taxonomy.pendingSuggestion")}
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => (user ? setTaxOpen(true) : openAuth())}
+                  className="ml-auto inline-flex cursor-pointer items-center gap-1 transition-colors hover:text-foreground"
+                >
+                  <PencilLine className="size-3.5" />
+                  {t("taxonomy.editCta")}
+                </button>
+              ))}
           </div>
 
           {/* Actions — favorite toggle + open, no footer bar */}

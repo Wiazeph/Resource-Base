@@ -92,10 +92,12 @@ export const fr = {
 
   taxonomy: {
     editCta: "Suggérer une modification",
+    pendingSuggestion: "Suggestion en attente",
     addCategory: "Ajouter une catégorie…",
     addTag: "Ajouter un tag…",
     submit: "Envoyer la suggestion",
     atLeastOne: "Ajoutez au moins une catégorie ou un tag.",
+    pendingText: "Ajoutez ou effacez d'abord le texte du champ.",
     success: "Merci ! Votre suggestion est en cours d'examen.",
     error: "Échec de l'envoi. Veuillez réessayer.",
   },
