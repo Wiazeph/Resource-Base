@@ -8,6 +8,7 @@ import { useFavoriteCounts } from "@/components/favorite-counts-provider";
 import { useFavorites } from "@/components/favorites-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -16,9 +17,17 @@ import {
 } from "@/components/ui/dialog";
 import type { Resource } from "@/lib/types";
 import { cn, favicon } from "@/lib/utils";
-import { ArrowUpRight, Star, TrendingUp, TriangleAlert } from "lucide-react";
+import {
+  ArrowUpRight,
+  Loader2,
+  Star,
+  TrendingUp,
+  TriangleAlert,
+  Wrench,
+} from "lucide-react";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { Separator } from "./ui/separator";
 
@@ -58,6 +67,44 @@ export function ResourceModal({
   const clicks = get(resource._id);
   const favorites = getFavorites(resource._id);
 
+  // Broken-link fix suggestion (account-only, like submit/favorites).
+  const [fixOpen, setFixOpen] = useState(false);
+  const [fixUrl, setFixUrl] = useState("");
+  const [fixPending, setFixPending] = useState(false);
+
+  // Reset the inline fix form whenever the modal closes.
+  useEffect(() => {
+    if (!open) {
+      setFixOpen(false);
+      setFixUrl("");
+    }
+  }, [open]);
+
+  async function submitFix(e: React.FormEvent) {
+    e.preventDefault();
+    setFixPending(true);
+    try {
+      const res = await fetch("/api/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kind: "fix",
+          targetResourceId: resource._id,
+          name: resource.name,
+          url: fixUrl.trim(),
+        }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      toast.success(t("modal.fixSuccess"));
+      setFixOpen(false);
+      setFixUrl("");
+    } catch {
+      toast.error(t("modal.fixError"));
+    } finally {
+      setFixPending(false);
+    }
+  }
+
   useEffect(() => {
     if (open && resource.submittedBy) register(resource.submittedBy);
   }, [open, resource.submittedBy, register]);
@@ -75,7 +122,12 @@ export function ResourceModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] gap-6 overflow-y-auto p-4 sm:max-w-md">
+      <DialogContent
+        className={cn(
+          "max-h-[85vh] gap-6 overflow-y-auto p-4 sm:max-w-md",
+          broken && "ring-destructive/50",
+        )}
+      >
         {/* Header — icon top-aligned so long, wrapping names read naturally */}
         <DialogHeader className="flex-row items-start gap-3.5 pr-6 items-center">
           <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-xl border border-border bg-muted/50">
@@ -124,6 +176,61 @@ export function ResourceModal({
             </Badge>
           )}
         </div>
+
+        {/* Broken link → let signed-in users suggest a corrected URL. */}
+        {broken && (
+          <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-3">
+            {!fixOpen ? (
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm text-muted-foreground">
+                  {t("modal.fixPrompt")}
+                </p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => (user ? setFixOpen(true) : openAuth())}
+                >
+                  <Wrench className="size-3.5" />
+                  {t("modal.fixCta")}
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={submitFix} className="space-y-2">
+                <label className="block text-xs font-medium text-foreground">
+                  {t("modal.fixLabel")}
+                </label>
+                <Input
+                  type="url"
+                  required
+                  autoFocus
+                  value={fixUrl}
+                  onChange={(e) => setFixUrl(e.target.value)}
+                  placeholder="https://…"
+                />
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setFixOpen(false)}
+                  >
+                    {t("submissions.cancel")}
+                  </Button>
+                  <Button
+                    type="submit"
+                    size="sm"
+                    disabled={fixPending}
+                    className="flex-1"
+                  >
+                    {fixPending && <Loader2 className="size-4 animate-spin" />}
+                    {t("modal.fixSubmit")}
+                  </Button>
+                </div>
+              </form>
+            )}
+          </div>
+        )}
 
         {/* Description */}
         <p className="text-sm leading-relaxed text-muted-foreground">

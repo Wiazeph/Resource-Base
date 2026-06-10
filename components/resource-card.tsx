@@ -52,7 +52,7 @@ export function ResourceCard({ resource }: { resource: Resource }) {
       <div
         className={cn(
           "card-hover group relative flex items-center gap-3 rounded-xl border border-border bg-card p-4",
-          broken && "opacity-70",
+          broken && "border-destructive/50",
         )}
       >
         {/* Card body opens the detail modal. Sits behind the interactive
