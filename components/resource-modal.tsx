@@ -301,7 +301,7 @@ export function ResourceModal({
               size="sm"
               onClick={() => setTaxViewOpen(false)}
             >
-              {t("submissions.cancel")}
+              {t("taxonomy.close")}
             </Button>
           </div>
         ) : (

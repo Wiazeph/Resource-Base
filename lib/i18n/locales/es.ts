@@ -95,6 +95,8 @@ export const es = {
     pendingSuggestion: "Sugerencia pendiente",
     yourSuggestion: "Tus categorías y etiquetas sugeridas",
     newLegend: "Recién añadido",
+    removedLegend: "Eliminado",
+    close: "Salir",
     addCategory: "Añadir categoría…",
     addTag: "Añadir etiqueta…",
     submit: "Enviar sugerencia",

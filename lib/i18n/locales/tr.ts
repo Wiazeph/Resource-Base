@@ -95,6 +95,8 @@ export const tr = {
     pendingSuggestion: "Önerin beklemede",
     yourSuggestion: "Önerdiğin kategori ve etiketler",
     newLegend: "Yeni eklenen",
+    removedLegend: "Kaldırılan",
+    close: "Çık",
     addCategory: "Kategori ekle…",
     addTag: "Etiket ekle…",
     submit: "Öneriyi gönder",

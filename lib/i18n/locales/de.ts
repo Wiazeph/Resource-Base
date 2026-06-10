@@ -95,6 +95,8 @@ export const de = {
     pendingSuggestion: "Vorschlag ausstehend",
     yourSuggestion: "Deine vorgeschlagenen Kategorien & Tags",
     newLegend: "Neu hinzugefügt",
+    removedLegend: "Entfernt",
+    close: "Schließen",
     addCategory: "Kategorie hinzufügen…",
     addTag: "Tag hinzufügen…",
     submit: "Vorschlag senden",

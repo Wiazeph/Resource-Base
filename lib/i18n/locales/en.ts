@@ -95,6 +95,8 @@ export const en = {
     pendingSuggestion: "Suggestion pending",
     yourSuggestion: "Your suggested categories & tags",
     newLegend: "Newly added",
+    removedLegend: "Removed",
+    close: "Exit",
     addCategory: "Add a category…",
     addTag: "Add a tag…",
     submit: "Submit suggestion",
