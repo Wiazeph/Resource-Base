@@ -83,6 +83,15 @@ export async function POST(req: NextRequest) {
     ),
   ).slice(0, 10);
 
+  // A "fix" targets an existing resource (its url is wrong); "new" is a brand
+  // new resource suggestion.
+  const kind = data.kind === "fix" ? "fix" : "new";
+  const targetResourceId =
+    kind === "fix" ? (data.targetResourceId ?? "").trim() : "";
+  if (kind === "fix" && !targetResourceId) {
+    return new NextResponse("Missing target resource", { status: 400 });
+  }
+
   const fields = {
     name: name.slice(0, 200),
     url,
@@ -146,6 +155,8 @@ export async function POST(req: NextRequest) {
     const created = await writeClient.create({
       _type: "submission",
       ...fields,
+      kind,
+      ...(kind === "fix" ? { targetResourceId } : {}),
       email: email.slice(0, 200),
       submittedBy: userId,
       status: "pending",
@@ -158,6 +169,8 @@ export async function POST(req: NextRequest) {
       await admin.from("submissions").insert({
         user_id: userId,
         sanity_submission_id: created._id,
+        kind,
+        target_resource_id: targetResourceId || null,
         name: fields.name,
         url: fields.url,
         suggested_category: fields.suggestedCategory,

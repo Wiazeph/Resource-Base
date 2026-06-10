@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   Clock,
   Loader2,
+  Wrench,
   XCircle,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -98,8 +99,16 @@ export function MySubmissions({ categories }: { categories: Category[] }) {
                   <img src={icon} alt="" className="size-5" loading="lazy" />
                 ) : null}
               </span>
-              <span className="min-w-0 flex-1 truncate font-medium leading-tight group-hover:underline">
-                {s.name}
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-medium leading-tight group-hover:underline">
+                  {s.name}
+                </span>
+                {s.kind === "fix" && (
+                  <span className="mt-0.5 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+                    <Wrench className="size-3" />
+                    {t("submissions.urlFix")}
+                  </span>
+                )}
               </span>
               <StatusBadge status={s.status} />
             </button>
@@ -140,7 +149,9 @@ function SubmissionDialog({
     (c) => c.title === submission?.suggested_category,
   );
   // Live (approved) submissions are read-only; pending/rejected can be edited.
-  const canEdit = submission?.status !== "approved";
+  // URL fixes are simple, single-field corrections — kept read-only here.
+  const canEdit =
+    submission?.status !== "approved" && submission?.kind !== "fix";
 
   // Reset per-open state whenever a different submission opens.
   const openId = submission?.id ?? null;

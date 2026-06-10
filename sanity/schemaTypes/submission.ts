@@ -11,6 +11,29 @@ export const submission = defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'kind',
+      title: 'Submission type',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'New resource', value: 'new' },
+          { title: 'URL fix', value: 'fix' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'new',
+      readOnly: true,
+    }),
+    defineField({
+      name: 'targetResourceId',
+      title: 'Target resource (_id) — for URL fixes',
+      type: 'string',
+      description:
+        'The resource this fix corrects. On approval its url is updated and link status reset.',
+      readOnly: true,
+      hidden: ({ parent }) => parent?.kind !== 'fix',
+    }),
+    defineField({
       name: 'name',
       type: 'string',
       validation: (rule) => rule.required(),

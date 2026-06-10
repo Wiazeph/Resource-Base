@@ -78,10 +78,14 @@ export interface Tag {
 
 export type SubmissionStatus = 'pending' | 'approved' | 'rejected'
 
+export type SubmissionKind = 'new' | 'fix'
+
 /** A user's own submission row (public.submissions mirror, RLS read-own). */
 export interface Submission {
   id: string
   sanity_submission_id: string | null
+  kind: SubmissionKind
+  target_resource_id: string | null
   name: string | null
   url: string | null
   status: SubmissionStatus

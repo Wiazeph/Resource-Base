@@ -25,7 +25,7 @@ export function useSubmissions() {
     const { data } = await supabase
       .from("submissions")
       .select(
-        "id, sanity_submission_id, name, url, status, suggested_category, pricing, tags, note, rejection_reason, created_at, updated_at",
+        "id, sanity_submission_id, kind, target_resource_id, name, url, status, suggested_category, pricing, tags, note, rejection_reason, created_at, updated_at",
       )
       .order("created_at", { ascending: false });
     setItems((data as Submission[]) ?? []);
