@@ -109,17 +109,26 @@ export function BrowseClient({
     [resources],
   );
 
-  const filtered = useMemo(() => {
+  // Everything except the tag filter — the base set the tag facet counts and
+  // the final result both build on. Keeping it separate lets tag counts reflect
+  // the *other* active filters (category/pricing/language/search).
+  const baseFiltered = useMemo(() => {
     let list = q.trim() ? fuse.search(q).map((r) => r.item) : [...resources];
-
     if (cat)
       list = list.filter((r) => r.categories?.some((c) => c.slug === cat));
-    if (activeTags.length)
-      list = list.filter((r) =>
-        activeTags.every((t) => r.tags?.some((rt) => rt.slug === t)),
-      );
     if (lang) list = list.filter((r) => r.language?.includes(lang));
     if (pricing) list = list.filter((r) => (r.pricing ?? "free") === pricing);
+    return list;
+  }, [q, cat, lang, pricing, fuse, resources]);
+
+  const filtered = useMemo(() => {
+    // Tags are OR'd: a resource matches if it carries ANY selected tag, so
+    // adding tags broadens the result set rather than narrowing it to nothing.
+    const list = activeTags.length
+      ? baseFiltered.filter((r) =>
+          activeTags.some((t) => r.tags?.some((rt) => rt.slug === t)),
+        )
+      : [...baseFiltered];
 
     if (!q.trim()) {
       if (sort === "name")
@@ -138,18 +147,18 @@ export function BrowseClient({
         );
     }
     return list;
-  }, [
-    q,
-    cat,
-    activeTags,
-    lang,
-    pricing,
-    sort,
-    fuse,
-    resources,
-    getClicks,
-    getFavorites,
-  ]);
+  }, [baseFiltered, activeTags, q, sort, getClicks, getFavorites]);
+
+  // How many resources each tag would add, given the other active filters.
+  const tagCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const r of baseFiltered) {
+      for (const tg of r.tags ?? []) {
+        counts.set(tg.slug, (counts.get(tg.slug) ?? 0) + 1);
+      }
+    }
+    return counts;
+  }, [baseFiltered]);
 
   // Reset to the first page whenever the result set changes.
   useEffect(() => {
@@ -177,8 +186,18 @@ export function BrowseClient({
     .filter((c) => !c.parentSlug)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   const subCategories = categories.filter((c) => c.parentSlug);
+  // Rank tags by their count *within the current filters* so the most relevant
+  // ones surface; always keep active tags so they stay toggleable.
   const popularTags = [...tags]
-    .sort((a, b) => b.count - a.count)
+    .sort(
+      (a, b) =>
+        (tagCounts.get(b.slug) ?? 0) - (tagCounts.get(a.slug) ?? 0) ||
+        b.count - a.count,
+    )
+    .filter(
+      (tag) =>
+        (tagCounts.get(tag.slug) ?? 0) > 0 || activeTags.includes(tag.slug),
+    )
     .slice(0, 24);
 
   const hasFilters =
@@ -279,21 +298,27 @@ export function BrowseClient({
                 {t("browse.facet.tags")}
               </p>
               <div className="flex flex-wrap gap-1.5">
-                {popularTags.map((tag) => (
-                  <button
-                    key={tag._id}
-                    onClick={() => toggleTag(tag.slug)}
-                    className={cn(
-                      "cursor-pointer rounded-full border px-2.5 py-0.5 text-xs transition-colors",
-                      activeTags.includes(tag.slug)
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-background hover:bg-muted",
-                    )}
-                  >
-                    {tag.title}
-                    <span className="ml-1 opacity-60">{tag.count}</span>
-                  </button>
-                ))}
+                {popularTags.map((tag) => {
+                  const active = activeTags.includes(tag.slug);
+                  // Count reflects the other active filters (popularTags has
+                  // already dropped tags that would yield nothing).
+                  const count = tagCounts.get(tag.slug) ?? 0;
+                  return (
+                    <button
+                      key={tag._id}
+                      onClick={() => toggleTag(tag.slug)}
+                      className={cn(
+                        "cursor-pointer rounded-full border px-2.5 py-0.5 text-xs transition-colors",
+                        active
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-background hover:bg-muted",
+                      )}
+                    >
+                      {tag.title}
+                      <span className="ml-1 opacity-60">{count}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
