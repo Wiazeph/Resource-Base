@@ -85,3 +85,15 @@ export const tagBySlugQuery = groq`
 
 export const categorySlugsQuery = groq`*[_type == "category" && defined(slug.current)].slug.current`
 export const tagSlugsQuery = groq`*[_type == "tag" && defined(slug.current)].slug.current`
+export const resourceSlugsQuery = groq`*[${PUBLISHED} && defined(slug.current)].slug.current`
+
+/** A single published resource by slug, with related resources (same category). */
+export const resourceBySlugQuery = groq`
+  *[${PUBLISHED} && slug.current == $slug][0] {
+    ${RESOURCE_FIELDS},
+    "related": *[${PUBLISHED} && slug.current != $slug && count(categories[@._ref in ^.^.categories[]._ref]) > 0]
+      | order(featured desc, addedAt desc)[0...6] {
+      ${RESOURCE_FIELDS}
+    }
+  }
+`

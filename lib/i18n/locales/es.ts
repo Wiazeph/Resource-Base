@@ -80,6 +80,7 @@ export const es = {
   modal: {
     close: "Cerrar",
     open: "Abrir recurso",
+    details: "Detalles",
     viewDetails: "Ver detalles",
     noDescription: "Sin descripción disponible.",
     fixPrompt: "Este enlace parece roto.",
@@ -108,6 +109,8 @@ export const es = {
     success: "¡Gracias! Tu sugerencia está en revisión.",
     error: "No se pudo enviar la sugerencia. Inténtalo de nuevo.",
   },
+
+  resource: { share: "Compartir", related: "Recursos relacionados" },
 
   command: {
     title: "Buscar recursos",

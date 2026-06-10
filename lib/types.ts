@@ -104,6 +104,11 @@ export interface Submission {
   updated_at: string | null
 }
 
+/** A single resource plus its related resources (detail page query). */
+export interface ResourceWithRelated extends Resource {
+  related: Resource[]
+}
+
 /** A category with its resolved resource list (detail page query). */
 export interface CategoryWithResources extends Omit<Category, 'count' | 'parentSlug'> {
   resources: Resource[]

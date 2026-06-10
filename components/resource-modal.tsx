@@ -444,6 +444,16 @@ export function ResourceModal({
             >
               <Star className={cn(fav && "fill-primary text-primary")} />
             </Button>
+            {resource.slug && (
+              <Button asChild variant="outline">
+                <Link
+                  href={`/resource/${resource.slug}`}
+                  onClick={() => onOpenChange(false)}
+                >
+                  {t("modal.details")}
+                </Link>
+              </Button>
+            )}
             <Button asChild className="flex-1">
               <a
                 href={resource.url}

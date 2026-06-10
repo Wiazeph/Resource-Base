@@ -3,6 +3,7 @@ import { Inter, Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { siteName, siteDescription, siteUrl } from "@/lib/site";
 
 // Inter for body text (crisp, neutral), Plus Jakarta Sans for headings
 // (modern, geometric, distinctive). Geist Mono for code/kbd.
@@ -24,12 +25,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Resource Base — Resources for everything",
     template: "%s · Resource Base",
   },
-  description:
-    "A curated, searchable directory of resources for anything and everything.",
+  description: siteDescription,
+  openGraph: {
+    type: "website",
+    siteName,
+    title: "Resource Base — Resources for everything",
+    description: siteDescription,
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Resource Base — Resources for everything",
+    description: siteDescription,
+  },
 };
 
 export default function RootLayout({

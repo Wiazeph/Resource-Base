@@ -80,6 +80,7 @@ export const en = {
   modal: {
     close: "Close",
     open: "Open resource",
+    details: "Details",
     viewDetails: "View details",
     noDescription: "No description available.",
     fixPrompt: "This link looks broken.",
@@ -108,6 +109,8 @@ export const en = {
     success: "Thanks! Your suggestion is in the review queue.",
     error: "Couldn't submit your suggestion. Please try again.",
   },
+
+  resource: { share: "Share", related: "Related resources" },
 
   command: {
     title: "Search resources",

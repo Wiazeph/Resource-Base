@@ -80,6 +80,7 @@ export const tr = {
   modal: {
     close: "Kapat",
     open: "Kaynağı aç",
+    details: "Detaylar",
     viewDetails: "Detayları gör",
     noDescription: "Açıklama bulunmuyor.",
     fixPrompt: "Bu bağlantı kırık görünüyor.",
@@ -108,6 +109,8 @@ export const tr = {
     success: "Teşekkürler! Önerin inceleme sırasında.",
     error: "Önerin gönderilemedi. Lütfen tekrar dene.",
   },
+
+  resource: { share: "Paylaş", related: "İlgili kaynaklar" },
 
   command: {
     title: "Kaynaklarda ara",
