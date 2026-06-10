@@ -20,6 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { PricingSelect } from "@/components/pricing-select";
 import { useSubmissions } from "@/lib/submissions";
 import { cn, favicon } from "@/lib/utils";
 import type { Category, Submission, SubmissionStatus } from "@/lib/types";
@@ -89,7 +90,7 @@ export function MySubmissions({ categories }: { categories: Category[] }) {
               key={s.id}
               type="button"
               onClick={() => setOpen(s)}
-              className="card-hover group flex items-center gap-3 rounded-xl border border-border bg-card p-4 text-left"
+              className="card-hover group flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-card p-4 text-left"
             >
               <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-muted/50">
                 {icon ? (
@@ -401,16 +402,7 @@ function FormFields({
         <label className="mb-1.5 block text-sm font-medium">
           {t("submit.pricing")}
         </label>
-        <select
-          name="pricing"
-          defaultValue={submission.pricing ?? ""}
-          className="h-9 w-full cursor-pointer rounded-md border border-border bg-background px-3 text-sm"
-        >
-          <option value="">{t("submit.selectPricing")}</option>
-          <option value="free">{t("pricing.free")}</option>
-          <option value="freemium">{t("pricing.freemium")}</option>
-          <option value="paid">{t("pricing.paid")}</option>
-        </select>
+        <PricingSelect defaultValue={submission.pricing ?? undefined} />
       </div>
       <div>
         <label className="mb-1.5 block text-sm font-medium">

@@ -1,18 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { toast } from "sonner";
-import { Loader2, Send } from "lucide-react";
+import { ListChecks, Loader2, Send } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { PricingSelect } from "@/components/pricing-select";
+import { useProfile } from "@/lib/profile";
 import type { Category } from "@/lib/types";
 
 const OTHER = "__other__";
 
 export function SubmitForm({ categories }: { categories: Category[] }) {
   const { t } = useTranslation();
+  const { profile } = useProfile();
   const [pending, setPending] = useState(false);
   const [categoryChoice, setCategoryChoice] = useState("");
 
@@ -63,6 +67,20 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
           {t("submit.title")}
         </h1>
         <p className="mt-2 text-muted-foreground">{t("submit.subtitle")}</p>
+        {profile?.username && (
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="mt-3"
+            type="button"
+          >
+            <Link href={`/profile/${profile.username}`}>
+              <ListChecks className="size-3.5" />
+              {t("submit.viewMine")}
+            </Link>
+          </Button>
+        )}
       </div>
       <div>
         <label className="mb-1.5 block text-sm font-medium">
@@ -111,16 +129,7 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
         <label className="mb-1.5 block text-sm font-medium">
           {t("submit.pricing")}
         </label>
-        <select
-          name="pricing"
-          defaultValue=""
-          className="h-9 w-full cursor-pointer rounded-md border border-border bg-background px-3 text-sm"
-        >
-          <option value="">{t("submit.selectPricing")}</option>
-          <option value="free">{t("pricing.free")}</option>
-          <option value="freemium">{t("pricing.freemium")}</option>
-          <option value="paid">{t("pricing.paid")}</option>
-        </select>
+        <PricingSelect />
       </div>
       <div>
         <label className="mb-1.5 block text-sm font-medium">

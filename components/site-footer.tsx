@@ -2,6 +2,7 @@
 
 import { Boxes, CircleDot, Globe, Heart, Mail } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Separator } from "@/components/ui/separator";
 
 const REPO_URL = "https://github.com/Wiazeph/Resource-Base";
 const ISSUES_URL = "https://github.com/Wiazeph/Resource-Base/issues";
@@ -39,6 +40,7 @@ export function SiteFooter() {
   const { t } = useTranslation();
   return (
     <footer className="px-4 pb-8 pt-4">
+      <Separator className="mx-auto mb-8 max-w-3xl" />
       <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-3 rounded-2xl border border-border/60 bg-card/40 px-4 py-8 text-sm text-muted-foreground backdrop-blur-sm sm:px-6">
         {/* Brand */}
         <div className="flex items-center gap-2 text-foreground">
