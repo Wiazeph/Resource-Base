@@ -42,8 +42,11 @@ export function NotificationsClient() {
       </div>
 
       {items.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border py-20 text-center text-muted-foreground">
-          {t("notifications.empty")}
+        <div className="rounded-xl border border-dashed border-border py-20 text-center">
+          <p className="text-muted-foreground">{t("notifications.empty")}</p>
+          <Button asChild className="mt-4">
+            <Link href="/">{t("favorites.browse")}</Link>
+          </Button>
         </div>
       ) : (
         <ul className="space-y-2">
@@ -75,12 +78,6 @@ export function NotificationsClient() {
           })}
         </ul>
       )}
-
-      <div className="mt-8 text-center">
-        <Button asChild variant="ghost" size="sm">
-          <Link href="/">{t("notifications.back")}</Link>
-        </Button>
-      </div>
     </div>
   );
 }

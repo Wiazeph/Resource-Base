@@ -89,7 +89,7 @@ export function UserMenu() {
           <Link href="/notifications">
             <Bell className="size-4" /> {t("nav.notifications")}
             {unread > 0 && (
-              <span className="ml-auto rounded-full bg-primary px-1.5 text-[11px] font-medium text-primary-foreground">
+              <span className="ml-auto rounded-full bg-emerald-500 px-1.5 text-[11px] font-medium text-white">
                 {unread}
               </span>
             )}

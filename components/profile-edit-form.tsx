@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Eye, EyeOff, Loader2, Mail } from "lucide-react";
+import { AtSign, Eye, EyeOff, Globe, Loader2, Mail, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { IconInput } from "@/components/ui/icon-input";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useProfile } from "@/lib/profile";
@@ -119,7 +119,8 @@ export function ProfileEditForm() {
       </Field>
 
       <Field label={t("profile.username")}>
-        <Input
+        <IconInput
+          icon={AtSign}
           value={username}
           onChange={(e) => setUsernameInput(e.target.value)}
           required
@@ -130,28 +131,28 @@ export function ProfileEditForm() {
         />
       </Field>
       <Field label={t("profile.fullName")}>
-        <Input name="full_name" defaultValue={profile.full_name ?? ""} />
+        <IconInput icon={User} name="full_name" defaultValue={profile.full_name ?? ""} />
       </Field>
       <Field label={t("profile.bio")}>
         <Textarea name="bio" rows={3} defaultValue={profile.bio ?? ""} maxLength={280} />
       </Field>
       <Field label={t("profile.portfolio")}>
-        <Input name="portfolio_url" type="url" defaultValue={profile.portfolio_url ?? ""} placeholder="https://…" />
+        <IconInput icon={Globe} name="portfolio_url" type="url" defaultValue={profile.portfolio_url ?? ""} placeholder="https://…" />
       </Field>
       <Field label="GitHub">
-        <Input name="github_url" type="url" defaultValue={profile.github_url ?? ""} placeholder="https://github.com/…" />
+        <IconInput icon={Globe} name="github_url" type="url" defaultValue={profile.github_url ?? ""} placeholder="https://github.com/…" />
       </Field>
       <Field label="X (Twitter)">
-        <Input name="twitter_url" type="url" defaultValue={profile.twitter_url ?? ""} placeholder="https://x.com/…" />
+        <IconInput icon={Globe} name="twitter_url" type="url" defaultValue={profile.twitter_url ?? ""} placeholder="https://x.com/…" />
       </Field>
       <Field label="Instagram">
-        <Input name="instagram_url" type="url" defaultValue={profile.instagram_url ?? ""} placeholder="https://instagram.com/…" />
+        <IconInput icon={Globe} name="instagram_url" type="url" defaultValue={profile.instagram_url ?? ""} placeholder="https://instagram.com/…" />
       </Field>
       <Field label="Dribbble">
-        <Input name="dribbble_url" type="url" defaultValue={profile.dribbble_url ?? ""} placeholder="https://dribbble.com/…" />
+        <IconInput icon={Globe} name="dribbble_url" type="url" defaultValue={profile.dribbble_url ?? ""} placeholder="https://dribbble.com/…" />
       </Field>
 
-      <Button type="submit" disabled={pending} className="w-full">
+      <Button type="submit" disabled={pending} size="lg" className="w-full">
         {pending && <Loader2 className="size-4 animate-spin" />}
         {t("profile.save")}
       </Button>

@@ -3,11 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { ListChecks, Loader2, Send } from "lucide-react";
+import { Globe, Hash, ListChecks, Loader2, Send, Type } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { IconInput } from "@/components/ui/icon-input";
 import { PricingSelect } from "@/components/pricing-select";
 import { useProfile } from "@/lib/profile";
 import type { Category, Pricing } from "@/lib/types";
@@ -88,13 +88,13 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
         <label className="mb-1.5 block text-sm font-medium">
           {t("submit.name")} *
         </label>
-        <Input name="name" required placeholder="e.g. Tailwind CSS" />
+        <IconInput icon={Type} name="name" required placeholder="e.g. Tailwind CSS" />
       </div>
       <div>
         <label className="mb-1.5 block text-sm font-medium">
           {t("submit.url")} *
         </label>
-        <Input name="url" type="url" required placeholder="https://…" />
+        <IconInput icon={Globe} name="url" type="url" required placeholder="https://…" />
       </div>
       <div>
         <label className="mb-1.5 block text-sm font-medium">
@@ -117,14 +117,16 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
           <option value={OTHER}>{t("submit.otherCategory")}</option>
         </select>
         {categoryChoice === OTHER && (
-          <Input
-            name="customCategory"
-            className="mt-2"
-            required
-            maxLength={60}
-            placeholder={t("submit.customCategoryPlaceholder")}
-            autoFocus
-          />
+          <div className="mt-2">
+            <IconInput
+              icon={Type}
+              name="customCategory"
+              required
+              maxLength={60}
+              placeholder={t("submit.customCategoryPlaceholder")}
+              autoFocus
+            />
+          </div>
         )}
       </div>
       <div>
@@ -137,7 +139,7 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
         <label className="mb-1.5 block text-sm font-medium">
           {t("submit.tags")}
         </label>
-        <Input name="tags" placeholder={t("submit.tagsPlaceholder")} />
+        <IconInput icon={Hash} name="tags" placeholder={t("submit.tagsPlaceholder")} />
       </div>
       <div>
         <label className="mb-1.5 block text-sm font-medium">
@@ -160,7 +162,7 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
         aria-hidden
       />
 
-      <Button type="submit" disabled={pending} className="w-full">
+      <Button type="submit" disabled={pending} size="lg" className="w-full">
         {pending ? (
           <Loader2 className="size-4 animate-spin" />
         ) : (

@@ -6,15 +6,18 @@ import {
   ArrowUpRight,
   CheckCircle2,
   Clock,
+  Globe,
+  Hash,
   Loader2,
+  Type,
   Wrench,
   XCircle,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { IconInput } from "@/components/ui/icon-input";
 import {
   Dialog,
   DialogContent,
@@ -407,7 +410,8 @@ function FormFields({
         <label className="mb-1.5 block text-sm font-medium">
           {t("submit.name")} *
         </label>
-        <Input
+        <IconInput
+          icon={Type}
           name="name"
           required
           defaultValue={submission.name ?? ""}
@@ -418,7 +422,8 @@ function FormFields({
         <label className="mb-1.5 block text-sm font-medium">
           {t("submit.url")} *
         </label>
-        <Input
+        <IconInput
+          icon={Globe}
           name="url"
           type="url"
           required
@@ -446,14 +451,16 @@ function FormFields({
           <option value={OTHER}>{t("submit.otherCategory")}</option>
         </select>
         {categoryChoice === OTHER && (
-          <Input
-            name="customCategory"
-            className="mt-2"
-            required
-            maxLength={60}
-            defaultValue={known ? "" : (submission.suggested_category ?? "")}
-            placeholder={t("submit.customCategoryPlaceholder")}
-          />
+          <div className="mt-2">
+            <IconInput
+              icon={Type}
+              name="customCategory"
+              required
+              maxLength={60}
+              defaultValue={known ? "" : (submission.suggested_category ?? "")}
+              placeholder={t("submit.customCategoryPlaceholder")}
+            />
+          </div>
         )}
       </div>
       <div>
@@ -466,7 +473,8 @@ function FormFields({
         <label className="mb-1.5 block text-sm font-medium">
           {t("submit.tags")}
         </label>
-        <Input
+        <IconInput
+          icon={Hash}
           name="tags"
           defaultValue={submission.tags.join(", ")}
           placeholder={t("submit.tagsPlaceholder")}

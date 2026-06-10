@@ -120,25 +120,28 @@ export function PublicProfileView({
           <h1 className="text-2xl font-bold tracking-tight">{name}</h1>
           <p className="text-muted-foreground">@{profile.username}</p>
           {email && (
-            <p
-              className="mt-1 inline-flex items-center gap-1.5 text-sm text-muted-foreground"
-              title={
-                isOwner
-                  ? profile.show_email
-                    ? t("profile.emailPublic")
-                    : t("profile.emailHidden")
-                  : undefined
-              }
-            >
-              {/* The eye marker is only meaningful to the owner. */}
-              {isOwner &&
-                (profile.show_email ? (
-                  <Eye className="size-3.5" />
-                ) : (
-                  <EyeOff className="size-3.5" />
-                ))}
-              {!isOwner && <Mail className="size-3.5" />}
-              {email}
+            <p className="mt-1 inline-flex items-start gap-1.5 text-sm text-muted-foreground">
+              {!isOwner && <Mail className="mt-0.5 size-3.5" />}
+              <span className="relative">
+                {email}
+                {/* Owner-only visibility marker, pinned to the top-right. */}
+                {isOwner && (
+                  <span
+                    className="absolute -right-[18px] -top-1 text-muted-foreground"
+                    title={
+                      profile.show_email
+                        ? t("profile.emailPublic")
+                        : t("profile.emailHidden")
+                    }
+                  >
+                    {profile.show_email ? (
+                      <Eye className="size-4" />
+                    ) : (
+                      <EyeOff className="size-4" />
+                    )}
+                  </span>
+                )}
+              </span>
             </p>
           )}
         </div>
