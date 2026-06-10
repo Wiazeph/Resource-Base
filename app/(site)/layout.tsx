@@ -23,9 +23,11 @@ export default async function SiteLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Same query + tags as the home page so Next.js dedupes the two fetches
+  // within a single request instead of hitting Sanity twice.
   const resources = await sanityFetch<Resource[]>({
     query: allResourcesQuery,
-    tags: ["resource", "category", "tag"],
+    tags: ["resource"],
   });
 
   return (
