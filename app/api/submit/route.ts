@@ -71,13 +71,63 @@ export async function POST(req: NextRequest) {
   const userId = user.id;
   const email = user.email ?? "";
 
+  const fields = {
+    name: name.slice(0, 200),
+    url,
+    suggestedCategory: (data.suggestedCategory ?? "").slice(0, 100),
+    note: (data.note ?? "").slice(0, 1000),
+  };
+
+  // Resubmit path: the user edited a previously rejected submission. We update
+  // that same doc back to "pending" (clearing the rejection reason) instead of
+  // creating a duplicate. Ownership is enforced against submittedBy.
+  const resubmitId = (data.submissionId ?? "").trim();
+
   try {
+    const admin = createAdminClient();
+
+    if (resubmitId) {
+      // Verify the doc belongs to this user and is rejected before touching it.
+      const existing = await writeClient.fetch<{
+        submittedBy?: string;
+        status?: string;
+      } | null>(`*[_id == $id][0]{submittedBy, status}`, { id: resubmitId });
+
+      if (!existing || existing.submittedBy !== userId) {
+        return new NextResponse("Not found", { status: 404 });
+      }
+      if (existing.status !== "rejected") {
+        return new NextResponse("Only rejected submissions can be resubmitted", {
+          status: 409,
+        });
+      }
+
+      await writeClient
+        .patch(resubmitId)
+        .set({ ...fields, status: "pending" })
+        .unset(["rejectionReason"])
+        .commit();
+
+      await admin
+        .from("submissions")
+        .update({
+          name: fields.name,
+          url: fields.url,
+          suggested_category: fields.suggestedCategory,
+          note: fields.note,
+          status: "pending",
+          rejection_reason: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("sanity_submission_id", resubmitId)
+        .eq("user_id", userId);
+
+      return NextResponse.json({ ok: true, resubmitted: true });
+    }
+
     const created = await writeClient.create({
       _type: "submission",
-      name: name.slice(0, 200),
-      url,
-      suggestedCategory: (data.suggestedCategory ?? "").slice(0, 100),
-      note: (data.note ?? "").slice(0, 1000),
+      ...fields,
       email: email.slice(0, 200),
       submittedBy: userId,
       status: "pending",
@@ -87,11 +137,13 @@ export async function POST(req: NextRequest) {
     // Mirror to Supabase so the submission is tied to the user and the
     // approval notification can find its target. Best-effort.
     try {
-      await createAdminClient().from("submissions").insert({
+      await admin.from("submissions").insert({
         user_id: userId,
         sanity_submission_id: created._id,
-        name: name.slice(0, 200),
-        url,
+        name: fields.name,
+        url: fields.url,
+        suggested_category: fields.suggestedCategory,
+        note: fields.note,
         status: "pending",
       });
     } catch (mirrorErr) {

@@ -45,6 +45,15 @@ export const submission = defineType({
       initialValue: 'pending',
     }),
     defineField({
+      name: 'rejectionReason',
+      title: 'Rejection reason',
+      type: 'text',
+      rows: 2,
+      description:
+        'Shown to the submitter so they can fix and resubmit. Only fill this when rejecting.',
+      hidden: ({ parent }) => parent?.status !== 'rejected',
+    }),
+    defineField({
       name: 'createdAt',
       type: 'datetime',
       readOnly: true,
