@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/components/auth/auth-provider";
-import type { Profile, PublicProfile } from "@/lib/types";
+import type { Profile, PublicProfile, PublicProfileCompact } from "@/lib/types";
 
 const EDITABLE_COLUMNS = [
   "full_name",
@@ -110,15 +110,15 @@ export async function fetchPublicProfile(
 /** Bulk-fetch public profiles by user id (for resource-card attribution). */
 export async function fetchProfilesByIds(
   ids: string[],
-): Promise<Record<string, PublicProfile>> {
+): Promise<Record<string, PublicProfileCompact>> {
   if (ids.length === 0) return {};
   const supabase = createClient();
   const { data } = await supabase
     .from("public_profiles")
     .select("id, username, full_name, avatar_url")
     .in("id", ids);
-  const map: Record<string, PublicProfile> = {};
-  for (const row of (data ?? []) as PublicProfile[]) map[row.id] = row;
+  const map: Record<string, PublicProfileCompact> = {};
+  for (const row of (data ?? []) as PublicProfileCompact[]) map[row.id] = row;
   return map;
 }
 

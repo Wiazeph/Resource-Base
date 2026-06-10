@@ -21,6 +21,14 @@ export interface PublicProfile {
   show_email: boolean
 }
 
+/** Minimal profile for inline attribution (resource cards/modals). */
+export interface PublicProfileCompact {
+  id: string
+  username: string
+  full_name: string | null
+  avatar_url: string | null
+}
+
 /** The signed-in user's own editable profile (private columns included). */
 export interface Profile extends PublicProfile {
   email: string | null

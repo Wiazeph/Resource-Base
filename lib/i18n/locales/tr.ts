@@ -138,7 +138,6 @@ export const tr = {
     title: "Bildirimler",
     empty: "Henüz bildirim yok.",
     signInPrompt: "Bildirimlerini görmek için giriş yap.",
-    back: "Anasayfaya dön",
   },
 
   submit: {

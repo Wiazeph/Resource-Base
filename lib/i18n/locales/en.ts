@@ -138,7 +138,6 @@ export const en = {
     title: "Notifications",
     empty: "No notifications yet.",
     signInPrompt: "Sign in to see your notifications.",
-    back: "Back to home",
   },
 
   submit: {

@@ -310,6 +310,7 @@ export function BrowseClient({
                     <button
                       key={tag._id}
                       onClick={() => toggleTag(tag.slug)}
+                      aria-pressed={active}
                       className={cn(
                         "cursor-pointer rounded-full border px-2.5 py-0.5 text-xs transition-colors",
                         active
@@ -402,6 +403,7 @@ function Facet({
           <button
             key={o.value}
             onClick={() => onChange(o.value)}
+            aria-pressed={value === o.value}
             className={cn(
               "cursor-pointer rounded-full border px-2.5 py-0.5 text-xs transition-colors",
               value === o.value

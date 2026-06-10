@@ -138,7 +138,6 @@ export const de = {
     title: "Benachrichtigungen",
     empty: "Noch keine Benachrichtigungen.",
     signInPrompt: "Melde dich an, um deine Benachrichtigungen zu sehen.",
-    back: "Zurück zur Startseite",
   },
 
   submit: {

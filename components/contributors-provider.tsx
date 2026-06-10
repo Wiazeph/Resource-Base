@@ -10,13 +10,13 @@ import {
   useState,
 } from "react";
 import { fetchProfilesByIds } from "@/lib/profile";
-import type { PublicProfile } from "@/lib/types";
+import type { PublicProfileCompact } from "@/lib/types";
 
 type ContributorsValue = {
   /** Register a submitter id to be resolved (batched). */
   register: (id: string) => void;
   /** Look up a resolved contributor by user id. */
-  get: (id: string) => PublicProfile | undefined;
+  get: (id: string) => PublicProfileCompact | undefined;
 };
 
 const ContributorsContext = createContext<ContributorsValue | null>(null);
@@ -40,7 +40,7 @@ export function ContributorsProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [map, setMap] = useState<Record<string, PublicProfile>>({});
+  const [map, setMap] = useState<Record<string, PublicProfileCompact>>({});
   const pending = useRef<Set<string>>(new Set());
   const requested = useRef<Set<string>>(new Set());
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);

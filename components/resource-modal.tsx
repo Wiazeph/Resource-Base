@@ -379,7 +379,7 @@ export function ResourceModal({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={contributor.avatar_url}
-                    alt=""
+                    alt={contributor.username}
                     className="size-4 rounded-full object-cover"
                   />
                 ) : null}

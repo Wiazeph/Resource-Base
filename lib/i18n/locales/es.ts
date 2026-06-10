@@ -138,7 +138,6 @@ export const es = {
     title: "Notificaciones",
     empty: "Aún no hay notificaciones.",
     signInPrompt: "Inicia sesión para ver tus notificaciones.",
-    back: "Volver al inicio",
   },
 
   submit: {
