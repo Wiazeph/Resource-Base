@@ -59,9 +59,21 @@ export async function POST(req: NextRequest) {
   // Honeypot: real users never fill this.
   if (data.company) return NextResponse.json({ ok: true });
 
+  // Submission kinds: "new" (brand-new resource), "fix" (correct a broken URL),
+  // "taxonomy" (correct a resource's categories/tags). Fixes target an
+  // existing resource.
+  const kind =
+    data.kind === "fix" || data.kind === "taxonomy" ? data.kind : "new";
+  const isFix = kind === "fix" || kind === "taxonomy";
+  const targetResourceId = isFix ? (data.targetResourceId ?? "").trim() : "";
+  if (isFix && !targetResourceId) {
+    return new NextResponse("Missing target resource", { status: 400 });
+  }
+
   const name = (data.name ?? "").trim();
   const url = (data.url ?? "").trim();
-  if (!name || !isValidUrl(url)) {
+  // A URL is required everywhere except taxonomy fixes (which don't touch it).
+  if (!name || (kind !== "taxonomy" && !isValidUrl(url))) {
     return new NextResponse("Name and a valid URL are required", {
       status: 400,
     });
@@ -83,13 +95,27 @@ export async function POST(req: NextRequest) {
     ),
   ).slice(0, 10);
 
-  // A "fix" targets an existing resource (its url is wrong); "new" is a brand
-  // new resource suggestion.
-  const kind = data.kind === "fix" ? "fix" : "new";
-  const targetResourceId =
-    kind === "fix" ? (data.targetResourceId ?? "").trim() : "";
-  if (kind === "fix" && !targetResourceId) {
-    return new NextResponse("Missing target resource", { status: 400 });
+  // Proposed taxonomy (existing slugs or new free-text titles), capped/cleaned.
+  const cleanList = (raw: unknown, cap: number) =>
+    Array.from(
+      new Set(
+        (Array.isArray(raw) ? raw : [])
+          .map((v) => String(v).trim().slice(0, 60))
+          .filter(Boolean),
+      ),
+    ).slice(0, cap);
+  const proposedCategories = cleanList(
+    (data as Record<string, unknown>).proposedCategories,
+    12,
+  );
+  const proposedTags = cleanList(
+    (data as Record<string, unknown>).proposedTags,
+    20,
+  );
+  if (kind === "taxonomy" && !proposedCategories.length && !proposedTags.length) {
+    return new NextResponse("Propose at least one category or tag", {
+      status: 400,
+    });
   }
 
   const fields = {
@@ -156,7 +182,8 @@ export async function POST(req: NextRequest) {
       _type: "submission",
       ...fields,
       kind,
-      ...(kind === "fix" ? { targetResourceId } : {}),
+      ...(isFix ? { targetResourceId } : {}),
+      ...(kind === "taxonomy" ? { proposedCategories, proposedTags } : {}),
       email: email.slice(0, 200),
       submittedBy: userId,
       status: "pending",
@@ -176,6 +203,8 @@ export async function POST(req: NextRequest) {
         suggested_category: fields.suggestedCategory,
         pricing: fields.pricing ?? null,
         tags: fields.tags,
+        proposed_categories: proposedCategories,
+        proposed_tags: proposedTags,
         note: fields.note,
         status: "pending",
       });

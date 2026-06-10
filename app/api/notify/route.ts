@@ -14,16 +14,48 @@ type ModerationBody = {
   rejectionReason?: string;
   kind?: string;
   targetResourceId?: string;
+  proposedCategories?: string[];
+  proposedTags?: string[];
 };
 
 /**
- * Sanity webhook → Supabase notification + mirror sync (+ URL-fix apply).
+ * Resolve proposed category/tag values (each an existing slug/title or new
+ * free-text) to Sanity reference ids. Returns the matched references plus the
+ * values that couldn't be resolved (so the editor can add them by hand).
+ */
+async function resolveRefs(
+  docType: "category" | "tag",
+  values: string[],
+): Promise<{ refs: { _type: "reference"; _ref: string; _key: string }[]; unresolved: string[] }> {
+  const refs: { _type: "reference"; _ref: string; _key: string }[] = [];
+  const unresolved: string[] = [];
+  for (const raw of values) {
+    const v = raw.trim();
+    if (!v) continue;
+    const id = await writeClient.fetch<string | null>(
+      `*[_type == $t && (slug.current == $v || lower(title) == lower($v))][0]._id`,
+      { t: docType, v },
+    );
+    if (id) {
+      // Stable key derived from the ref id keeps the array idempotent.
+      refs.push({ _type: "reference", _ref: id, _key: id.slice(0, 12) });
+    } else {
+      unresolved.push(v);
+    }
+  }
+  return { refs, unresolved };
+}
+
+/**
+ * Sanity webhook → Supabase notification + mirror sync (+ fix apply).
  * Configure a webhook in sanity.io/manage filtered to
  *   _type == "submission" && (status == "approved" || status == "rejected")
  * projecting { _id, status, submittedBy, name, url, rejectionReason, kind,
- * targetResourceId }, POSTing here with SANITY_NOTIFY_SECRET. On approval of a
- * "fix" submission the target resource's url is updated automatically and its
- * link status reset; the submitter is notified and their "My submissions" view
+ * targetResourceId, proposedCategories, proposedTags }, POSTing here with
+ * SANITY_NOTIFY_SECRET. On approval of a "fix" the resource's url is updated
+ * (and link status reset); on a "taxonomy" fix its categories/tags are set
+ * from the resolved references. The submitter is notified and their "My
+ * submissions" view
  * reflects the decision either way.
  */
 export async function POST(req: NextRequest) {
@@ -52,12 +84,14 @@ export async function POST(req: NextRequest) {
 
   const supabase = createAdminClient();
   const approved = body.status === "approved";
-  const isFix = body.kind === "fix";
+  const isUrlFix = body.kind === "fix";
+  const isTaxonomyFix = body.kind === "taxonomy";
+  const isFix = isUrlFix || isTaxonomyFix;
   const label = body.name ? `“${body.name}”` : "Your submitted resource";
 
   // On approval of a URL fix, apply the corrected url to the live resource and
   // reset its link health so the daily checker re-verifies it.
-  if (approved && isFix && body.targetResourceId && body.url) {
+  if (approved && isUrlFix && body.targetResourceId && body.url) {
     try {
       await writeClient
         .patch(body.targetResourceId)
@@ -68,6 +102,35 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // On approval of a taxonomy fix, resolve the proposed categories/tags to
+  // references and set them on the resource. Free-text values that don't match
+  // an existing doc are recorded back on the submission for the editor.
+  if (approved && isTaxonomyFix && body.targetResourceId) {
+    try {
+      const [cats, tags] = await Promise.all([
+        resolveRefs("category", body.proposedCategories ?? []),
+        resolveRefs("tag", body.proposedTags ?? []),
+      ]);
+      const patch: Record<string, unknown> = {};
+      if (cats.refs.length) patch.categories = cats.refs;
+      if (tags.refs.length) patch.tags = tags.refs;
+      if (Object.keys(patch).length) {
+        await writeClient.patch(body.targetResourceId).set(patch).commit();
+      }
+      const unresolved = [...cats.unresolved, ...tags.unresolved];
+      if (unresolved.length) {
+        await writeClient
+          .patch(body._id)
+          .set({
+            note: `Unresolved proposals to add manually: ${unresolved.join(", ")}`,
+          })
+          .commit();
+      }
+    } catch (err) {
+      console.error("taxonomy fix apply failed", err);
+    }
+  }
+
   // Idempotent: source_key has a unique index, so webhook retries are no-ops.
   // The status is part of the key so an approve-after-reject still notifies.
   const { error } = await supabase.from("notifications").insert({
@@ -75,17 +138,19 @@ export async function POST(req: NextRequest) {
     type: approved ? "submission_approved" : "submission_rejected",
     title: approved
       ? isFix
-        ? "Your URL fix was applied ✅"
+        ? "Your fix was applied ✅"
         : "Your resource was approved 🎉"
       : "Your submission needs changes",
     body: approved
-      ? isFix
+      ? isUrlFix
         ? `Thanks! ${label} now points to the corrected link.`
-        : `${label} is now live in the directory.`
+        : isTaxonomyFix
+          ? `Thanks! The categories/tags for ${label} were updated.`
+          : `${label} is now live in the directory.`
       : body.rejectionReason
         ? `${label} wasn’t approved: ${body.rejectionReason}`
         : `${label} wasn’t approved. You can edit and resubmit it.`,
-    url: approved ? (body.url ?? null) : "/profile/edit",
+    url: approved && isUrlFix ? (body.url ?? null) : approved ? null : "/profile/edit",
     source_key: `submission_${body.status}:${body._id}`,
   });
 

@@ -18,6 +18,7 @@ export const submission = defineType({
         list: [
           { title: 'New resource', value: 'new' },
           { title: 'URL fix', value: 'fix' },
+          { title: 'Category / tag fix', value: 'taxonomy' },
         ],
         layout: 'radio',
       },
@@ -26,12 +27,32 @@ export const submission = defineType({
     }),
     defineField({
       name: 'targetResourceId',
-      title: 'Target resource (_id) — for URL fixes',
+      title: 'Target resource (_id) — for fixes',
       type: 'string',
       description:
-        'The resource this fix corrects. On approval its url is updated and link status reset.',
+        'The resource this fix corrects. On approval the relevant fields are updated automatically.',
       readOnly: true,
-      hidden: ({ parent }) => parent?.kind !== 'fix',
+      hidden: ({ parent }) => parent?.kind === 'new',
+    }),
+    defineField({
+      name: 'proposedCategories',
+      title: 'Proposed categories (slug or new title)',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description:
+        'For taxonomy fixes. Existing category slugs are applied automatically; unrecognized values are left for you to add.',
+      options: { layout: 'tags' },
+      hidden: ({ parent }) => parent?.kind !== 'taxonomy',
+    }),
+    defineField({
+      name: 'proposedTags',
+      title: 'Proposed tags (slug or new title)',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description:
+        'For taxonomy fixes. Existing tag slugs are applied automatically; unrecognized values are left for you to add.',
+      options: { layout: 'tags' },
+      hidden: ({ parent }) => parent?.kind !== 'taxonomy',
     }),
     defineField({
       name: 'name',
