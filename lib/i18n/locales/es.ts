@@ -90,6 +90,16 @@ export const es = {
     addedOn: "Añadido el {{date}}",
   },
 
+  taxonomy: {
+    editCta: "Sugerir edición",
+    addCategory: "Añadir categoría…",
+    addTag: "Añadir etiqueta…",
+    submit: "Enviar sugerencia",
+    atLeastOne: "Añade al menos una categoría o etiqueta.",
+    success: "¡Gracias! Tu sugerencia está en revisión.",
+    error: "No se pudo enviar la sugerencia. Inténtalo de nuevo.",
+  },
+
   command: {
     title: "Buscar recursos",
     description: "Busca en todos los recursos, categorías y etiquetas.",
@@ -148,6 +158,7 @@ export const es = {
     edit: "Editar",
     cancel: "Cancelar",
     urlFix: "Corrección de URL",
+    taxonomyFix: "Corrección de categoría/etiqueta",
     editResubmit: "Editar y reenviar",
     resubmit: "Reenviar",
     resubmitSuccess: "¡Reenviada! Está de nuevo en revisión.",

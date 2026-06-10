@@ -90,6 +90,16 @@ export const tr = {
     addedOn: "{{date}} tarihinde eklendi",
   },
 
+  taxonomy: {
+    editCta: "Düzenleme öner",
+    addCategory: "Kategori ekle…",
+    addTag: "Etiket ekle…",
+    submit: "Öneriyi gönder",
+    atLeastOne: "En az bir kategori veya etiket ekle.",
+    success: "Teşekkürler! Önerin inceleme sırasında.",
+    error: "Önerin gönderilemedi. Lütfen tekrar dene.",
+  },
+
   command: {
     title: "Kaynaklarda ara",
     description: "Tüm kaynaklarda, kategorilerde ve etiketlerde ara.",
@@ -148,6 +158,7 @@ export const tr = {
     edit: "Düzenle",
     cancel: "Vazgeç",
     urlFix: "URL düzeltme",
+    taxonomyFix: "Kategori/etiket düzeltme",
     editResubmit: "Düzenle ve tekrar gönder",
     resubmit: "Tekrar gönder",
     resubmitSuccess: "Tekrar gönderildi! İnceleme sırasına alındı.",

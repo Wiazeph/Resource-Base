@@ -90,6 +90,16 @@ export const en = {
     addedOn: "Added {{date}}",
   },
 
+  taxonomy: {
+    editCta: "Suggest edit",
+    addCategory: "Add a category…",
+    addTag: "Add a tag…",
+    submit: "Submit suggestion",
+    atLeastOne: "Add at least one category or tag.",
+    success: "Thanks! Your suggestion is in the review queue.",
+    error: "Couldn't submit your suggestion. Please try again.",
+  },
+
   command: {
     title: "Search resources",
     description: "Search across every resource, category and tag.",
@@ -148,6 +158,7 @@ export const en = {
     edit: "Edit",
     cancel: "Cancel",
     urlFix: "URL fix",
+    taxonomyFix: "Category/tag fix",
     editResubmit: "Edit & resubmit",
     resubmit: "Resubmit",
     resubmitSuccess: "Resubmitted! It's back in the review queue.",

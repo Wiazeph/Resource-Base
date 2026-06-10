@@ -9,6 +9,7 @@ import { useFavorites } from "@/components/favorites-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { TaxonomyFixEditor } from "@/components/taxonomy-fix-editor";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +21,7 @@ import { cn, favicon } from "@/lib/utils";
 import {
   ArrowUpRight,
   Loader2,
+  PencilLine,
   Star,
   TrendingUp,
   TriangleAlert,
@@ -71,12 +73,15 @@ export function ResourceModal({
   const [fixOpen, setFixOpen] = useState(false);
   const [fixUrl, setFixUrl] = useState("");
   const [fixPending, setFixPending] = useState(false);
+  // Category/tag fix editor (account-only).
+  const [taxOpen, setTaxOpen] = useState(false);
 
-  // Reset the inline fix form whenever the modal closes.
+  // Reset the inline forms whenever the modal closes.
   useEffect(() => {
     if (!open) {
       setFixOpen(false);
       setFixUrl("");
+      setTaxOpen(false);
     }
   }, [open]);
 
@@ -237,47 +242,86 @@ export function ResourceModal({
           {resource.description || t("modal.noDescription")}
         </p>
 
-        {/* Categories */}
-        {resource.categories?.length > 0 && (
-          <div className="flex flex-col gap-2">
-            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-              {t("modal.categories")}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {resource.categories.map((cat) => (
-                <Link
-                  key={cat._id}
-                  href={`/category/${cat.slug}`}
-                  onClick={() => onOpenChange(false)}
-                  className={PILL}
-                >
-                  <CategoryIcon className="size-3.5" />
-                  {cat.title}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Categories & tags — with an edit affordance to propose a fix. */}
+        {taxOpen ? (
+          <TaxonomyFixEditor
+            resource={resource}
+            onCancel={() => setTaxOpen(false)}
+            onDone={() => setTaxOpen(false)}
+          />
+        ) : (
+          (resource.categories?.length > 0 || resource.tags?.length > 0) && (
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                {resource.categories?.length > 0 && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                        {t("modal.categories")}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => (user ? setTaxOpen(true) : openAuth())}
+                        aria-label={t("taxonomy.editCta")}
+                        title={t("taxonomy.editCta")}
+                        className="inline-flex cursor-pointer items-center gap-1 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        <PencilLine className="size-3" />
+                        {t("taxonomy.editCta")}
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {resource.categories.map((cat) => (
+                        <Link
+                          key={cat._id}
+                          href={`/category/${cat.slug}`}
+                          onClick={() => onOpenChange(false)}
+                          className={PILL}
+                        >
+                          <CategoryIcon className="size-3.5" />
+                          {cat.title}
+                        </Link>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
 
-        {/* Tags */}
-        {resource.tags?.length > 0 && (
-          <div className="flex flex-col gap-2">
-            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-              {t("modal.tags")}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {resource.tags.map((tag) => (
-                <Link
-                  key={tag._id}
-                  href={`/tag/${tag.slug}`}
-                  onClick={() => onOpenChange(false)}
-                  className={PILL}
-                >
-                  {tag.title}
-                </Link>
-              ))}
+              {resource.tags?.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                      {t("modal.tags")}
+                    </p>
+                    {resource.categories?.length === 0 && (
+                      <button
+                        type="button"
+                        onClick={() => (user ? setTaxOpen(true) : openAuth())}
+                        aria-label={t("taxonomy.editCta")}
+                        title={t("taxonomy.editCta")}
+                        className="inline-flex cursor-pointer items-center gap-1 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        <PencilLine className="size-3" />
+                        {t("taxonomy.editCta")}
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {resource.tags.map((tag) => (
+                      <Link
+                        key={tag._id}
+                        href={`/tag/${tag.slug}`}
+                        onClick={() => onOpenChange(false)}
+                        className={PILL}
+                      >
+                        {tag.title}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
+          )
         )}
 
         <div className="flex flex-col gap-y-4">

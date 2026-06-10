@@ -103,10 +103,14 @@ export function MySubmissions({ categories }: { categories: Category[] }) {
                 <span className="block truncate font-medium leading-tight group-hover:underline">
                   {s.name}
                 </span>
-                {s.kind === "fix" && (
+                {s.kind !== "new" && (
                   <span className="mt-0.5 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
                     <Wrench className="size-3" />
-                    {t("submissions.urlFix")}
+                    {t(
+                      s.kind === "fix"
+                        ? "submissions.urlFix"
+                        : "submissions.taxonomyFix",
+                    )}
                   </span>
                 )}
               </span>
@@ -149,9 +153,10 @@ function SubmissionDialog({
     (c) => c.title === submission?.suggested_category,
   );
   // Live (approved) submissions are read-only; pending/rejected can be edited.
-  // URL fixes are simple, single-field corrections — kept read-only here.
+  // Only "new" resource submissions use the generic edit form here — URL and
+  // taxonomy fixes are simple targeted corrections, kept read-only.
   const canEdit =
-    submission?.status !== "approved" && submission?.kind !== "fix";
+    submission?.status !== "approved" && submission?.kind === "new";
 
   // Reset per-open state whenever a different submission opens.
   const openId = submission?.id ?? null;

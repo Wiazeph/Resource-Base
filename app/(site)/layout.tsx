@@ -8,10 +8,15 @@ import { ClickCountsProvider } from "@/components/click-counts-provider";
 import { ContributorsProvider } from "@/components/contributors-provider";
 import { FavoritesProvider } from "@/components/favorites-provider";
 import { FavoriteCountsProvider } from "@/components/favorite-counts-provider";
+import { TaxonomyProvider } from "@/components/taxonomy-provider";
 import { I18nProvider } from "@/components/i18n-provider";
 import { sanityFetch } from "@/sanity/lib/fetch";
-import { allResourcesQuery } from "@/sanity/lib/queries";
-import type { Resource } from "@/lib/types";
+import {
+  allCategoriesQuery,
+  allResourcesQuery,
+  allTagsQuery,
+} from "@/sanity/lib/queries";
+import type { Category, Resource, Tag } from "@/lib/types";
 
 /**
  * Public site chrome. AuthProvider + ClickCountsProvider wrap everything so the
@@ -23,16 +28,18 @@ export default async function SiteLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Same query + tags as the home page so Next.js dedupes the two fetches
-  // within a single request instead of hitting Sanity twice.
-  const resources = await sanityFetch<Resource[]>({
-    query: allResourcesQuery,
-    tags: ["resource"],
-  });
+  // Same queries + tags as the pages so Next.js dedupes within a request.
+  // Categories/tags also feed the taxonomy-fix editor in resource modals.
+  const [resources, categories, tags] = await Promise.all([
+    sanityFetch<Resource[]>({ query: allResourcesQuery, tags: ["resource"] }),
+    sanityFetch<Category[]>({ query: allCategoriesQuery, tags: ["category"] }),
+    sanityFetch<Tag[]>({ query: allTagsQuery, tags: ["tag"] }),
+  ]);
 
   return (
     <I18nProvider>
       <AuthProvider>
+        <TaxonomyProvider categories={categories} tags={tags}>
         <FavoriteCountsProvider>
         <FavoritesProvider>
         <ClickCountsProvider>
@@ -50,6 +57,7 @@ export default async function SiteLayout({
         </ClickCountsProvider>
         </FavoritesProvider>
         </FavoriteCountsProvider>
+        </TaxonomyProvider>
       </AuthProvider>
     </I18nProvider>
   );
