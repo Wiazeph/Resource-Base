@@ -51,7 +51,7 @@ export const es = {
     summary: "{{resources}} recursos en {{categories}} categorías.",
     searchPlaceholder: "Buscar por nombre, etiqueta, descripción…",
     filters: "Filtros",
-    sort: { featured: "Destacados", popular: "Más populares", favorites: "Más guardados", name: "Nombre A→Z", recent: "Añadidos recientemente" },
+    sort: { featured: "Destacados", popular: "Más populares", favorites: "Más guardados", name: "Nombre A→Z", nameDesc: "Nombre Z→A", recent: "Añadidos recientemente" },
     facet: { category: "Categoría", pricing: "Precio", language: "Idioma", tags: "Etiquetas" },
     results: "{{count}} resultados",
     clear: "Limpiar",

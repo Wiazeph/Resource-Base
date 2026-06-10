@@ -51,7 +51,7 @@ export const de = {
     summary: "{{resources}} Ressourcen in {{categories}} Kategorien.",
     searchPlaceholder: "Nach Name, Tag, Beschreibung suchen…",
     filters: "Filter",
-    sort: { featured: "Empfohlen", popular: "Beliebteste", favorites: "Meiste Favoriten", name: "Name A→Z", recent: "Zuletzt hinzugefügt" },
+    sort: { featured: "Empfohlen", popular: "Beliebteste", favorites: "Meiste Favoriten", name: "Name A→Z", nameDesc: "Name Z→A", recent: "Zuletzt hinzugefügt" },
     facet: { category: "Kategorie", pricing: "Preis", language: "Sprache", tags: "Tags" },
     results: "{{count}} Ergebnisse",
     clear: "Zurücksetzen",

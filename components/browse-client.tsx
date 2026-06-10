@@ -21,7 +21,13 @@ import { useFavoriteCounts } from "@/components/favorite-counts-provider";
 import { cn } from "@/lib/utils";
 import type { Category, Resource, Tag } from "@/lib/types";
 
-type Sort = "featured" | "popular" | "favorites" | "name" | "recent";
+type Sort =
+  | "featured"
+  | "popular"
+  | "favorites"
+  | "name"
+  | "name-desc"
+  | "recent";
 
 const PRICING_VALUES = ["free", "freemium", "paid"] as const;
 const LANG_VALUES = ["en", "tr"] as const;
@@ -133,6 +139,8 @@ export function BrowseClient({
     if (!q.trim()) {
       if (sort === "name")
         list.sort((a, b) => a.name.localeCompare(b.name));
+      else if (sort === "name-desc")
+        list.sort((a, b) => b.name.localeCompare(a.name));
       else if (sort === "recent")
         list.sort((a, b) =>
           (b.addedAt ?? "").localeCompare(a.addedAt ?? ""),
@@ -263,6 +271,7 @@ export function BrowseClient({
             <option value="popular">{t("browse.sort.popular")}</option>
             <option value="favorites">{t("browse.sort.favorites")}</option>
             <option value="name">{t("browse.sort.name")}</option>
+            <option value="name-desc">{t("browse.sort.nameDesc")}</option>
             <option value="recent">{t("browse.sort.recent")}</option>
           </select>
         </div>

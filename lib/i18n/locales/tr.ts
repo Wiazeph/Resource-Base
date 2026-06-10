@@ -51,7 +51,7 @@ export const tr = {
     summary: "{{categories}} kategoride {{resources}} kaynak.",
     searchPlaceholder: "İsim, etiket, açıklamaya göre ara…",
     filters: "Filtreler",
-    sort: { featured: "Öne çıkanlar", popular: "En popüler", favorites: "En çok favorilenenler", name: "İsim A→Z", recent: "Son eklenenler" },
+    sort: { featured: "Öne çıkanlar", popular: "En popüler", favorites: "En çok favorilenenler", name: "İsim A→Z", nameDesc: "İsim Z→A", recent: "Son eklenenler" },
     facet: { category: "Kategori", pricing: "Fiyat", language: "Dil", tags: "Etiketler" },
     results: "{{count}} sonuç",
     clear: "Temizle",
