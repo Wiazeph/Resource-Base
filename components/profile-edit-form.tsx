@@ -103,9 +103,11 @@ export function ProfileEditForm() {
           <Button
             type="button"
             variant="outline"
-            size="sm"
             onClick={() => setShowEmail((v) => !v)}
-            className={cn(showEmail && "border-primary text-primary")}
+            className={cn(
+              "h-9 w-28 shrink-0 justify-center",
+              showEmail && "border-primary text-primary",
+            )}
             aria-pressed={showEmail}
           >
             {showEmail ? (

@@ -127,7 +127,7 @@ export function PublicProfileView({
                 {/* Owner-only visibility marker, pinned to the top-right. */}
                 {isOwner && (
                   <span
-                    className="absolute -right-[18px] -top-1 text-muted-foreground"
+                    className="absolute -top-1 right-[-18px] text-muted-foreground"
                     title={
                       profile.show_email
                         ? t("profile.emailPublic")
