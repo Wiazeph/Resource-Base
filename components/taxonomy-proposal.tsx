@@ -86,7 +86,7 @@ export function TaxonomyProposal({
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
           {anyAdded && (
             <span className="inline-flex items-center gap-1.5">
-              <span className="size-1.5 rounded-full bg-primary" />
+              <span className="size-1.5 rounded-full bg-emerald-500" />
               {t("taxonomy.newLegend")}
             </span>
           )}
@@ -130,13 +130,16 @@ function Chip({
     <span
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs",
-        state === "added" && "border border-primary bg-primary/10 text-foreground",
+        state === "added" &&
+          "border border-emerald-500/60 bg-emerald-500/10 text-foreground",
         state === "removed" &&
           "border border-destructive/50 bg-destructive/10 text-muted-foreground line-through",
         state === "kept" && "bg-accent text-accent-foreground",
       )}
     >
-      {state === "added" && <span className="size-1.5 rounded-full bg-primary" />}
+      {state === "added" && (
+        <span className="size-1.5 rounded-full bg-emerald-500" />
+      )}
       {state === "removed" && (
         <span className="size-1.5 rounded-full bg-destructive" />
       )}
