@@ -33,14 +33,18 @@ export function useProfile() {
       setLoading(false);
       return;
     }
+    // email is sourced from the auth session, not the profiles table — the
+    // table no longer grants SELECT on email to any role (see migration 0005).
     const { data } = await supabase
       .from("profiles")
       .select(
-        "id, email, username, full_name, avatar_url, bio, portfolio_url, github_url, twitter_url, instagram_url, dribbble_url",
+        "id, username, full_name, avatar_url, bio, portfolio_url, github_url, twitter_url, instagram_url, dribbble_url",
       )
       .eq("id", user.id)
       .single();
-    setProfile((data as Profile) ?? null);
+    setProfile(
+      data ? ({ ...data, email: user.email ?? null } as Profile) : null,
+    );
     setLoading(false);
   }, [user, supabase]);
 
