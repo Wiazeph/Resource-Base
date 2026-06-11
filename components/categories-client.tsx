@@ -2,6 +2,7 @@
 
 import { CategoryIcon } from "@/components/category-icon";
 import type { Category } from "@/lib/types";
+import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
@@ -52,7 +53,7 @@ export function CategoriesClient({ categories }: { categories: Category[] }) {
                 return (
                   <div
                     key={cat._id}
-                    className="card-hover rounded-xl border border-border bg-card p-5"
+                    className="card-hover group rounded-xl border border-border bg-card p-5"
                   >
                     <Link
                       href={`/category/${cat.slug}`}
@@ -61,8 +62,11 @@ export function CategoriesClient({ categories }: { categories: Category[] }) {
                       <span className="grid size-11 place-items-center rounded-lg bg-primary/10 text-primary">
                         <CategoryIcon name={cat.icon} className="size-5" />
                       </span>
-                      <div>
-                        <h3 className="font-medium">{cat.title}</h3>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="inline-flex items-center gap-1 font-medium">
+                          {cat.title}
+                          <ArrowUpRight className="size-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-60" />
+                        </h3>
                         <p className="text-xs text-muted-foreground">
                           {t("categories.count", { count: totalFor(cat) })}
                         </p>

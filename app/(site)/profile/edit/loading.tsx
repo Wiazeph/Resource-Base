@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function Loading() {
   // Field index 2 is the bio textarea (rows={3}); the rest are single inputs.
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-2xl">
       <Skeleton className="mb-4 h-9 w-48" />
       <div className="space-y-4">
         {Array.from({ length: 8 }).map((_, i) => (

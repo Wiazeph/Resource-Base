@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 // client (shows a sign-in prompt) as a fallback, so no server getUser() here.
 export default function ProfileEditPage() {
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-2xl">
       <ProfileEditForm />
     </div>
   );

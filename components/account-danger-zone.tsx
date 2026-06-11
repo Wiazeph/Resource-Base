@@ -68,7 +68,7 @@ export function AccountDangerZone() {
   }
 
   return (
-    <section className="mt-10 border-t border-border pt-8">
+    <section className="mt-10">
       <h2 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
         {t("account.title")}
       </h2>

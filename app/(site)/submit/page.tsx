@@ -18,7 +18,7 @@ export default async function SubmitPage() {
   });
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-2xl">
       <SubmitForm categories={categories} />
     </div>
   );
