@@ -15,11 +15,13 @@ export async function GET() {
   } = await supabase.auth.getUser();
   if (!user) return new NextResponse("Unauthorized", { status: 401 });
 
+  // RLS already scopes every table to the caller; the explicit user_id filters
+  // are belt-and-braces so the export stays correct even if a policy changes.
   const [profile, favorites, submissions, notifications] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
-    supabase.from("favorites").select("*"),
-    supabase.from("submissions").select("*"),
-    supabase.from("notifications").select("*"),
+    supabase.from("favorites").select("*").eq("user_id", user.id),
+    supabase.from("submissions").select("*").eq("user_id", user.id),
+    supabase.from("notifications").select("*").eq("user_id", user.id),
   ]);
 
   const payload = {

@@ -61,9 +61,12 @@ async function check(url: string): Promise<{ status: Status; httpStatus?: number
 }
 
 export async function GET(req: NextRequest) {
-  // Vercel Cron sends `Authorization: Bearer <CRON_SECRET>`.
+  // Vercel Cron sends `Authorization: Bearer <CRON_SECRET>`. Require the secret
+  // to be configured AND match — a missing secret must fail closed, not open,
+  // so this link-checker can never be triggered anonymously (it fans out HTTP
+  // requests per resource, which is exactly what we don't want exposed).
   const auth = req.headers.get("authorization");
-  if (process.env.CRON_SECRET && auth !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!process.env.CRON_SECRET || auth !== `Bearer ${process.env.CRON_SECRET}`) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
