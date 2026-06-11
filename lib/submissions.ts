@@ -14,7 +14,7 @@ import { useAuth } from "@/components/auth/auth-provider";
 import type { Submission } from "@/lib/types";
 
 const SELECT =
-  "id, sanity_submission_id, kind, target_resource_id, name, url, status, suggested_category, pricing, tags, proposed_categories, proposed_tags, original_categories, original_tags, note, rejection_reason, created_at, updated_at";
+  "id, sanity_submission_id, kind, target_resource_id, name, url, status, suggested_category, pricing, tags, proposed_categories, proposed_tags, proposed_description, original_categories, original_tags, original_description, note, rejection_reason, created_at, updated_at";
 
 type SubmissionsValue = {
   items: Submission[];

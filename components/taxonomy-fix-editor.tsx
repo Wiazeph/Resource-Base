@@ -6,6 +6,7 @@ import { Loader2, Plus, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useTaxonomy } from "@/components/taxonomy-provider";
 import { cn } from "@/lib/utils";
 import type { Resource } from "@/lib/types";
@@ -43,8 +44,10 @@ export function TaxonomyFixEditor({
     () => (resource.tags ?? []).map((tg) => ({ slug: tg.slug, title: tg.title })),
     [resource.tags],
   );
+  const initialDescription = resource.description ?? "";
   const [cats, setCats] = useState<Picked[]>(initialCats);
   const [tagList, setTagList] = useState<Picked[]>(initialTags);
+  const [description, setDescription] = useState(initialDescription);
   // Uncommitted input text — the user must add (+) or clear it before submitting.
   const [catQuery, setCatQuery] = useState("");
   const [tagQuery, setTagQuery] = useState("");
@@ -56,12 +59,16 @@ export function TaxonomyFixEditor({
     const bs = new Set(b.map((p) => p.slug));
     return a.every((p) => bs.has(p.slug));
   };
+  const descriptionChanged = description.trim() !== initialDescription.trim();
   const dirty =
-    !sameSet(cats, initialCats) || !sameSet(tagList, initialTags);
+    !sameSet(cats, initialCats) ||
+    !sameSet(tagList, initialTags) ||
+    descriptionChanged;
 
   async function submit() {
     if (!dirty) return;
-    if (!cats.length && !tagList.length) {
+    // Categories/tags can both be emptied as long as a description is proposed.
+    if (!cats.length && !tagList.length && !description.trim()) {
       toast.error(t("taxonomy.atLeastOne"));
       return;
     }
@@ -84,6 +91,10 @@ export function TaxonomyFixEditor({
           // resolves either against slug or title on approval.
           proposedCategories: cats.map((c) => c.slug),
           proposedTags: tagList.map((tg) => tg.slug),
+          // Only send a description when the user actually changed it.
+          ...(descriptionChanged
+            ? { proposedDescription: description.trim() }
+            : {}),
         }),
       });
       if (!res.ok) throw new Error(await res.text());
@@ -98,6 +109,18 @@ export function TaxonomyFixEditor({
 
   return (
     <div className="flex flex-col gap-4 rounded-lg border border-border bg-muted/30 p-3">
+      <div className="flex flex-col gap-1.5">
+        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+          {t("taxonomy.description")}
+        </p>
+        <Textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={3}
+          maxLength={1000}
+          placeholder={t("taxonomy.descriptionPlaceholder")}
+        />
+      </div>
       <TokenField
         label={t("modal.categories")}
         picked={cats}

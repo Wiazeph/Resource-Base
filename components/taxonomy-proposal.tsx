@@ -17,23 +17,34 @@ type ChipState = "kept" | "added" | "removed";
 export function TaxonomyProposal({
   categoriesLabel,
   tagsLabel,
+  descriptionLabel,
   proposedCategories,
   proposedTags,
+  proposedDescription,
   originalCategories,
   originalTags,
+  originalDescription,
   resolveCategory = (s) => s,
   resolveTag = (s) => s,
 }: {
   categoriesLabel: string;
   tagsLabel: string;
+  descriptionLabel?: string;
   proposedCategories: string[];
   proposedTags: string[];
+  proposedDescription?: string | null;
   originalCategories: string[];
   originalTags: string[];
+  originalDescription?: string | null;
   resolveCategory?: (slug: string) => string;
   resolveTag?: (slug: string) => string;
 }) {
   const { t } = useTranslation();
+  // A description change is shown only when one was actually proposed and it
+  // differs from the snapshot taken at submit time.
+  const descriptionChanged =
+    proposedDescription != null &&
+    proposedDescription.trim() !== (originalDescription ?? "").trim();
   // Older submissions (created before we snapshotted the original taxonomy)
   // have no baseline to diff against — show everything as plain "kept".
   const hasBaseline =
@@ -59,11 +70,28 @@ export function TaxonomyProposal({
   const catRows = diff(proposedCategories, originalCategories);
   const tagRows = diff(proposedTags, originalTags);
   const all = [...catRows, ...tagRows];
-  const anyAdded = all.some((r) => r.state === "added");
-  const anyRemoved = all.some((r) => r.state === "removed");
+  const anyAdded =
+    all.some((r) => r.state === "added") || descriptionChanged;
+  const anyRemoved =
+    all.some((r) => r.state === "removed") ||
+    (descriptionChanged && !!(originalDescription ?? "").trim());
 
   return (
     <div className="flex flex-col gap-3">
+      {descriptionChanged && descriptionLabel && (
+        <Section label={descriptionLabel}>
+          <div className="flex flex-col gap-1.5">
+            {(originalDescription ?? "").trim() && (
+              <p className="rounded-md border border-destructive/40 bg-destructive/5 px-2.5 py-1.5 text-xs text-muted-foreground line-through">
+                {originalDescription}
+              </p>
+            )}
+            <p className="rounded-md border border-emerald-500/50 bg-emerald-500/10 px-2.5 py-1.5 text-xs text-foreground">
+              {proposedDescription}
+            </p>
+          </div>
+        </Section>
+      )}
       {catRows.length > 0 && (
         <Section label={categoriesLabel}>
           {catRows.map((r) => (

@@ -289,14 +289,18 @@ function SubmissionDialog({
                 {/* Taxonomy fix: show proposals with new items highlighted. */}
                 {s.kind === "taxonomy" &&
                   (s.proposed_categories.length > 0 ||
-                    s.proposed_tags.length > 0) && (
+                    s.proposed_tags.length > 0 ||
+                    !!s.proposed_description) && (
                     <TaxonomyProposal
                       categoriesLabel={t("modal.categories")}
                       tagsLabel={t("modal.tags")}
+                      descriptionLabel={t("taxonomy.description")}
                       proposedCategories={s.proposed_categories}
                       proposedTags={s.proposed_tags}
+                      proposedDescription={s.proposed_description}
                       originalCategories={s.original_categories}
                       originalTags={s.original_tags}
+                      originalDescription={s.original_description}
                       resolveCategory={(c) =>
                         categories.find((x) => x.slug === c)?.title ?? c
                       }

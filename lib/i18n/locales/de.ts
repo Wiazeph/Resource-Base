@@ -97,6 +97,8 @@ export const de = {
 
   taxonomy: {
     editCta: "Änderung vorschlagen",
+    description: "Beschreibung",
+    descriptionPlaceholder: "Schlage eine klarere oder vollständigere Beschreibung vor…",
     pendingSuggestion: "Vorschlag ausstehend",
     yourSuggestion: "Deine vorgeschlagenen Kategorien & Tags",
     newLegend: "Neu hinzugefügt",

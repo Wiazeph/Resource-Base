@@ -55,6 +55,23 @@ export const submission = defineType({
       hidden: ({ parent }) => parent?.kind !== 'taxonomy',
     }),
     defineField({
+      name: 'proposedDescription',
+      title: 'Proposed description',
+      type: 'text',
+      rows: 3,
+      description:
+        'For taxonomy fixes. The submitter’s suggested description — review and apply to the resource on approval.',
+      hidden: ({ parent }) => parent?.kind !== 'taxonomy',
+    }),
+    defineField({
+      name: 'originalDescription',
+      title: 'Original description (at submit time)',
+      type: 'text',
+      rows: 3,
+      readOnly: true,
+      hidden: ({ parent }) => parent?.kind !== 'taxonomy',
+    }),
+    defineField({
       name: 'originalCategories',
       title: 'Original categories (slugs at submit time)',
       type: 'array',

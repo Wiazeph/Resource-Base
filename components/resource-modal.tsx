@@ -288,10 +288,13 @@ export function ResourceModal({
             <TaxonomyProposal
               categoriesLabel={t("modal.categories")}
               tagsLabel={t("modal.tags")}
+              descriptionLabel={t("taxonomy.description")}
               proposedCategories={pendingTaxFix.proposed_categories}
               proposedTags={pendingTaxFix.proposed_tags}
+              proposedDescription={pendingTaxFix.proposed_description}
               originalCategories={pendingTaxFix.original_categories}
               originalTags={pendingTaxFix.original_tags}
+              originalDescription={pendingTaxFix.original_description}
               resolveCategory={titleForCat}
               resolveTag={titleForTag}
             />

@@ -118,26 +118,42 @@ export async function POST(req: NextRequest) {
     (data as Record<string, unknown>).proposedTags,
     20,
   );
-  if (kind === "taxonomy" && !proposedCategories.length && !proposedTags.length) {
-    return new NextResponse("Propose at least one category or tag", {
+  // Proposed description (taxonomy fixes only): trimmed, capped, null when empty.
+  const rawDescription = (data as Record<string, unknown>).proposedDescription;
+  const proposedDescription =
+    kind === "taxonomy" && typeof rawDescription === "string"
+      ? rawDescription.trim().slice(0, 1000) || null
+      : null;
+  // A taxonomy suggestion must change SOMETHING — categories, tags, or the
+  // description.
+  if (
+    kind === "taxonomy" &&
+    !proposedCategories.length &&
+    !proposedTags.length &&
+    !proposedDescription
+  ) {
+    return new NextResponse("Propose at least one change", {
       status: 400,
     });
   }
 
-  // For taxonomy fixes, snapshot the resource's CURRENT taxonomy server-side
-  // (trusted source) so the suggestion view can highlight what's new.
+  // For taxonomy fixes, snapshot the resource's CURRENT taxonomy + description
+  // server-side (trusted source) so the suggestion view can highlight what's new.
   let originalCategories: string[] = [];
   let originalTags: string[] = [];
+  let originalDescription: string | null = null;
   if (kind === "taxonomy") {
     const snap = await writeClient.fetch<{
       categories?: string[];
       tags?: string[];
+      description?: string | null;
     } | null>(
-      `*[_id == $id][0]{ "categories": categories[]->slug.current, "tags": tags[]->slug.current }`,
+      `*[_id == $id][0]{ "categories": categories[]->slug.current, "tags": tags[]->slug.current, description }`,
       { id: targetResourceId },
     );
     originalCategories = (snap?.categories ?? []).filter(Boolean);
     originalTags = (snap?.tags ?? []).filter(Boolean);
+    originalDescription = snap?.description ?? null;
   }
 
   const fields = {
@@ -223,8 +239,10 @@ export async function POST(req: NextRequest) {
         ? {
             proposedCategories,
             proposedTags,
+            proposedDescription,
             originalCategories,
             originalTags,
+            originalDescription,
           }
         : {}),
       email: email.slice(0, 200),
@@ -251,8 +269,10 @@ export async function POST(req: NextRequest) {
         tags: fields.tags,
         proposed_categories: proposedCategories,
         proposed_tags: proposedTags,
+        proposed_description: proposedDescription,
         original_categories: originalCategories,
         original_tags: originalTags,
+        original_description: originalDescription,
         note: fields.note,
         status: "pending",
       });

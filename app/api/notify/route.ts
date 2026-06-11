@@ -16,6 +16,7 @@ type ModerationBody = {
   targetResourceId?: string;
   proposedCategories?: string[];
   proposedTags?: string[];
+  proposedDescription?: string;
 };
 
 /**
@@ -114,6 +115,9 @@ export async function POST(req: NextRequest) {
       const patch: Record<string, unknown> = {};
       if (cats.refs.length) patch.categories = cats.refs;
       if (tags.refs.length) patch.tags = tags.refs;
+      // Apply a proposed description verbatim (it was reviewed before approval).
+      const proposedDescription = body.proposedDescription?.trim();
+      if (proposedDescription) patch.description = proposedDescription;
       if (Object.keys(patch).length) {
         await writeClient.patch(body.targetResourceId).set(patch).commit();
       }

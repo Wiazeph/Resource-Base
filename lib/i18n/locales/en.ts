@@ -97,6 +97,8 @@ export const en = {
 
   taxonomy: {
     editCta: "Suggest edit",
+    description: "Description",
+    descriptionPlaceholder: "Suggest a clearer or more complete description…",
     pendingSuggestion: "Suggestion pending",
     yourSuggestion: "Your suggested categories & tags",
     newLegend: "Newly added",

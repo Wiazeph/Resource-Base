@@ -104,8 +104,10 @@ export interface Submission {
   tags: string[]
   proposed_categories: string[]
   proposed_tags: string[]
+  proposed_description: string | null
   original_categories: string[]
   original_tags: string[]
+  original_description: string | null
   note: string | null
   rejection_reason: string | null
   created_at: string

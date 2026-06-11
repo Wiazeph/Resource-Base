@@ -97,6 +97,8 @@ export const tr = {
 
   taxonomy: {
     editCta: "Düzenleme öner",
+    description: "Açıklama",
+    descriptionPlaceholder: "Daha açık veya daha eksiksiz bir açıklama öner…",
     pendingSuggestion: "Önerin beklemede",
     yourSuggestion: "Önerdiğin kategori ve etiketler",
     newLegend: "Yeni eklenen",
