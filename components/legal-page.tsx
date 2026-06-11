@@ -14,7 +14,7 @@ export function LegalPage({ kind }: { kind: "privacy" | "terms" }) {
   }).format(new Date(doc.updated));
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12">
+    <div className="mx-auto max-w-3xl">
       <h1 className="text-3xl font-bold tracking-tight">{doc.title}</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         {t("legal.updated", { date: updated })}

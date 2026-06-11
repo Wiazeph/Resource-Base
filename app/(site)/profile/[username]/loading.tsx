@@ -1,9 +1,9 @@
-import { Skeleton } from "@/components/ui/skeleton";
 import { ResourceGridSkeleton } from "@/components/skeletons";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Loading() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    <div className="mx-auto max-w-3xl">
       <div className="flex flex-col items-center gap-4">
         <Skeleton className="size-20 rounded-full" />
         <Skeleton className="h-6 w-40" />

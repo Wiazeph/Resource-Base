@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { Boxes, CircleDot, Globe, Heart, Mail } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { Separator } from "@/components/ui/separator";
 import { GithubIcon } from "@/components/brand-icons";
+import { Separator } from "@/components/ui/separator";
+import { Boxes, CircleDot, Globe, Heart, Mail } from "lucide-react";
+import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 const REPO_URL = "https://github.com/Wiazeph/Resource-Base";
 const ISSUES_URL = "https://github.com/Wiazeph/Resource-Base/issues";
@@ -26,9 +26,9 @@ const linkClass =
 export function SiteFooter() {
   const { t } = useTranslation();
   return (
-    <footer className="px-4 pb-8 pt-4">
-      <Separator className="mx-auto mb-8 max-w-3xl" />
-      <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-3 rounded-2xl border border-border/60 bg-card/40 px-4 py-8 text-sm text-muted-foreground backdrop-blur-sm sm:px-6">
+    <footer className="px-4 pb-12 flex flex-col gap-12">
+      <Separator className="mx-auto max-w-5xl" />
+      <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 rounded-xl border border-border/60 bg-card/40 px-4 py-8 text-sm text-muted-foreground backdrop-blur-sm sm:px-6">
         {/* Brand */}
         <div className="flex items-center gap-2 text-foreground">
           <span className="grid size-7 place-items-center rounded-md bg-primary text-primary-foreground">

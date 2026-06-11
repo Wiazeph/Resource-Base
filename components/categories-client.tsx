@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { useTranslation } from "react-i18next";
 import { CategoryIcon } from "@/components/category-icon";
 import type { Category } from "@/lib/types";
+import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 type Domain = "developer" | "designer" | "general";
 const DOMAIN_ORDER: Domain[] = ["developer", "designer", "general"];
@@ -30,7 +30,7 @@ export function CategoriesClient({ categories }: { categories: Category[] }) {
   })).filter((g) => g.cats.length > 0);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    <div className="mx-auto max-w-3xl">
       <div className="mb-10">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
           {t("categories.title")}

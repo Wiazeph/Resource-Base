@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Analytics } from "@vercel/analytics/next";
-import { GoogleAnalytics } from "@next/third-parties/google";
-import { useTranslation } from "react-i18next";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { GoogleAnalytics } from "@next/third-parties/google";
+import { Analytics } from "@vercel/analytics/next";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const KEY = "analytics-consent"; // "granted" | "denied"
 
@@ -44,7 +44,7 @@ export function ConsentGate({ gaId }: { gaId?: string }) {
       {/* Banner: only once the stored choice is read AND none was made. */}
       {ready && consent === null && (
         <div className="fixed inset-x-0 bottom-0 z-50 px-3 pb-3">
-          <div className="mx-auto flex max-w-3xl flex-col gap-3 rounded-2xl border border-border bg-background/95 p-4 shadow-lg ring-1 ring-black/5 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
+          <div className="mx-auto flex max-w-3xl flex-col gap-3 rounded-xl border border-border bg-background/95 p-4 shadow-lg ring-1 ring-black/5 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-muted-foreground">
               {t("consent.message")}{" "}
               <Link

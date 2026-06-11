@@ -1,13 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { Loader2, Star } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useAuth } from "@/components/auth/auth-provider";
+import { useFavorites } from "@/components/favorites-provider";
 import { ResourceGrid } from "@/components/resource-grid";
 import { Button } from "@/components/ui/button";
-import { useFavorites } from "@/components/favorites-provider";
-import { useAuth } from "@/components/auth/auth-provider";
 import type { Resource } from "@/lib/types";
+import { Loader2, Star } from "lucide-react";
+import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 export function FavoritesClient({ resources }: { resources: Resource[] }) {
   const { t } = useTranslation();
@@ -16,7 +16,7 @@ export function FavoritesClient({ resources }: { resources: Resource[] }) {
   const favorites = resources.filter((r) => ids.includes(r._id));
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    <div className="mx-auto max-w-3xl">
       <div className="mb-8 flex items-center gap-3">
         <Star className="size-6 text-primary" />
         <h1 className="text-3xl font-bold tracking-tight">

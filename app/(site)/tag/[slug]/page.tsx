@@ -1,11 +1,11 @@
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import type { Metadata } from "next";
-import { ChevronRight, Hash } from "lucide-react";
 import { ResourceGrid } from "@/components/resource-grid";
+import type { TagWithResources } from "@/lib/types";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { tagBySlugQuery, tagSlugsQuery } from "@/sanity/lib/queries";
-import type { TagWithResources } from "@/lib/types";
+import { ChevronRight, Hash } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 export async function generateStaticParams() {
   const slugs = await sanityFetch<string[]>({
@@ -45,7 +45,7 @@ export default async function TagPage({
   if (!tag) notFound();
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    <div className="mx-auto max-w-3xl">
       <nav className="mb-6 flex items-center gap-1 text-sm text-muted-foreground">
         <Link href="/" className="hover:text-foreground">
           Home

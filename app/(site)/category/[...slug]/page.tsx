@@ -1,17 +1,17 @@
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import type { Metadata } from "next";
-import { ChevronRight } from "lucide-react";
-import { ResourceGrid } from "@/components/resource-grid";
 import { CategoryIcon } from "@/components/category-icon";
+import { ResourceGrid } from "@/components/resource-grid";
+import { siteUrl } from "@/lib/site";
+import type { Category, CategoryWithResources } from "@/lib/types";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import {
   allCategoriesQuery,
   categoryBySlugQuery,
   categorySlugsQuery,
 } from "@/sanity/lib/queries";
-import type { Category, CategoryWithResources } from "@/lib/types";
-import { siteUrl } from "@/lib/site";
+import { ChevronRight } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 export async function generateStaticParams() {
   const slugs = await sanityFetch<string[]>({
@@ -78,7 +78,7 @@ export default async function CategoryPage({
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    <div className="mx-auto max-w-3xl">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

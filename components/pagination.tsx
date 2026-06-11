@@ -22,7 +22,7 @@ export function Pagination({
   firstLabel: string;
 }) {
   return (
-    <div className="mt-10 flex items-center justify-center gap-2">
+    <div className="mt-6 flex items-center justify-center gap-2">
       <Button
         variant="outline"
         size="sm"

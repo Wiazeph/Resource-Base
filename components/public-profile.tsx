@@ -1,24 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { Award, Eye, EyeOff, Globe, Mail, Pencil, Send, User as UserIcon } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { contributorTier } from "@/lib/contributor-tier";
-import { cn } from "@/lib/utils";
-import { ResourceGrid } from "@/components/resource-grid";
-import { MySubmissions } from "@/components/my-submissions";
 import { useAuth } from "@/components/auth/auth-provider";
 import {
-  GithubIcon,
-  XIcon,
-  InstagramIcon,
   DribbbleIcon,
+  GithubIcon,
+  InstagramIcon,
+  XIcon,
 } from "@/components/brand-icons";
+import { MySubmissions } from "@/components/my-submissions";
+import { ResourceGrid } from "@/components/resource-grid";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { contributorTier } from "@/lib/contributor-tier";
 import { fetchPublicEmail } from "@/lib/profile";
 import type { Category, PublicProfile, Resource } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { Award, Eye, EyeOff, Globe, Mail, Pencil, Send, User as UserIcon } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 function SocialLink({
   href,
@@ -71,7 +71,7 @@ export function PublicProfileView({
   const email = isOwner ? (user?.email ?? null) : publicEmail;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    <div className="mx-auto max-w-3xl">
       {/* Header */}
       <div className="flex flex-col items-center gap-4 text-center">
         <span className="grid size-20 place-items-center overflow-hidden rounded-full border border-border bg-muted">

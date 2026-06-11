@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
-import { Plus, Sparkles } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/auth/auth-provider";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Plus, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 /**
  * Invites visitors to contribute a resource (and sign in if needed). Two
@@ -47,7 +47,7 @@ export function SubmitCta({
   return (
     <div
       className={cn(
-        "mt-12 flex flex-col items-center gap-4 rounded-2xl border border-border/70 bg-card/40 px-6 py-10 text-center backdrop-blur-sm sm:flex-row sm:justify-between sm:text-left",
+        "mt-12 flex flex-col items-center gap-4 rounded-xl border border-border/70 bg-card/40 px-6 py-10 text-center backdrop-blur-sm sm:flex-row sm:justify-between sm:text-left",
       )}
     >
       <div className="flex items-start gap-3">

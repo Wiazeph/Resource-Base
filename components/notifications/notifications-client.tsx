@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
-import Link from "next/link";
-import { Bell } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/auth/auth-provider";
+import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/lib/notifications";
 import { cn } from "@/lib/utils";
+import { Bell } from "lucide-react";
+import Link from "next/link";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 export function NotificationsClient() {
   const { t } = useTranslation();
@@ -33,7 +33,7 @@ export function NotificationsClient() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10">
+    <div className="mx-auto max-w-3xl">
       <div className="mb-8 flex items-center gap-3">
         <Bell className="size-6 text-primary" />
         <h1 className="text-3xl font-bold tracking-tight">

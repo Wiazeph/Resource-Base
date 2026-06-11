@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
 import { SubmitForm } from "@/components/submit-form";
+import type { Category } from "@/lib/types";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { allCategoriesQuery } from "@/sanity/lib/queries";
-import type { Category } from "@/lib/types";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Submit a resource",
@@ -18,7 +18,7 @@ export default async function SubmitPage() {
   });
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-12">
+    <div className="mx-auto max-w-3xl">
       <SubmitForm categories={categories} />
     </div>
   );

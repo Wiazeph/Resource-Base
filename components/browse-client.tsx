@@ -1,20 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useTranslation } from "react-i18next";
-import Fuse from "fuse.js";
-import { Search, SlidersHorizontal, X } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useClickCounts } from "@/components/click-counts-provider";
+import { useFavoriteCounts } from "@/components/favorite-counts-provider";
 import { Pagination } from "@/components/pagination";
 import { ResourceCard } from "@/components/resource-card";
 import { SubmitCta } from "@/components/submit-cta";
-import { useClickCounts } from "@/components/click-counts-provider";
-import { useFavoriteCounts } from "@/components/favorite-counts-provider";
-import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import type { Category, Resource, Tag } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import Fuse from "fuse.js";
+import { Search, SlidersHorizontal, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 type Sort =
   | "featured"
@@ -127,8 +127,8 @@ export function BrowseClient({
     // adding tags broadens the result set rather than narrowing it to nothing.
     const list = activeTags.length
       ? baseFiltered.filter((r) =>
-          activeTags.some((t) => r.tags?.some((rt) => rt.slug === t)),
-        )
+        activeTags.some((t) => r.tags?.some((rt) => rt.slug === t)),
+      )
       : [...baseFiltered];
 
     if (!q.trim()) {
@@ -221,7 +221,7 @@ export function BrowseClient({
     );
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    <div className="mx-auto max-w-3xl">
       {intro ?? (
         <div className="mb-6">
           <h1 className="text-3xl font-bold tracking-tight">
@@ -237,116 +237,118 @@ export function BrowseClient({
       )}
 
       {/* Search + sort bar — floating island that docks under the header */}
-      <div className="sticky top-[4.75rem] z-30 mb-6 rounded-2xl border border-border/70 bg-background/95 p-3 shadow-md shadow-black/5 ring-1 ring-black/[0.03] backdrop-blur-xl supports-[backdrop-filter]:bg-background/85">
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder={t("browse.searchPlaceholder")}
-              className="pl-9"
-            />
+      <div className="sticky top-[86px] z-50 mb-6 rounded-b-xl bg-background">
+        <div className="rounded-xl border border-border/70 bg-background/95 p-3 shadow-md shadow-black/5 ring-1 ring-black/[0.03] backdrop-blur-xl supports-[backdrop-filter]:bg-background/85">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder={t("browse.searchPlaceholder")}
+                className="pl-9"
+              />
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setShowFilters((s) => !s)}
+              className={cn(showFilters && "border-primary text-primary")}
+            >
+              <SlidersHorizontal className="size-4" />
+              {t("browse.filters")}
+            </Button>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as Sort)}
+              className="cursor-pointer rounded-md border border-border bg-background px-3 text-sm"
+              aria-label={t("browse.sort.featured")}
+            >
+              <option value="featured">{t("browse.sort.featured")}</option>
+              <option value="popular">{t("browse.sort.popular")}</option>
+              <option value="favorites">{t("browse.sort.favorites")}</option>
+              <option value="name">{t("browse.sort.name")}</option>
+              <option value="name-desc">{t("browse.sort.nameDesc")}</option>
+              <option value="recent">{t("browse.sort.recent")}</option>
+            </select>
           </div>
-          <Button
-            variant="outline"
-            onClick={() => setShowFilters((s) => !s)}
-            className={cn(showFilters && "border-primary text-primary")}
-          >
-            <SlidersHorizontal className="size-4" />
-            {t("browse.filters")}
-          </Button>
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as Sort)}
-            className="cursor-pointer rounded-md border border-border bg-background px-3 text-sm"
-            aria-label={t("browse.sort.featured")}
-          >
-            <option value="featured">{t("browse.sort.featured")}</option>
-            <option value="popular">{t("browse.sort.popular")}</option>
-            <option value="favorites">{t("browse.sort.favorites")}</option>
-            <option value="name">{t("browse.sort.name")}</option>
-            <option value="name-desc">{t("browse.sort.nameDesc")}</option>
-            <option value="recent">{t("browse.sort.recent")}</option>
-          </select>
-        </div>
 
-        {showFilters && (
-          <div className="mt-3 space-y-3 rounded-lg border border-border bg-card p-4">
-            <Facet
-              label={t("browse.facet.category")}
-              options={[
-                ...topCategories.map((c) => ({ value: c.slug, label: c.title })),
-                ...subCategories.map((c) => ({
-                  value: c.slug,
-                  label: `↳ ${c.title}`,
-                })),
-              ]}
-              value={cat}
-              onChange={(v) => setCat(v === cat ? "" : v)}
-            />
-            <Facet
-              label={t("browse.facet.pricing")}
-              options={PRICING}
-              value={pricing}
-              onChange={(v) => setPricing(v === pricing ? "" : v)}
-            />
-            <Facet
-              label={t("browse.facet.language")}
-              options={LANGS}
-              value={lang}
-              onChange={(v) => setLang(v === lang ? "" : v)}
-            />
-            <div>
-              <p className="mb-1.5 text-xs font-medium text-muted-foreground">
-                {t("browse.facet.tags")}
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {popularTags.map((tag) => {
-                  const active = activeTags.includes(tag.slug);
-                  // Count reflects the other active filters (popularTags has
-                  // already dropped tags that would yield nothing).
-                  const count = tagCounts.get(tag.slug) ?? 0;
-                  return (
-                    <button
-                      key={tag._id}
-                      onClick={() => toggleTag(tag.slug)}
-                      aria-pressed={active}
-                      className={cn(
-                        "cursor-pointer rounded-full border px-2.5 py-0.5 text-xs transition-colors",
-                        active
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border bg-background hover:bg-muted",
-                      )}
-                    >
-                      {tag.title}
-                      <span className="ml-1 opacity-60">{count}</span>
-                    </button>
-                  );
-                })}
+          {showFilters && (
+            <div className="mt-3 space-y-3 rounded-lg border border-border bg-card p-4">
+              <Facet
+                label={t("browse.facet.category")}
+                options={[
+                  ...topCategories.map((c) => ({ value: c.slug, label: c.title })),
+                  ...subCategories.map((c) => ({
+                    value: c.slug,
+                    label: `↳ ${c.title}`,
+                  })),
+                ]}
+                value={cat}
+                onChange={(v) => setCat(v === cat ? "" : v)}
+              />
+              <Facet
+                label={t("browse.facet.pricing")}
+                options={PRICING}
+                value={pricing}
+                onChange={(v) => setPricing(v === pricing ? "" : v)}
+              />
+              <Facet
+                label={t("browse.facet.language")}
+                options={LANGS}
+                value={lang}
+                onChange={(v) => setLang(v === lang ? "" : v)}
+              />
+              <div>
+                <p className="mb-1.5 text-xs font-medium text-muted-foreground">
+                  {t("browse.facet.tags")}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {popularTags.map((tag) => {
+                    const active = activeTags.includes(tag.slug);
+                    // Count reflects the other active filters (popularTags has
+                    // already dropped tags that would yield nothing).
+                    const count = tagCounts.get(tag.slug) ?? 0;
+                    return (
+                      <button
+                        key={tag._id}
+                        onClick={() => toggleTag(tag.slug)}
+                        aria-pressed={active}
+                        className={cn(
+                          "cursor-pointer rounded-full border px-2.5 py-0.5 text-xs transition-colors",
+                          active
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-background hover:bg-muted",
+                        )}
+                      >
+                        {tag.title}
+                        <span className="ml-1 opacity-60">{count}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {hasFilters && (
-          <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-            <span>{t("browse.results", { count: filtered.length })}</span>
-            <Button variant="ghost" size="sm" onClick={reset} className="h-7">
-              <X className="size-3.5" /> {t("browse.clear")}
-            </Button>
-            {activeTags.map((slug) => (
-              <Badge
-                key={slug}
-                variant="secondary"
-                className="cursor-pointer"
-                onClick={() => toggleTag(slug)}
-              >
-                {tags.find((x) => x.slug === slug)?.title ?? slug} ×
-              </Badge>
-            ))}
-          </div>
-        )}
+          {hasFilters && (
+            <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+              <span>{t("browse.results", { count: filtered.length })}</span>
+              <Button variant="ghost" size="sm" onClick={reset} className="h-7">
+                <X className="size-3.5" /> {t("browse.clear")}
+              </Button>
+              {activeTags.map((slug) => (
+                <Badge
+                  key={slug}
+                  variant="secondary"
+                  className="cursor-pointer"
+                  onClick={() => toggleTag(slug)}
+                >
+                  {tags.find((x) => x.slug === slug)?.title ?? slug} ×
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Results */}
