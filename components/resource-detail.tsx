@@ -1,7 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import { useAuth } from "@/components/auth/auth-provider";
+import { CategoryIcon } from "@/components/category-icon";
+import { useClickCounts } from "@/components/click-counts-provider";
+import { useContributors } from "@/components/contributors-provider";
+import { useFavoriteCounts } from "@/components/favorite-counts-provider";
+import { useFavorites } from "@/components/favorites-provider";
+import { ResourceGrid } from "@/components/resource-grid";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import type { ResourceWithRelated } from "@/lib/types";
+import { cn, favicon } from "@/lib/utils";
 import {
   ArrowUpRight,
   Check,
@@ -11,18 +20,9 @@ import {
   TrendingUp,
   TriangleAlert,
 } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { CategoryIcon } from "@/components/category-icon";
-import { ResourceGrid } from "@/components/resource-grid";
-import { useFavorites } from "@/components/favorites-provider";
-import { useClickCounts } from "@/components/click-counts-provider";
-import { useFavoriteCounts } from "@/components/favorite-counts-provider";
-import { useContributors } from "@/components/contributors-provider";
-import { useAuth } from "@/components/auth/auth-provider";
-import { cn, favicon } from "@/lib/utils";
-import type { ResourceWithRelated } from "@/lib/types";
 
 const PILL =
   "inline-flex items-center gap-1.5 rounded-full bg-accent px-2.5 py-1 text-xs text-accent-foreground transition-colors hover:bg-accent/70";
@@ -53,10 +53,10 @@ export function ResourceDetail({ resource }: { resource: ResourceWithRelated }) 
 
   const addedOn = resource.addedAt
     ? new Intl.DateTimeFormat(i18n.language, {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }).format(new Date(resource.addedAt))
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(new Date(resource.addedAt))
     : undefined;
 
   function registerClick() {
@@ -68,7 +68,7 @@ export function ResourceDetail({ resource }: { resource: ResourceWithRelated }) 
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ resourceId: resource._id }),
       keepalive: true,
-    }).catch(() => {});
+    }).catch(() => { });
   }
 
   async function share() {
@@ -94,7 +94,7 @@ export function ResourceDetail({ resource }: { resource: ResourceWithRelated }) 
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10">
+    <div className="mx-auto max-w-4xl px-4 py-10">
       {/* Breadcrumb */}
       <nav className="mb-6 flex items-center gap-1 text-sm text-muted-foreground">
         <Link href="/" className="hover:text-foreground">

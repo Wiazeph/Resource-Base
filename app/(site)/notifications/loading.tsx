@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 /** Mirrors NotificationsClient: narrow column, icon + title, a list of rows. */
 export default function Loading() {
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-4xl">
       <div className="mb-8 flex items-center gap-3">
         <Skeleton className="size-6 rounded-md" />
         <Skeleton className="h-8 w-44" />

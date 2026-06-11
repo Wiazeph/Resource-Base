@@ -65,7 +65,7 @@ export function ResourceCard({ resource }: { resource: Resource }) {
           className="absolute inset-0 z-0 cursor-pointer rounded-xl"
         />
 
-        {/* Top row: icon (borderless) + name + favorite toggle */}
+        {/* Top row: icon (borderless) + name */}
         <div className="flex items-center gap-3">
           <span className="relative z-10 grid size-9 shrink-0 place-items-center overflow-hidden rounded-lg bg-muted/50">
             {icon ? (
@@ -87,34 +87,10 @@ export function ResourceCard({ resource }: { resource: Resource }) {
               <ArrowUpRight className="size-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-60" />
             </a>
           </div>
-
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              // Favorites are account-only — prompt sign-in for guests.
-              if (!user) {
-                openAuth();
-                return;
-              }
-              toggle(resource._id);
-            }}
-            aria-label={
-              !user
-                ? t("card.signInToSave")
-                : fav
-                  ? t("card.removeFavorite")
-                  : t("card.addFavorite")
-            }
-            className="relative z-10 -m-1 inline-flex shrink-0 cursor-pointer items-center rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <Star
-              className={cn("size-4", fav && "fill-primary text-primary")}
-            />
-          </button>
         </div>
 
-        {/* Bottom row: pricing (left) · click + favorite counts (right) */}
+        {/* Bottom row: pricing (left) · click count + favorite toggle (right).
+            The favorite count IS the toggle button — one star, not two. */}
         <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
           {resource.pricing && (
             <Badge
@@ -131,12 +107,31 @@ export function ResourceCard({ resource }: { resource: Resource }) {
                 {clicks}
               </span>
             )}
-            {favorites >= 1 && (
-              <span className="inline-flex items-center gap-0.5">
-                <Star className="size-3" />
-                {favorites}
-              </span>
-            )}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                // Favorites are account-only — prompt sign-in for guests.
+                if (!user) {
+                  openAuth();
+                  return;
+                }
+                toggle(resource._id);
+              }}
+              aria-label={
+                !user
+                  ? t("card.signInToSave")
+                  : fav
+                    ? t("card.removeFavorite")
+                    : t("card.addFavorite")
+              }
+              className="relative z-10 inline-flex shrink-0 cursor-pointer items-center gap-0.5 rounded-md transition-colors hover:text-foreground"
+            >
+              <Star
+                className={cn("size-3", fav && "fill-primary text-primary")}
+              />
+              {favorites >= 1 && favorites}
+            </button>
           </div>
         </div>
       </div>

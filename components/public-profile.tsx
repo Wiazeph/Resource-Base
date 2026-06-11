@@ -12,11 +12,11 @@ import { ResourceGrid } from "@/components/resource-grid";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { contributorTier } from "@/lib/contributor-tier";
+import { initial } from "@/lib/initial";
 import { fetchPublicEmail } from "@/lib/profile";
 import type { Category, PublicProfile, Resource } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Award, Eye, EyeOff, Globe, Mail, Pencil, Send } from "lucide-react";
-import { initial } from "@/lib/initial";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -72,7 +72,7 @@ export function PublicProfileView({
   const email = isOwner ? (user?.email ?? null) : publicEmail;
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-4xl">
       {/* Header */}
       <div className="flex flex-col items-center gap-4 text-center">
         <span className="grid size-20 place-items-center overflow-hidden rounded-full border border-border bg-muted text-2xl font-semibold text-foreground">

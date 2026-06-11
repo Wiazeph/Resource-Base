@@ -27,8 +27,8 @@ export function SiteFooter() {
   const { t } = useTranslation();
   return (
     <footer className="px-4 pb-12 flex flex-col gap-12">
-      <Separator className="mx-auto max-w-5xl" />
-      <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 rounded-xl border border-border/60 bg-card/40 px-4 py-8 text-sm text-muted-foreground backdrop-blur-sm sm:px-6">
+      <Separator className="mx-auto max-w-4xl" />
+      <div className="mx-auto flex w-full max-w-4xl flex-col items-center gap-3 rounded-xl border border-border/60 bg-card/40 px-4 py-8 text-sm text-muted-foreground backdrop-blur-sm sm:px-6">
         {/* Brand */}
         <div className="flex items-center gap-2 text-foreground">
           <span className="grid size-7 place-items-center rounded-md bg-primary text-primary-foreground">

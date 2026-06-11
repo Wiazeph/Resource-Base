@@ -31,7 +31,7 @@ export function SiteHeader() {
   return (
     /* Opaque strip masking content that scrolls beneath the floating header. */
     <header className="sticky px-4 inset-x-0 top-0 z-50 py-4 bg-background">
-      <div className="mx-auto flex h-14 max-w-5xl items-center rounded-xl border border-border/70 bg-background/95 px-3 shadow-lg shadow-black/5 ring-1 ring-black/[0.03] backdrop-blur-xl supports-[backdrop-filter]:bg-background/85 sm:px-4">
+      <div className="mx-auto flex h-14 max-w-4xl items-center rounded-xl border border-border/70 bg-background/95 px-3 shadow-lg shadow-black/5 ring-1 ring-black/[0.03] backdrop-blur-xl supports-[backdrop-filter]:bg-background/85 sm:px-4">
         <Link
           href="/"
           className="flex items-center gap-2 font-semibold transition-opacity hover:opacity-80"

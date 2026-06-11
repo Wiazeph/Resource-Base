@@ -1,7 +1,7 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
 import { getLegalDoc } from "@/lib/legal";
+import { useTranslation } from "react-i18next";
 
 /** Renders the localized Privacy / Terms document. */
 export function LegalPage({ kind }: { kind: "privacy" | "terms" }) {
@@ -14,7 +14,7 @@ export function LegalPage({ kind }: { kind: "privacy" | "terms" }) {
   }).format(new Date(doc.updated));
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-4xl">
       <h1 className="text-3xl font-bold tracking-tight">{doc.title}</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         {t("legal.updated", { date: updated })}

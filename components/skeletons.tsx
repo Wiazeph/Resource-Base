@@ -33,7 +33,7 @@ export function ResourceGridSkeleton({ count = 9 }: { count?: number }) {
 /** Heading + grid placeholder for list-style pages. */
 export function ListPageSkeleton() {
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-4xl">
       <div className="mb-8 space-y-2">
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-4 w-64" />

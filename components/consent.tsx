@@ -44,7 +44,7 @@ export function ConsentGate({ gaId }: { gaId?: string }) {
       {/* Banner: only once the stored choice is read AND none was made. */}
       {ready && consent === null && (
         <div className="fixed inset-x-0 bottom-0 z-50 px-3 pb-3">
-          <div className="mx-auto flex max-w-3xl flex-col gap-3 rounded-xl border border-border bg-background/95 p-4 shadow-lg ring-1 ring-black/5 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
+          <div className="mx-auto flex max-w-4xl flex-col gap-3 rounded-xl border border-border bg-background/95 p-4 shadow-lg ring-1 ring-black/5 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-muted-foreground">
               {t("consent.message")}{" "}
               <Link

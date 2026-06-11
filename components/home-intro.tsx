@@ -15,7 +15,7 @@ export function HomeIntro({ count }: { count: number }) {
         {t("home.titleLead")}{" "}
         <span className="text-primary">{t("home.titleHighlight")}</span>
       </h1>
-      <p className="mx-auto mt-3 max-w-xl text-balance text-muted-foreground">
+      <p className="mx-auto mt-4 text-balance text-muted-foreground">
         {t("home.subtitle")}
       </p>
     </div>

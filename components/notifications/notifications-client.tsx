@@ -33,7 +33,7 @@ export function NotificationsClient() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-4xl">
       <div className="mb-8 flex items-center gap-3">
         <Bell className="size-6 text-primary" />
         <h1 className="text-3xl font-bold tracking-tight">

@@ -30,7 +30,7 @@ export function CategoriesClient({ categories }: { categories: Category[] }) {
   })).filter((g) => g.cats.length > 0);
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-4xl">
       <div className="mb-10">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
           {t("categories.title")}
