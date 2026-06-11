@@ -9,6 +9,7 @@ import { FavoritesProvider } from "@/components/favorites-provider";
 import { I18nProvider } from "@/components/i18n-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { ScrollToTop } from "@/components/scroll-to-top";
 import { TaxonomyProvider } from "@/components/taxonomy-provider";
 import { SubmissionsProvider } from "@/lib/submissions";
 import type { Category, Resource, Tag } from "@/lib/types";
@@ -48,6 +49,7 @@ export default async function SiteLayout({
                 <ClickCountsProvider>
                   <ContributorsProvider>
                     <div className="flex min-h-screen flex-col">
+                      <ScrollToTop />
                       <SiteHeader />
                       <CommandPalette resources={resources} />
                       <Suspense>

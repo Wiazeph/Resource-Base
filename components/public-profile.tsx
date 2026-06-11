@@ -15,7 +15,8 @@ import { contributorTier } from "@/lib/contributor-tier";
 import { fetchPublicEmail } from "@/lib/profile";
 import type { Category, PublicProfile, Resource } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { Award, Eye, EyeOff, Globe, Mail, Pencil, Send, User as UserIcon } from "lucide-react";
+import { Award, Eye, EyeOff, Globe, Mail, Pencil, Send } from "lucide-react";
+import { initial } from "@/lib/initial";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -74,12 +75,12 @@ export function PublicProfileView({
     <div className="mx-auto max-w-3xl">
       {/* Header */}
       <div className="flex flex-col items-center gap-4 text-center">
-        <span className="grid size-20 place-items-center overflow-hidden rounded-full border border-border bg-muted">
+        <span className="grid size-20 place-items-center overflow-hidden rounded-full border border-border bg-muted text-2xl font-semibold text-foreground">
           {profile.avatar_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={profile.avatar_url} alt={profile.username} className="size-full object-cover" />
           ) : (
-            <UserIcon className="size-8 text-muted-foreground" />
+            initial(name)
           )}
         </span>
         <div>

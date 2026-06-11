@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { BrowseClient } from "@/components/browse-client";
-import { AnnouncementBanner } from "@/components/announcement-banner";
 import { HomeIntro } from "@/components/home-intro";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import {
@@ -18,17 +17,14 @@ export default async function HomePage() {
   ]);
 
   return (
-    <>
-      <AnnouncementBanner />
-      <Suspense>
-        <BrowseClient
-          resources={resources}
-          categories={categories}
-          tags={tags}
-          basePath="/"
-          intro={<HomeIntro count={resources.length} />}
-        />
-      </Suspense>
-    </>
+    <Suspense>
+      <BrowseClient
+        resources={resources}
+        categories={categories}
+        tags={tags}
+        basePath="/"
+        intro={<HomeIntro count={resources.length} />}
+      />
+    </Suspense>
   );
 }

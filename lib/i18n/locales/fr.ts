@@ -217,12 +217,6 @@ export const fr = {
     failed: "Échec de l'authentification",
   },
 
-  banner: {
-    title: "Resource Base fait peau neuve 🚧",
-    body:
-      "Nous reconstruisons et améliorons activement le site — certaines choses peuvent changer ou ne pas fonctionner. Merci de votre patience 💜",
-  },
-
   footer: {
     tagline:
       "Des ressources pour tout — au même endroit !",

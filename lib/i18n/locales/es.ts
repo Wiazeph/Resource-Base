@@ -217,12 +217,6 @@ export const es = {
     failed: "Error de autenticación",
   },
 
-  banner: {
-    title: "Resource Base se está renovando 🚧",
-    body:
-      "Estamos reconstruyendo y mejorando activamente el sitio — algunas cosas pueden cambiar o fallar mientras trabajamos. Gracias por tu paciencia 💜",
-  },
-
   footer: {
     tagline:
       "Recursos para todo — en un solo lugar!",

@@ -217,12 +217,6 @@ export const tr = {
     failed: "Kimlik doğrulama başarısız",
   },
 
-  banner: {
-    title: "Resource Base yenileniyor 🚧",
-    body:
-      "Siteyi aktif olarak yeniden inşa edip geliştiriyoruz — bu sırada bazı şeyler değişebilir veya bozulabilir. Sabrın için teşekkürler 💜",
-  },
-
   footer: {
     tagline:
       "Her şey için kaynaklar — hepsi tek bir yerde!",

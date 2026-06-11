@@ -133,7 +133,8 @@
     background-attachment: fixed;
   }
   html {
-    @apply font-sans scroll-smooth;
+    /* scroll-pt clears the sticky header for anchor/scrollIntoView jumps. */
+    @apply font-sans scroll-smooth scroll-pt-24;
   }
   h1, h2, h3 {
     @apply font-heading tracking-tight;

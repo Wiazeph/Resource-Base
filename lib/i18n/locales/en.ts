@@ -217,12 +217,6 @@ export const en = {
     failed: "Authentication failed",
   },
 
-  banner: {
-    title: "Resource Base is being renewed 🚧",
-    body:
-      "We're actively rebuilding and improving the site — things may change or break while we work. Thanks for your patience 💜",
-  },
-
   footer: {
     tagline:
       "Resources for anything and everything — all in one place!",

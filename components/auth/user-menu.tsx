@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useNotifications } from "@/lib/notifications";
 import { useProfile } from "@/lib/profile";
+import { initial } from "@/lib/initial";
 
 export function UserMenu() {
   const { t } = useTranslation();
@@ -58,7 +59,7 @@ export function UserMenu() {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={avatar} alt="" className="size-full object-cover" />
           ) : (
-            <UserIcon className="size-4" />
+            <span className="font-medium text-foreground">{initial(name)}</span>
           )}
           {unread > 0 && (
             <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-emerald-500 ring-2 ring-background" />

@@ -217,12 +217,6 @@ export const de = {
     failed: "Authentifizierung fehlgeschlagen",
   },
 
-  banner: {
-    title: "Resource Base wird erneuert 🚧",
-    body:
-      "Wir bauen die Seite aktiv um und verbessern sie — dabei kann sich etwas ändern oder nicht funktionieren. Danke für deine Geduld 💜",
-  },
-
   footer: {
     tagline:
       "Ressourcen für alles — alles an einem Ort!",
