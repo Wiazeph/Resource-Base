@@ -27,7 +27,7 @@ export function FavoritesClient({ resources }: { resources: Resource[] }) {
       {!authLoading && !user ? (
         <div className="rounded-xl border border-dashed border-border py-20 text-center">
           <p className="text-muted-foreground">{t("favorites.signInPrompt")}</p>
-          <Button className="mt-4" onClick={openAuth}>
+          <Button className="mt-4" onClick={() => openAuth()}>
             {t("header.signIn")}
           </Button>
         </div>

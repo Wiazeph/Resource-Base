@@ -111,7 +111,7 @@ export const tr = {
     error: "Önerin gönderilemedi. Lütfen tekrar dene.",
   },
 
-  resource: { share: "Paylaş", related: "İlgili kaynaklar" },
+  resource: { share: "Paylaş", related: "Önerilen kaynaklar" },
 
   contributor: {
     count_one: "{{count}} kaynak",

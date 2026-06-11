@@ -20,24 +20,31 @@ import { createClient } from "@/lib/supabase/client";
 export function AuthDialog({
   open,
   onOpenChange,
+  getRedirect,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Returns the post-login path to forward to (via OAuth ?next=), if any. */
+  getRedirect?: () => string | null;
 }) {
   const { t } = useTranslation();
   const supabase = useMemo(() => createClient(), []);
   const [pending, setPending] = useState(false);
 
-  const callbackUrl =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/auth/callback`
-      : undefined;
+  // OAuth leaves the page, so the post-login redirect must travel through the
+  // callback's ?next= param (only same-origin paths are honored server-side).
+  function callbackUrl() {
+    if (typeof window === "undefined") return undefined;
+    const base = `${window.location.origin}/auth/callback`;
+    const next = getRedirect?.();
+    return next ? `${base}?next=${encodeURIComponent(next)}` : base;
+  }
 
   async function oauth(provider: "google" | "github") {
     setPending(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: callbackUrl },
+      options: { redirectTo: callbackUrl() },
     });
     if (error) {
       toast.error(error.message);
@@ -61,7 +68,7 @@ export function AuthDialog({
           email,
           password,
           // Metadata flows into the profiles row via the handle_new_user trigger.
-          options: { emailRedirectTo: callbackUrl, data: { username } },
+          options: { emailRedirectTo: callbackUrl(), data: { username } },
         });
         if (error) throw error;
         toast.success(t("auth.confirmEmail"));
@@ -109,8 +116,8 @@ export function AuthDialog({
         </div>
 
         <div className="relative my-1 text-center text-xs text-muted-foreground">
-          <span className="relative z-10 bg-background px-2">{t("auth.or")}</span>
-          <span className="absolute inset-x-0 top-1/2 -z-0 h-px bg-border" />
+          <span className="relative z-10 bg-popover px-2">{t("auth.or")}</span>
+          <span className="absolute inset-x-0 top-1/2 z-0 h-px bg-border" />
         </div>
 
         <Tabs defaultValue="signin">

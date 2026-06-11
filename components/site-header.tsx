@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Boxes, Plus, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/components/auth/auth-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
 import { OPEN_COMMAND_EVENT } from "@/components/command-palette";
@@ -16,8 +17,17 @@ function openSearch() {
 export function SiteHeader() {
   const { t } = useTranslation();
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, openAuth } = useAuth();
   // The homepage already has a big inline search, so hide the header one there.
   const showSearch = pathname !== "/";
+
+  // Guests: open the sign-in modal in place (don't yank them to the home page),
+  // then forward to /submit after they authenticate. Signed-in: go straight.
+  function goSubmit() {
+    if (user) router.push("/submit");
+    else openAuth("/submit");
+  }
   return (
     <>
       {/* Opaque strip masking content that scrolls beneath the floating header. */}
@@ -45,13 +55,14 @@ export function SiteHeader() {
           >
             {t("nav.categories")}
           </Link>
-          <Link
-            href="/submit"
-            className="inline-flex items-center gap-1 rounded-md px-2 py-2 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+          <button
+            type="button"
+            onClick={goSubmit}
+            className="inline-flex cursor-pointer items-center gap-1 rounded-md px-2 py-2 text-sm font-medium text-primary transition-colors hover:text-primary/80"
           >
             <Plus className="size-3.5" />
             {t("nav.submit")}
-          </Link>
+          </button>
         </nav>
 
         <div className="ml-auto flex items-center gap-2">

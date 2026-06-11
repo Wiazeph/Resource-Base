@@ -111,7 +111,7 @@ export const fr = {
     error: "Échec de l'envoi. Veuillez réessayer.",
   },
 
-  resource: { share: "Partager", related: "Ressources connexes" },
+  resource: { share: "Partager", related: "Ressources suggérées" },
 
   contributor: {
     count_one: "{{count}} ressource",

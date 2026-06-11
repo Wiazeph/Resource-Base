@@ -111,7 +111,7 @@ export const de = {
     error: "Vorschlag konnte nicht gesendet werden. Bitte erneut versuchen.",
   },
 
-  resource: { share: "Teilen", related: "Verwandte Ressourcen" },
+  resource: { share: "Teilen", related: "Vorgeschlagene Ressourcen" },
 
   contributor: {
     count_one: "{{count}} Ressource",

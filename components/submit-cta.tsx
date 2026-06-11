@@ -20,19 +20,18 @@ export function SubmitCta({
   const { t } = useTranslation();
   const { user, openAuth } = useAuth();
 
-  const cta = (
-    <Button asChild={!!user} onClick={user ? undefined : openAuth}>
-      {user ? (
-        <Link href="/submit">
-          <Plus className="size-4" />
-          {t("cta.submit")}
-        </Link>
-      ) : (
-        <span className="inline-flex items-center gap-1.5">
-          <Plus className="size-4" />
-          {t("cta.submit")}
-        </span>
-      )}
+  const cta = user ? (
+    <Button asChild>
+      <Link href="/submit">
+        <Plus className="size-4" />
+        {t("cta.submit")}
+      </Link>
+    </Button>
+  ) : (
+    // Guests: open sign-in in place, then forward to /submit after auth.
+    <Button onClick={() => openAuth("/submit")}>
+      <Plus className="size-4" />
+      {t("cta.submit")}
     </Button>
   );
 

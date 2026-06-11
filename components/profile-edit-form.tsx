@@ -33,7 +33,7 @@ export function ProfileEditForm() {
     return (
       <div className="py-20 text-center">
         <p className="text-muted-foreground">{t("profile.signInPrompt")}</p>
-        <Button className="mt-4" onClick={openAuth}>
+        <Button className="mt-4" onClick={() => openAuth()}>
           {t("header.signIn")}
         </Button>
       </div>

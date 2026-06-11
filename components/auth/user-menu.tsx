@@ -28,7 +28,7 @@ export function UserMenu() {
 
   if (!user) {
     return (
-      <Button size="sm" variant="outline" onClick={openAuth}>
+      <Button size="sm" variant="outline" onClick={() => openAuth()}>
         {t("header.signIn")}
       </Button>
     );

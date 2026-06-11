@@ -25,7 +25,7 @@ export function NotificationsClient() {
       <div className="mx-auto max-w-2xl px-4 py-20 text-center">
         <Bell className="mx-auto mb-4 size-8 text-muted-foreground" />
         <p className="text-muted-foreground">{t("notifications.signInPrompt")}</p>
-        <Button className="mt-4" onClick={openAuth}>
+        <Button className="mt-4" onClick={() => openAuth()}>
           {t("header.signIn")}
         </Button>
       </div>

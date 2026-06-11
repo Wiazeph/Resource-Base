@@ -6,8 +6,10 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
+import { useRouter } from "next/navigation";
 import type { Session, User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { AuthDialog } from "@/components/auth/auth-dialog";
@@ -16,7 +18,8 @@ type AuthContextValue = {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  openAuth: () => void;
+  /** Open the sign-in dialog; pass a path to navigate there after success. */
+  openAuth: (redirectTo?: string) => void;
   signOut: () => Promise<void>;
 };
 
@@ -30,10 +33,14 @@ export function useAuth() {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = useMemo(() => createClient(), []);
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  // Where to send the user after a successful in-page sign-in (e.g. they
+  // clicked "Add a resource" while signed out). Consumed once on SIGNED_IN.
+  const redirectAfterAuth = useRef<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -61,13 +68,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       if (event === "SIGNED_IN" && next?.user) {
         setDialogOpen(false);
+        if (redirectAfterAuth.current) {
+          const to = redirectAfterAuth.current;
+          redirectAfterAuth.current = null;
+          router.push(to);
+        }
       }
     });
 
     return () => sub.subscription.unsubscribe();
-  }, [supabase]);
+  }, [supabase, router]);
 
-  const openAuth = useCallback(() => setDialogOpen(true), []);
+  const openAuth = useCallback((redirectTo?: string) => {
+    redirectAfterAuth.current = redirectTo ?? null;
+    setDialogOpen(true);
+  }, []);
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
   }, [supabase]);
@@ -80,7 +95,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider value={value}>
       {children}
-      <AuthDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      <AuthDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        getRedirect={() => redirectAfterAuth.current}
+      />
     </AuthContext.Provider>
   );
 }

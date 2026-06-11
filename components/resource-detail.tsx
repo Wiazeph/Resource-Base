@@ -73,14 +73,17 @@ export function ResourceDetail({ resource }: { resource: ResourceWithRelated }) 
 
   async function share() {
     const url = window.location.href;
+    // Native share sheet when available — never fall through to copy on
+    // cancel (that's what made the "copied ✓" tick show after dismissing).
     if (navigator.share) {
       try {
         await navigator.share({ title: resource.name, url });
-        return;
       } catch {
-        /* user cancelled — fall through to copy */
+        /* user cancelled — do nothing */
       }
+      return;
     }
+    // No native share: copy the link and confirm with the tick.
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);

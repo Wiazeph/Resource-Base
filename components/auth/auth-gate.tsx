@@ -33,7 +33,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
         <p className="mt-2 text-sm text-muted-foreground">
           {t("auth.requiredBody")}
         </p>
-        <Button className="mt-6" onClick={openAuth}>
+        <Button className="mt-6" onClick={() => openAuth()}>
           {t("header.signIn")}
         </Button>
       </div>

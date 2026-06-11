@@ -87,13 +87,23 @@ export const categorySlugsQuery = groq`*[_type == "category" && defined(slug.cur
 export const tagSlugsQuery = groq`*[_type == "tag" && defined(slug.current)].slug.current`
 export const resourceSlugsQuery = groq`*[${PUBLISHED} && defined(slug.current)].slug.current`
 
-/** A single published resource by slug, with related resources (same category). */
+/**
+ * A single published resource by slug, plus "suggested" resources: others that
+ * share at least one category OR tag, ranked by how many they share (tag
+ * overlap weighted higher than category, since tags are more specific), then by
+ * featured/recency. Top 6.
+ */
 export const resourceBySlugQuery = groq`
   *[${PUBLISHED} && slug.current == $slug][0] {
     ${RESOURCE_FIELDS},
-    "related": *[${PUBLISHED} && slug.current != $slug && count(categories[@._ref in ^.^.categories[]._ref]) > 0]
-      | order(featured desc, addedAt desc)[0...6] {
-      ${RESOURCE_FIELDS}
-    }
+    "related": *[
+      ${PUBLISHED} && slug.current != ^.slug.current &&
+      (count(categories[@._ref in ^.^.categories[]._ref]) > 0 ||
+       count(tags[@._ref in ^.^.tags[]._ref]) > 0)
+    ] {
+      ${RESOURCE_FIELDS},
+      "_score": count(tags[@._ref in ^.^.tags[]._ref]) * 2 +
+                count(categories[@._ref in ^.^.categories[]._ref])
+    } | order(_score desc, featured desc, addedAt desc)[0...6]
   }
 `

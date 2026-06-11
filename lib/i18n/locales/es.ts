@@ -111,7 +111,7 @@ export const es = {
     error: "No se pudo enviar la sugerencia. Inténtalo de nuevo.",
   },
 
-  resource: { share: "Compartir", related: "Recursos relacionados" },
+  resource: { share: "Compartir", related: "Recursos sugeridos" },
 
   contributor: {
     count_one: "{{count}} recurso",

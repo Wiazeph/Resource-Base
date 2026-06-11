@@ -111,7 +111,7 @@ export const en = {
     error: "Couldn't submit your suggestion. Please try again.",
   },
 
-  resource: { share: "Share", related: "Related resources" },
+  resource: { share: "Share", related: "Suggested resources" },
 
   contributor: {
     count_one: "{{count}} resource",
