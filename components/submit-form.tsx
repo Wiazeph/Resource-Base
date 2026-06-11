@@ -18,11 +18,22 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
   const { t } = useTranslation();
   const { profile } = useProfile();
   const [pending, setPending] = useState(false);
+  const [name, setName] = useState("");
+  const [url, setUrl] = useState("");
   const [categoryChoice, setCategoryChoice] = useState("");
+  const [customCategory, setCustomCategory] = useState("");
   const [pricing, setPricing] = useState<Pricing | "">("");
+
+  // Required fields must be filled and the URL well-formed before submitting;
+  // when "Other" is chosen, its free-text category is also required.
+  const urlValid = /^https?:\/\/.+\..+/.test(url.trim());
+  const categoryValid = categoryChoice !== OTHER || customCategory.trim().length > 0;
+  const canSubmit =
+    !pending && name.trim().length > 0 && urlValid && categoryValid;
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!canSubmit) return;
     const form = e.currentTarget;
     const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
     // Honeypot: bots fill hidden fields.
@@ -30,9 +41,7 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
 
     // "Other" → use the free-text category the user typed.
     const suggestedCategory =
-      data.categoryChoice === OTHER
-        ? (data.customCategory ?? "").trim()
-        : (data.categoryChoice ?? "");
+      categoryChoice === OTHER ? customCategory.trim() : categoryChoice;
 
     setPending(true);
     try {
@@ -42,8 +51,8 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
         // Identity (user id + email) is taken from the verified server session
         // in /api/submit — never sent from the client.
         body: JSON.stringify({
-          name: data.name,
-          url: data.url,
+          name: name.trim(),
+          url: url.trim(),
           suggestedCategory,
           pricing: data.pricing,
           tags: data.tags,
@@ -53,7 +62,10 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
       if (!res.ok) throw new Error(await res.text());
       toast.success(t("submit.success"));
       form.reset();
+      setName("");
+      setUrl("");
       setCategoryChoice("");
+      setCustomCategory("");
       setPricing("");
     } catch {
       toast.error(t("submit.error"));
@@ -88,13 +100,13 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
         <label className="mb-1.5 block text-sm font-medium">
           {t("submit.name")} *
         </label>
-        <IconInput icon={Type} name="name" required placeholder="e.g. Tailwind CSS" />
+        <IconInput icon={Type} name="name" value={name} onChange={(e) => setName(e.target.value)} required placeholder="e.g. Tailwind CSS" />
       </div>
       <div>
         <label className="mb-1.5 block text-sm font-medium">
           {t("submit.url")} *
         </label>
-        <IconInput icon={Globe} name="url" type="url" required placeholder="https://…" />
+        <IconInput icon={Globe} name="url" type="url" value={url} onChange={(e) => setUrl(e.target.value)} required placeholder="https://…" />
       </div>
       <div>
         <label className="mb-1.5 block text-sm font-medium">
@@ -121,6 +133,8 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
             <IconInput
               icon={Type}
               name="customCategory"
+              value={customCategory}
+              onChange={(e) => setCustomCategory(e.target.value)}
               required
               maxLength={60}
               placeholder={t("submit.customCategoryPlaceholder")}
@@ -162,7 +176,7 @@ export function SubmitForm({ categories }: { categories: Category[] }) {
         aria-hidden
       />
 
-      <Button type="submit" disabled={pending} size="lg" className="w-full">
+      <Button type="submit" disabled={!canSubmit} size="lg" className="w-full">
         {pending ? (
           <Loader2 className="size-4 animate-spin" />
         ) : (

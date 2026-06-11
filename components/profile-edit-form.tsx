@@ -13,21 +13,63 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useProfile } from "@/lib/profile";
 
+type Fields = {
+  username: string;
+  full_name: string;
+  bio: string;
+  portfolio_url: string;
+  github_url: string;
+  twitter_url: string;
+  instagram_url: string;
+  dribbble_url: string;
+  show_email: boolean;
+};
+
+function fieldsFromProfile(p: {
+  username?: string | null;
+  full_name?: string | null;
+  bio?: string | null;
+  portfolio_url?: string | null;
+  github_url?: string | null;
+  twitter_url?: string | null;
+  instagram_url?: string | null;
+  dribbble_url?: string | null;
+  show_email?: boolean | null;
+}): Fields {
+  return {
+    username: p.username ?? "",
+    full_name: p.full_name ?? "",
+    bio: p.bio ?? "",
+    portfolio_url: p.portfolio_url ?? "",
+    github_url: p.github_url ?? "",
+    twitter_url: p.twitter_url ?? "",
+    instagram_url: p.instagram_url ?? "",
+    dribbble_url: p.dribbble_url ?? "",
+    show_email: !!p.show_email,
+  };
+}
+
 export function ProfileEditForm() {
   const { t } = useTranslation();
   const router = useRouter();
   const { user, loading: authLoading, openAuth } = useAuth();
   const { profile, loading, update, setUsername } = useProfile();
   const [pending, setPending] = useState(false);
-  const [username, setUsernameInput] = useState("");
-  const [showEmail, setShowEmail] = useState(false);
+  // Snapshot of the profile as last loaded — the baseline we diff against to
+  // know whether anything actually changed.
+  const [baseline, setBaseline] = useState<Fields | null>(null);
+  const [fields, setFields] = useState<Fields | null>(null);
 
   useEffect(() => {
-    if (profile?.username) setUsernameInput(profile.username);
-  }, [profile?.username]);
-  useEffect(() => {
-    setShowEmail(!!profile?.show_email);
-  }, [profile?.show_email]);
+    if (profile) {
+      const next = fieldsFromProfile(profile);
+      setBaseline(next);
+      setFields(next);
+    }
+  }, [profile]);
+
+  const setField = <K extends keyof Fields>(key: K, value: Fields[K]) =>
+    setFields((f) => (f ? { ...f, [key]: value } : f));
 
   if (!authLoading && !user) {
     return (
@@ -40,7 +82,7 @@ export function ProfileEditForm() {
     );
   }
 
-  if (loading || !profile) {
+  if (loading || !profile || !fields || !baseline) {
     return (
       <div className="py-20 text-center text-muted-foreground">
         <Loader2 className="mx-auto size-5 animate-spin" />
@@ -48,14 +90,21 @@ export function ProfileEditForm() {
     );
   }
 
+  // Dirty when any field differs from the loaded baseline; valid when the
+  // (required) username clears the same constraints the input enforces.
+  const usernameValid = /^[a-zA-Z0-9_-]{3,20}$/.test(fields.username.trim());
+  const dirty = (Object.keys(fields) as (keyof Fields)[]).some(
+    (k) => fields[k] !== baseline[k],
+  );
+  const canSave = dirty && usernameValid && !pending;
+
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const form = e.currentTarget;
-    const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
+    if (!fields || !canSave) return;
     setPending(true);
     try {
       // Username goes through the validated RPC if it changed.
-      const nextUsername = username.trim().toLowerCase();
+      const nextUsername = fields.username.trim().toLowerCase();
       if (nextUsername && nextUsername !== profile!.username) {
         const { error } = await setUsername(nextUsername);
         if (error) {
@@ -71,14 +120,14 @@ export function ProfileEditForm() {
         }
       }
       const { error } = await update({
-        full_name: data.full_name || null,
-        bio: data.bio || null,
-        portfolio_url: data.portfolio_url || null,
-        github_url: data.github_url || null,
-        twitter_url: data.twitter_url || null,
-        instagram_url: data.instagram_url || null,
-        dribbble_url: data.dribbble_url || null,
-        show_email: showEmail,
+        full_name: fields.full_name || null,
+        bio: fields.bio || null,
+        portfolio_url: fields.portfolio_url || null,
+        github_url: fields.github_url || null,
+        twitter_url: fields.twitter_url || null,
+        instagram_url: fields.instagram_url || null,
+        dribbble_url: fields.dribbble_url || null,
+        show_email: fields.show_email,
       });
       if (error) throw new Error(error);
       toast.success(t("profile.saved"));
@@ -105,19 +154,19 @@ export function ProfileEditForm() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => setShowEmail((v) => !v)}
+            onClick={() => setField("show_email", !fields.show_email)}
             className={cn(
               "h-9 w-28 shrink-0 justify-center",
-              showEmail && "border-primary text-primary",
+              fields.show_email && "border-primary text-primary",
             )}
-            aria-pressed={showEmail}
+            aria-pressed={fields.show_email}
           >
-            {showEmail ? (
+            {fields.show_email ? (
               <Eye className="size-4" />
             ) : (
               <EyeOff className="size-4" />
             )}
-            {showEmail ? t("profile.emailPublic") : t("profile.emailHidden")}
+            {fields.show_email ? t("profile.emailPublic") : t("profile.emailHidden")}
           </Button>
         </div>
       </Field>
@@ -125,8 +174,8 @@ export function ProfileEditForm() {
       <Field label={t("profile.username")}>
         <IconInput
           icon={AtSign}
-          value={username}
-          onChange={(e) => setUsernameInput(e.target.value)}
+          value={fields.username}
+          onChange={(e) => setField("username", e.target.value)}
           required
           minLength={3}
           maxLength={20}
@@ -135,28 +184,28 @@ export function ProfileEditForm() {
         />
       </Field>
       <Field label={t("profile.fullName")}>
-        <IconInput icon={User} name="full_name" defaultValue={profile.full_name ?? ""} />
+        <IconInput icon={User} value={fields.full_name} onChange={(e) => setField("full_name", e.target.value)} />
       </Field>
       <Field label={t("profile.bio")}>
-        <Textarea name="bio" rows={3} defaultValue={profile.bio ?? ""} maxLength={280} />
+        <Textarea rows={3} value={fields.bio} onChange={(e) => setField("bio", e.target.value)} maxLength={280} />
       </Field>
       <Field label={t("profile.portfolio")}>
-        <IconInput icon={Globe} name="portfolio_url" type="url" defaultValue={profile.portfolio_url ?? ""} placeholder="https://…" />
+        <IconInput icon={Globe} type="url" value={fields.portfolio_url} onChange={(e) => setField("portfolio_url", e.target.value)} placeholder="https://…" />
       </Field>
       <Field label="GitHub">
-        <IconInput icon={Globe} name="github_url" type="url" defaultValue={profile.github_url ?? ""} placeholder="https://github.com/…" />
+        <IconInput icon={Globe} type="url" value={fields.github_url} onChange={(e) => setField("github_url", e.target.value)} placeholder="https://github.com/…" />
       </Field>
       <Field label="X (Twitter)">
-        <IconInput icon={Globe} name="twitter_url" type="url" defaultValue={profile.twitter_url ?? ""} placeholder="https://x.com/…" />
+        <IconInput icon={Globe} type="url" value={fields.twitter_url} onChange={(e) => setField("twitter_url", e.target.value)} placeholder="https://x.com/…" />
       </Field>
       <Field label="Instagram">
-        <IconInput icon={Globe} name="instagram_url" type="url" defaultValue={profile.instagram_url ?? ""} placeholder="https://instagram.com/…" />
+        <IconInput icon={Globe} type="url" value={fields.instagram_url} onChange={(e) => setField("instagram_url", e.target.value)} placeholder="https://instagram.com/…" />
       </Field>
       <Field label="Dribbble">
-        <IconInput icon={Globe} name="dribbble_url" type="url" defaultValue={profile.dribbble_url ?? ""} placeholder="https://dribbble.com/…" />
+        <IconInput icon={Globe} type="url" value={fields.dribbble_url} onChange={(e) => setField("dribbble_url", e.target.value)} placeholder="https://dribbble.com/…" />
       </Field>
 
-      <Button type="submit" disabled={pending} size="lg" className="w-full">
+      <Button type="submit" disabled={!canSave} size="lg" className="w-full">
         {pending && <Loader2 className="size-4 animate-spin" />}
         {t("profile.save")}
       </Button>

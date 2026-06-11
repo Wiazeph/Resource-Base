@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { ArrowUpRight, Star, TrendingUp } from "lucide-react";
 import { cn, favicon } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { Badge } from "@/components/ui/badge";
 import { useFavorites } from "@/components/favorites-provider";
 import { useClickCounts } from "@/components/click-counts-provider";
 import { useFavoriteCounts } from "@/components/favorite-counts-provider";
@@ -51,12 +52,12 @@ export function ResourceCard({ resource }: { resource: Resource }) {
     <>
       <div
         className={cn(
-          "card-hover group relative flex items-center gap-3 rounded-xl border border-border bg-card p-4",
+          "card-hover group relative flex flex-col gap-3 rounded-xl border border-border bg-card p-4",
           broken && "border-destructive/50",
         )}
       >
         {/* Card body opens the detail modal. Sits behind the interactive
-            elements below (name link, star) which carry their own z-10. */}
+            elements (name link, star) which carry their own z-10. */}
         <button
           type="button"
           onClick={() => setModalOpen(true)}
@@ -64,59 +65,80 @@ export function ResourceCard({ resource }: { resource: Resource }) {
           className="absolute inset-0 z-0 cursor-pointer rounded-xl"
         />
 
-        <span className="relative z-10 grid size-10 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-muted/50 transition-colors group-hover:border-primary/30 group-hover:bg-primary/5">
-          {icon ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={icon} alt="" className="size-5" loading="lazy" />
-          ) : null}
-        </span>
+        {/* Top row: icon (borderless) + name + favorite toggle */}
+        <div className="flex items-center gap-3">
+          <span className="relative z-10 grid size-9 shrink-0 place-items-center overflow-hidden rounded-lg bg-muted/50">
+            {icon ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={icon} alt="" className="size-5" loading="lazy" />
+            ) : null}
+          </span>
 
-        <div className="min-w-0 flex-1">
-          <a
-            href={resource.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={registerClick}
-            onAuxClick={registerClick}
-            className="relative z-10 inline-flex max-w-full items-center gap-1 font-medium leading-tight hover:underline"
+          <div className="min-w-0 flex-1">
+            <a
+              href={resource.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={registerClick}
+              onAuxClick={registerClick}
+              className="relative z-10 inline-flex max-w-full items-center gap-1 font-medium leading-tight hover:underline"
+            >
+              <span className="truncate">{resource.name}</span>
+              <ArrowUpRight className="size-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-60" />
+            </a>
+          </div>
+
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              // Favorites are account-only — prompt sign-in for guests.
+              if (!user) {
+                openAuth();
+                return;
+              }
+              toggle(resource._id);
+            }}
+            aria-label={
+              !user
+                ? t("card.signInToSave")
+                : fav
+                  ? t("card.removeFavorite")
+                  : t("card.addFavorite")
+            }
+            className="relative z-10 -m-1 inline-flex shrink-0 cursor-pointer items-center rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
           >
-            <span className="truncate">{resource.name}</span>
-            <ArrowUpRight className="size-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-60" />
-          </a>
+            <Star
+              className={cn("size-4", fav && "fill-primary text-primary")}
+            />
+          </button>
         </div>
 
-        {/* Click count */}
-        {clicks >= 1 && (
-          <span className="relative z-10 inline-flex items-center gap-0.5 text-[11px] text-muted-foreground">
-            <TrendingUp className="size-3" />
-            {clicks}
-          </span>
-        )}
-
-        {/* Favorite toggle + public favorite count */}
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            // Favorites are account-only — prompt sign-in for guests.
-            if (!user) {
-              openAuth();
-              return;
-            }
-            toggle(resource._id);
-          }}
-          aria-label={
-            !user
-              ? t("card.signInToSave")
-              : fav
-                ? t("card.removeFavorite")
-                : t("card.addFavorite")
-          }
-          className="relative z-10 -m-1 inline-flex cursor-pointer items-center gap-0.5 rounded-md p-1 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <Star className={cn("size-4", fav && "fill-primary text-primary")} />
-          {favorites >= 1 && <span>{favorites}</span>}
-        </button>
+        {/* Bottom row: pricing (left) · click + favorite counts (right) */}
+        <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+          {resource.pricing && (
+            <Badge
+              variant={resource.pricing === "free" ? "outline" : "secondary"}
+              className="text-[10px]"
+            >
+              {t(`pricing.${resource.pricing}`)}
+            </Badge>
+          )}
+          <div className="ml-auto flex items-center gap-3">
+            {clicks >= 1 && (
+              <span className="inline-flex items-center gap-0.5">
+                <TrendingUp className="size-3" />
+                {clicks}
+              </span>
+            )}
+            {favorites >= 1 && (
+              <span className="inline-flex items-center gap-0.5">
+                <Star className="size-3" />
+                {favorites}
+              </span>
+            )}
+          </div>
+        </div>
       </div>
 
       <ResourceModal

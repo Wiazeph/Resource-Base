@@ -116,7 +116,7 @@ export function ResourceDetail({ resource }: { resource: ResourceWithRelated }) 
       </nav>
 
       {/* Header */}
-      <div className="flex items-start gap-4">
+      <div className="flex items-center gap-4">
         <span className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-xl border border-border bg-muted/50">
           {icon ? (
             // eslint-disable-next-line @next/next/no-img-element

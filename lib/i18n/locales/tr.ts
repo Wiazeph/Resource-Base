@@ -239,6 +239,7 @@ export const tr = {
   account: {
     title: "Verilerin",
     export: "Verilerimi dışa aktar",
+    exportError: "Verilerin dışa aktarılamadı. Lütfen tekrar dene.",
     delete: "Hesabı sil",
     deleted: "Hesabın silindi.",
     deleteError: "Hesabın silinemedi. Lütfen tekrar dene.",

@@ -23,6 +23,30 @@ export function AccountDangerZone() {
   const { signOut } = useAuth();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [exporting, setExporting] = useState(false);
+
+  // Fetch the export, then trigger a download — gives us a loading state
+  // instead of leaving the button inert while the file is prepared.
+  async function exportData() {
+    setExporting(true);
+    try {
+      const res = await fetch("/api/user/export");
+      if (!res.ok) throw new Error(await res.text());
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "resource-base-data.json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error(t("account.exportError"));
+    } finally {
+      setExporting(false);
+    }
+  }
 
   async function deleteAccount() {
     setDeleting(true);
@@ -50,12 +74,19 @@ export function AccountDangerZone() {
       </h2>
 
       <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-        <Button asChild variant="outline" className="sm:w-auto">
-          {/* GET download — opens the export file. */}
-          <a href="/api/user/export" download>
+        <Button
+          type="button"
+          variant="outline"
+          className="sm:w-auto"
+          disabled={exporting}
+          onClick={exportData}
+        >
+          {exporting ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
             <Download className="size-4" />
-            {t("account.export")}
-          </a>
+          )}
+          {t("account.export")}
         </Button>
         <Button
           type="button"

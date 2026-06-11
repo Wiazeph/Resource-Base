@@ -239,6 +239,7 @@ export const fr = {
   account: {
     title: "Vos données",
     export: "Exporter mes données",
+    exportError: "Impossible d'exporter vos données. Veuillez réessayer.",
     delete: "Supprimer le compte",
     deleted: "Votre compte a été supprimé.",
     deleteError: "Impossible de supprimer votre compte. Veuillez réessayer.",
