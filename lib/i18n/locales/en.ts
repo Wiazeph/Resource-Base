@@ -113,6 +113,14 @@ export const en = {
 
   resource: { share: "Share", related: "Related resources" },
 
+  cta: {
+    title: "Know a resource we're missing?",
+    subtitle:
+      "Add it to the directory — every suggestion is reviewed before going live.",
+    submit: "Submit a resource",
+    emptyPrompt: "Can't find it? Suggest it and help others.",
+  },
+
   command: {
     title: "Search resources",
     description: "Search across every resource, category and tag.",
@@ -181,7 +189,8 @@ export const en = {
     title: "Welcome 👋",
     requiredTitle: "Sign in required",
     requiredBody: "You need to be signed in to view this page.",
-    subtitle: "Sign in to save favorites and submit resources.",
+    subtitle:
+      "Join to save favorites, submit resources and help the directory grow.",
     google: "Continue with Google",
     github: "Continue with GitHub",
     or: "or",

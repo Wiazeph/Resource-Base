@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Pagination } from "@/components/pagination";
 import { ResourceCard } from "@/components/resource-card";
+import { SubmitCta } from "@/components/submit-cta";
 import { useClickCounts } from "@/components/click-counts-provider";
 import { useFavoriteCounts } from "@/components/favorite-counts-provider";
 import { cn } from "@/lib/utils";
@@ -353,6 +354,7 @@ export function BrowseClient({
       {filtered.length === 0 ? (
         <div className="py-20 text-center text-muted-foreground">
           {t("browse.empty")}
+          <SubmitCta variant="compact" />
         </div>
       ) : (
         <>
@@ -376,6 +378,9 @@ export function BrowseClient({
               })}
             />
           )}
+
+          {/* Encourage contribution after the results. */}
+          <SubmitCta variant="band" />
         </>
       )}
     </div>

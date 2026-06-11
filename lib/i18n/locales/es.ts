@@ -113,6 +113,14 @@ export const es = {
 
   resource: { share: "Compartir", related: "Recursos relacionados" },
 
+  cta: {
+    title: "¿Conoces un recurso que falta?",
+    subtitle:
+      "Añádelo al directorio — cada sugerencia se revisa antes de publicarse.",
+    submit: "Proponer un recurso",
+    emptyPrompt: "¿No lo encuentras? Propónlo y ayuda a los demás.",
+  },
+
   command: {
     title: "Buscar recursos",
     description: "Busca en todos los recursos, categorías y etiquetas.",
@@ -181,7 +189,8 @@ export const es = {
     title: "Bienvenido 👋",
     requiredTitle: "Inicio de sesión requerido",
     requiredBody: "Debes iniciar sesión para ver esta página.",
-    subtitle: "Inicia sesión para guardar favoritos y enviar recursos.",
+    subtitle:
+      "Únete para guardar favoritos, enviar recursos y ayudar a que el directorio crezca.",
     google: "Continuar con Google",
     github: "Continuar con GitHub",
     or: "o",

@@ -113,6 +113,14 @@ export const fr = {
 
   resource: { share: "Partager", related: "Ressources connexes" },
 
+  cta: {
+    title: "Vous connaissez une ressource manquante ?",
+    subtitle:
+      "Ajoutez-la au répertoire — chaque proposition est examinée avant publication.",
+    submit: "Proposer une ressource",
+    emptyPrompt: "Vous ne la trouvez pas ? Proposez-la et aidez les autres.",
+  },
+
   command: {
     title: "Rechercher des ressources",
     description: "Recherchez dans toutes les ressources, catégories et tags.",
@@ -181,7 +189,8 @@ export const fr = {
     title: "Bienvenue 👋",
     requiredTitle: "Connexion requise",
     requiredBody: "Vous devez être connecté pour voir cette page.",
-    subtitle: "Connectez-vous pour enregistrer des favoris et proposer des ressources.",
+    subtitle:
+      "Rejoignez-nous pour enregistrer des favoris, proposer des ressources et faire grandir le répertoire.",
     google: "Continuer avec Google",
     github: "Continuer avec GitHub",
     or: "ou",

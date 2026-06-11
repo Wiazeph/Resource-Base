@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Boxes, Search } from "lucide-react";
+import { Boxes, Plus, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
@@ -38,12 +38,19 @@ export function SiteHeader() {
           •
         </span>
 
-        <nav className="hidden md:flex">
+        <nav className="hidden items-center gap-1 md:flex">
           <Link
             href="/categories"
             className="rounded-md px-2 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             {t("nav.categories")}
+          </Link>
+          <Link
+            href="/submit"
+            className="inline-flex items-center gap-1 rounded-md px-2 py-2 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+          >
+            <Plus className="size-3.5" />
+            {t("nav.submit")}
           </Link>
         </nav>
 

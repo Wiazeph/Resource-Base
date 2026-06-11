@@ -113,6 +113,14 @@ export const tr = {
 
   resource: { share: "Paylaş", related: "İlgili kaynaklar" },
 
+  cta: {
+    title: "Eksik bir kaynak mı biliyorsun?",
+    subtitle:
+      "Dizine ekle — her öneri yayına girmeden önce incelenir.",
+    submit: "Kaynak öner",
+    emptyPrompt: "Bulamadın mı? Öner, başkalarına da yardım et.",
+  },
+
   command: {
     title: "Kaynaklarda ara",
     description: "Tüm kaynaklarda, kategorilerde ve etiketlerde ara.",
@@ -181,7 +189,8 @@ export const tr = {
     title: "Hoş geldin 👋",
     requiredTitle: "Giriş yapmanız gerekiyor",
     requiredBody: "Bu sayfayı görüntülemek için giriş yapmalısınız.",
-    subtitle: "Favori kaydetmek ve kaynak önermek için giriş yap.",
+    subtitle:
+      "Favori kaydetmek, kaynak önermek ve dizinin büyümesine katkıda bulunmak için katıl.",
     google: "Google ile devam et",
     github: "GitHub ile devam et",
     or: "veya",

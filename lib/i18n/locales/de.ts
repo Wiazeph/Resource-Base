@@ -113,6 +113,14 @@ export const de = {
 
   resource: { share: "Teilen", related: "Verwandte Ressourcen" },
 
+  cta: {
+    title: "Kennst du eine fehlende Ressource?",
+    subtitle:
+      "Füge sie zum Verzeichnis hinzu — jeder Vorschlag wird vor der Veröffentlichung geprüft.",
+    submit: "Ressource vorschlagen",
+    emptyPrompt: "Nicht gefunden? Schlage sie vor und hilf anderen.",
+  },
+
   command: {
     title: "Ressourcen durchsuchen",
     description: "Durchsuche alle Ressourcen, Kategorien und Tags.",
@@ -181,7 +189,8 @@ export const de = {
     title: "Willkommen 👋",
     requiredTitle: "Anmeldung erforderlich",
     requiredBody: "Du musst angemeldet sein, um diese Seite zu sehen.",
-    subtitle: "Melde dich an, um Favoriten zu speichern und Ressourcen einzureichen.",
+    subtitle:
+      "Mach mit, um Favoriten zu speichern, Ressourcen einzureichen und das Verzeichnis wachsen zu lassen.",
     google: "Mit Google fortfahren",
     github: "Mit GitHub fortfahren",
     or: "oder",
