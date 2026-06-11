@@ -9,10 +9,11 @@ import {
   useRef,
   useState,
 } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { Session, User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { AuthDialog } from "@/components/auth/auth-dialog";
+import { isProtectedPage } from "@/lib/protected-routes";
 
 type AuthContextValue = {
   user: User | null;
@@ -34,6 +35,7 @@ export function useAuth() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = useMemo(() => createClient(), []);
   const router = useRouter();
+  const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,6 +43,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Where to send the user after a successful in-page sign-in (e.g. they
   // clicked "Add a resource" while signed out). Consumed once on SIGNED_IN.
   const redirectAfterAuth = useRef<string | null>(null);
+  // Current path mirrored in a ref so the (stable) auth listener can read it
+  // without being torn down and rebuilt on every navigation.
+  const pathnameRef = useRef(pathname);
+  useEffect(() => {
+    pathnameRef.current = pathname;
+  }, [pathname]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -73,6 +81,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           redirectAfterAuth.current = null;
           router.push(to);
         }
+      }
+      // On sign-out, if the user is sitting on a protected page, bounce home
+      // immediately — otherwise the now-unauthorized page stays visible until
+      // the next refresh (which the middleware would then redirect).
+      if (event === "SIGNED_OUT" && isProtectedPage(pathnameRef.current)) {
+        router.replace("/");
       }
     });
 

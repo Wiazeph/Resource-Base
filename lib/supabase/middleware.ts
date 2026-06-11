@@ -1,13 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-
-/** Page routes that require a signed-in user. */
-const PROTECTED_PAGES = [
-  "/submit",
-  "/favorites",
-  "/notifications",
-  "/profile/edit",
-];
+import { isProtectedPage } from "@/lib/protected-routes";
 
 /** API routes that require a signed-in user. */
 const PROTECTED_APIS = ["/api/submit", "/api/user"];
@@ -55,7 +48,7 @@ export async function updateSession(request: NextRequest) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
     // Protected pages → bounce home with a flag so the UI can prompt sign-in.
-    if (PROTECTED_PAGES.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
+    if (isProtectedPage(pathname)) {
       const url = request.nextUrl.clone();
       url.pathname = "/";
       url.search = "?auth=required";
