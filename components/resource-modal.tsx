@@ -389,42 +389,11 @@ export function ResourceModal({
                 {t("card.addedBy", { username: contributor.username })}
               </Link>
             )}
-
-            {/* Taxonomy fix: suggest edit, or — if the user already sent one —
-                a clickable "pending" chip that opens the read-only view. While
-                the user's submissions are still loading we show a neutral
-                placeholder so the control never flips from edit → pending. */}
-            {!taxOpen &&
-              !taxViewOpen &&
-              (resource.categories?.length > 0 ||
-                resource.tags?.length > 0) &&
-              (user && submissionsLoading ? (
-                <span className="ml-auto inline-flex items-center gap-1 opacity-60">
-                  <Loader2 className="size-3.5 animate-spin" />
-                </span>
-              ) : pendingTaxFix ? (
-                <button
-                  type="button"
-                  onClick={() => setTaxViewOpen(true)}
-                  className="ml-auto inline-flex cursor-pointer items-center gap-1 text-amber-600 transition-opacity hover:opacity-80 dark:text-amber-400"
-                  title={t("taxonomy.pendingSuggestion")}
-                >
-                  <Clock className="size-3.5" />
-                  {t("taxonomy.pendingSuggestion")}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => (user ? setTaxOpen(true) : openAuth())}
-                  className="ml-auto inline-flex cursor-pointer items-center gap-1 transition-colors hover:text-foreground"
-                >
-                  <PencilLine className="size-3.5" />
-                  {t("taxonomy.editCta")}
-                </button>
-              ))}
           </div>
 
-          {/* Actions — favorite toggle + open, no footer bar */}
+          {/* Actions — favorite · details · suggest edit · open. Suggest edit
+              becomes a clickable "pending" chip once the user has an open
+              suggestion; the editor/read-only view render above this row. */}
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
@@ -448,7 +417,7 @@ export function ResourceModal({
               <Star className={cn(fav && "fill-primary text-primary")} />
             </Button>
             {resource.slug && (
-              <Button asChild variant="outline">
+              <Button asChild variant="outline" size="lg">
                 <Link
                   href={`/resource/${resource.slug}`}
                   onClick={() => onOpenChange(false)}
@@ -457,7 +426,41 @@ export function ResourceModal({
                 </Link>
               </Button>
             )}
-            <Button asChild className="flex-1">
+
+            {/* Suggest edit (categories / tags / description). Hidden while the
+                editor or read-only view is already open. */}
+            {!taxOpen &&
+              !taxViewOpen &&
+              (resource.categories?.length > 0 || resource.tags?.length > 0) &&
+              (user && submissionsLoading ? (
+                <Button variant="outline" size="lg" disabled>
+                  <Loader2 className="animate-spin" />
+                </Button>
+              ) : pendingTaxFix ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setTaxViewOpen(true)}
+                  title={t("taxonomy.pendingSuggestion")}
+                  className="text-amber-600 dark:text-amber-400"
+                >
+                  <Clock />
+                  {t("taxonomy.pendingSuggestion")}
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  onClick={() => (user ? setTaxOpen(true) : openAuth())}
+                >
+                  <PencilLine />
+                  {t("taxonomy.editCta")}
+                </Button>
+              ))}
+
+            <Button asChild size="lg" className="flex-1">
               <a
                 href={resource.url}
                 target="_blank"

@@ -260,36 +260,6 @@ export function ResourceDetail({ resource }: { resource: ResourceWithRelated }) 
               </div>
             </div>
           )}
-
-          {/* Suggest edit — categories, tags, or description. While the user's
-              own submissions are loading we show a neutral spinner so the
-              control never flips from edit → pending. */}
-          <div className="mt-5">
-            {user && submissionsLoading ? (
-              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground opacity-60">
-                <Loader2 className="size-3.5 animate-spin" />
-              </span>
-            ) : pendingTaxFix ? (
-              <button
-                type="button"
-                onClick={() => setTaxViewOpen(true)}
-                className="inline-flex cursor-pointer items-center gap-1 text-xs text-amber-600 transition-opacity hover:opacity-80 dark:text-amber-400"
-                title={t("taxonomy.pendingSuggestion")}
-              >
-                <Clock className="size-3.5" />
-                {t("taxonomy.pendingSuggestion")}
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => (user ? setTaxOpen(true) : openAuth())}
-                className="inline-flex cursor-pointer items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <PencilLine className="size-3.5" />
-                {t("taxonomy.editCta")}
-              </button>
-            )}
-          </div>
         </>
       )}
 
@@ -351,6 +321,40 @@ export function ResourceDetail({ resource }: { resource: ResourceWithRelated }) 
         >
           {copied ? <Check className="text-emerald-500" /> : <Share2 />}
         </Button>
+
+        {/* Suggest edit (categories / tags / description) — hidden while the
+            editor or read-only view is already open above. */}
+        {!taxOpen &&
+          !taxViewOpen &&
+          (resource.categories?.length > 0 || resource.tags?.length > 0) &&
+          (user && submissionsLoading ? (
+            <Button variant="outline" size="lg" disabled>
+              <Loader2 className="animate-spin" />
+            </Button>
+          ) : pendingTaxFix ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={() => setTaxViewOpen(true)}
+              title={t("taxonomy.pendingSuggestion")}
+              className="text-amber-600 dark:text-amber-400"
+            >
+              <Clock />
+              {t("taxonomy.pendingSuggestion")}
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={() => (user ? setTaxOpen(true) : openAuth())}
+            >
+              <PencilLine />
+              {t("taxonomy.editCta")}
+            </Button>
+          ))}
+
         <Button asChild size="lg" className="flex-1">
           <a
             href={resource.url}
