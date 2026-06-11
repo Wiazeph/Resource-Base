@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { AtSign, Loader2, Lock, Mail } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   Dialog,
@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { IconInput } from "@/components/ui/icon-input";
+import { GoogleIcon, GithubIcon } from "@/components/brand-icons";
 import { createClient } from "@/lib/supabase/client";
 
 export function AuthDialog({
@@ -94,6 +95,7 @@ export function AuthDialog({
             disabled={pending}
             onClick={() => oauth("google")}
           >
+            <GoogleIcon className="size-4" />
             {t("auth.google")}
           </Button>
           <Button
@@ -101,6 +103,7 @@ export function AuthDialog({
             disabled={pending}
             onClick={() => oauth("github")}
           >
+            <GithubIcon className="size-4" />
             {t("auth.github")}
           </Button>
         </div>
@@ -126,7 +129,8 @@ export function AuthDialog({
                 }}
               >
                 {mode === "signup" && (
-                  <Input
+                  <IconInput
+                    icon={AtSign}
                     name="username"
                     required
                     minLength={3}
@@ -136,13 +140,15 @@ export function AuthDialog({
                     autoComplete="username"
                   />
                 )}
-                <Input
+                <IconInput
+                  icon={Mail}
                   name="email"
                   type="email"
                   required
                   placeholder={t("auth.emailPlaceholder")}
                 />
-                <Input
+                <IconInput
+                  icon={Lock}
                   name="password"
                   type="password"
                   required

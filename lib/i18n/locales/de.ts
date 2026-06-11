@@ -36,7 +36,7 @@ export const de = {
     categories: "Kategorien",
     notifications: "Benachrichtigungen",
     favorites: "Favoriten",
-    submit: "Ressource vorschlagen",
+    submit: "Ressource hinzufügen",
     signOut: "Abmelden",
     account: "Konto",
   },
@@ -113,12 +113,23 @@ export const de = {
 
   resource: { share: "Teilen", related: "Verwandte Ressourcen" },
 
+  contributor: {
+    count_one: "{{count}} Ressource",
+    count_other: "{{count}} Ressourcen",
+    tier: {
+      newcomer: "Neuling",
+      contributor: "Beitragender",
+      star: "Top-Beitragender",
+      legend: "Legende",
+    },
+  },
+
   cta: {
     title: "Kennst du eine fehlende Ressource?",
     subtitle:
       "Füge sie zum Verzeichnis hinzu — jeder Vorschlag wird vor der Veröffentlichung geprüft.",
-    submit: "Ressource vorschlagen",
-    emptyPrompt: "Nicht gefunden? Schlage sie vor und hilf anderen.",
+    submit: "Ressource hinzufügen",
+    emptyPrompt: "Nicht gefunden? Füge sie hinzu und hilf anderen.",
   },
 
   command: {
@@ -149,9 +160,9 @@ export const de = {
   },
 
   submit: {
-    title: "Ressource vorschlagen",
+    title: "Ressource hinzufügen",
     subtitle:
-      "Kennst du eine großartige Ressource, die fehlt? Schlage sie vor — wir prüfen jeden Vorschlag, bevor er live geht.",
+      "Kennst du eine großartige Ressource, die fehlt? Füge sie hinzu — wir prüfen jede Einreichung, bevor sie live geht.",
     name: "Name",
     url: "URL",
     category: "Kategorie",
@@ -164,8 +175,8 @@ export const de = {
     viewMine: "Meine Einreichungen ansehen",
     note: "Notiz",
     notePlaceholder: "Warum ist diese Ressource großartig?",
-    submit: "Ressource einreichen",
-    success: "Danke! Dein Vorschlag ist in der Prüfung.",
+    submit: "Ressource hinzufügen",
+    success: "Danke! Deine Einreichung ist in der Prüfung.",
     error: "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
   },
 

@@ -36,7 +36,7 @@ export const es = {
     categories: "Categorías",
     notifications: "Notificaciones",
     favorites: "Favoritos",
-    submit: "Sugerir un recurso",
+    submit: "Añadir un recurso",
     signOut: "Cerrar sesión",
     account: "Cuenta",
   },
@@ -113,12 +113,23 @@ export const es = {
 
   resource: { share: "Compartir", related: "Recursos relacionados" },
 
+  contributor: {
+    count_one: "{{count}} recurso",
+    count_other: "{{count}} recursos",
+    tier: {
+      newcomer: "Recién llegado",
+      contributor: "Colaborador",
+      star: "Colaborador estrella",
+      legend: "Leyenda",
+    },
+  },
+
   cta: {
     title: "¿Conoces un recurso que falta?",
     subtitle:
       "Añádelo al directorio — cada sugerencia se revisa antes de publicarse.",
-    submit: "Proponer un recurso",
-    emptyPrompt: "¿No lo encuentras? Propónlo y ayuda a los demás.",
+    submit: "Añadir un recurso",
+    emptyPrompt: "¿No lo encuentras? Añádelo y ayuda a los demás.",
   },
 
   command: {
@@ -149,9 +160,9 @@ export const es = {
   },
 
   submit: {
-    title: "Sugerir un recurso",
+    title: "Añadir un recurso",
     subtitle:
-      "¿Conoces un gran recurso que falta? Sugiérelo — revisamos cada propuesta antes de publicarla.",
+      "¿Conoces un gran recurso que falta? Añádelo — revisamos cada envío antes de publicarlo.",
     name: "Nombre",
     url: "URL",
     category: "Categoría",
@@ -164,8 +175,8 @@ export const es = {
     viewMine: "Ver mis propuestas",
     note: "Nota",
     notePlaceholder: "¿Por qué es genial este recurso?",
-    submit: "Enviar recurso",
-    success: "¡Gracias! Tu propuesta está en revisión.",
+    submit: "Añadir recurso",
+    success: "¡Gracias! Tu envío está en revisión.",
     error: "Algo salió mal. Inténtalo de nuevo.",
   },
 

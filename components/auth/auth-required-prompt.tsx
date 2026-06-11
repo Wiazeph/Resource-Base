@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -10,6 +10,11 @@ import { useAuth } from "@/components/auth/auth-provider";
  * When the middleware bounces a signed-out user off a protected page it adds
  * ?auth=required. This opens the sign-in modal and cleans the URL so the
  * redirect is explained rather than silent.
+ *
+ * The effect is driven by the param itself (not a one-shot ref): this
+ * component lives in the persistent (site) layout and never remounts, so a ref
+ * guard would swallow every bounce after the first. Stripping the param via
+ * router.replace is what prevents re-firing.
  */
 export function AuthRequiredPrompt() {
   const { t } = useTranslation();
@@ -17,20 +22,20 @@ export function AuthRequiredPrompt() {
   const params = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const handled = useRef(false);
+
+  const needsAuth = params.get("auth") === "required";
 
   useEffect(() => {
-    if (loading || handled.current) return;
-    if (params.get("auth") === "required") {
-      handled.current = true;
-      if (!user) {
-        toast.info(t("auth.requiredBody"));
-        openAuth();
-      }
-      // Strip the param so a refresh doesn't re-trigger.
-      router.replace(pathname, { scroll: false });
+    // Wait until auth has resolved so we don't prompt a user who's actually
+    // signed in (e.g. a stale link).
+    if (!needsAuth || loading) return;
+    if (!user) {
+      toast.info(t("auth.requiredBody"));
+      openAuth();
     }
-  }, [params, loading, user, openAuth, router, pathname, t]);
+    // Strip the param so refresh/back doesn't re-trigger.
+    router.replace(pathname, { scroll: false });
+  }, [needsAuth, loading, user, openAuth, router, pathname, t]);
 
   return null;
 }

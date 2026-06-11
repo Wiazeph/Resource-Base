@@ -36,7 +36,7 @@ export const fr = {
     categories: "Catégories",
     notifications: "Notifications",
     favorites: "Favoris",
-    submit: "Proposer une ressource",
+    submit: "Ajouter une ressource",
     signOut: "Se déconnecter",
     account: "Compte",
   },
@@ -113,12 +113,23 @@ export const fr = {
 
   resource: { share: "Partager", related: "Ressources connexes" },
 
+  contributor: {
+    count_one: "{{count}} ressource",
+    count_other: "{{count}} ressources",
+    tier: {
+      newcomer: "Nouveau",
+      contributor: "Contributeur",
+      star: "Contributeur étoile",
+      legend: "Légende",
+    },
+  },
+
   cta: {
     title: "Vous connaissez une ressource manquante ?",
     subtitle:
       "Ajoutez-la au répertoire — chaque proposition est examinée avant publication.",
-    submit: "Proposer une ressource",
-    emptyPrompt: "Vous ne la trouvez pas ? Proposez-la et aidez les autres.",
+    submit: "Ajouter une ressource",
+    emptyPrompt: "Vous ne la trouvez pas ? Ajoutez-la et aidez les autres.",
   },
 
   command: {
@@ -149,9 +160,9 @@ export const fr = {
   },
 
   submit: {
-    title: "Proposer une ressource",
+    title: "Ajouter une ressource",
     subtitle:
-      "Vous connaissez une superbe ressource qui manque ? Proposez-la — nous examinons chaque proposition avant publication.",
+      "Vous connaissez une superbe ressource qui manque ? Ajoutez-la — nous examinons chaque ajout avant publication.",
     name: "Nom",
     url: "URL",
     category: "Catégorie",
@@ -164,8 +175,8 @@ export const fr = {
     viewMine: "Voir mes propositions",
     note: "Note",
     notePlaceholder: "Pourquoi cette ressource est-elle géniale ?",
-    submit: "Envoyer la ressource",
-    success: "Merci ! Votre proposition est en cours d'examen.",
+    submit: "Ajouter la ressource",
+    success: "Merci ! Votre ajout est en cours d'examen.",
     error: "Une erreur s'est produite. Veuillez réessayer.",
   },
 

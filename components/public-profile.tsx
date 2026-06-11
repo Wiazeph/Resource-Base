@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff, Globe, Mail, Pencil, Send, User as UserIcon } from "lucide-react";
+import { Award, Eye, EyeOff, Globe, Mail, Pencil, Send, User as UserIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { contributorTier } from "@/lib/contributor-tier";
+import { cn } from "@/lib/utils";
 import { ResourceGrid } from "@/components/resource-grid";
 import { MySubmissions } from "@/components/my-submissions";
 import { useAuth } from "@/components/auth/auth-provider";
@@ -53,6 +56,8 @@ export function PublicProfileView({
   const { user } = useAuth();
   const isOwner = user?.id === profile.id;
   const name = profile.full_name || `@${profile.username}`;
+  // Gamification: tier badge based on accepted contributions.
+  const tier = contributorTier(resources.length);
 
   // Email display: the owner always sees their own (from the session) with an
   // eye/eye-off marking whether it's public; other visitors see it only if the
@@ -104,6 +109,14 @@ export function PublicProfileView({
                 )}
               </span>
             </p>
+          )}
+          {tier && (
+            <div className="mt-2 flex items-center justify-center">
+              <Badge variant="outline" className={cn("gap-1", tier.className)}>
+                <Award className="size-3" />
+                {t(tier.labelKey)} · {t("contributor.count", { count: resources.length })}
+              </Badge>
+            </div>
           )}
         </div>
         {isOwner && (

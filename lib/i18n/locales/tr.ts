@@ -36,7 +36,7 @@ export const tr = {
     categories: "Kategoriler",
     notifications: "Bildirimler",
     favorites: "Favoriler",
-    submit: "Kaynak öner",
+    submit: "Kaynak ekle",
     signOut: "Çıkış yap",
     account: "Hesap",
   },
@@ -113,12 +113,23 @@ export const tr = {
 
   resource: { share: "Paylaş", related: "İlgili kaynaklar" },
 
+  contributor: {
+    count_one: "{{count}} kaynak",
+    count_other: "{{count}} kaynak",
+    tier: {
+      newcomer: "Yeni katkıcı",
+      contributor: "Katkıcı",
+      star: "Yıldız katkıcı",
+      legend: "Efsane",
+    },
+  },
+
   cta: {
     title: "Eksik bir kaynak mı biliyorsun?",
     subtitle:
-      "Dizine ekle — her öneri yayına girmeden önce incelenir.",
-    submit: "Kaynak öner",
-    emptyPrompt: "Bulamadın mı? Öner, başkalarına da yardım et.",
+      "Depoya ekle — her gönderi yayına girmeden önce incelenir.",
+    submit: "Kaynak ekle",
+    emptyPrompt: "Bulamadın mı? Ekle, başkalarına da yardım et.",
   },
 
   command: {
@@ -149,9 +160,9 @@ export const tr = {
   },
 
   submit: {
-    title: "Kaynak öner",
+    title: "Kaynak ekle",
     subtitle:
-      "Eksik olan harika bir kaynak mı biliyorsun? Öner — her öneriyi yayına almadan önce inceliyoruz.",
+      "Eksik olan harika bir kaynak mı biliyorsun? Ekle — her gönderiyi yayına almadan önce inceliyoruz.",
     name: "İsim",
     url: "URL",
     category: "Kategori",
@@ -164,8 +175,8 @@ export const tr = {
     viewMine: "Gönderilerimi gör",
     note: "Not",
     notePlaceholder: "Bu kaynak neden harika?",
-    submit: "Kaynağı gönder",
-    success: "Teşekkürler! Önerin inceleme sırasında.",
+    submit: "Kaynağı ekle",
+    success: "Teşekkürler! Gönderin inceleme sırasında.",
     error: "Bir şeyler ters gitti. Lütfen tekrar dene.",
   },
 
@@ -190,7 +201,7 @@ export const tr = {
     requiredTitle: "Giriş yapmanız gerekiyor",
     requiredBody: "Bu sayfayı görüntülemek için giriş yapmalısınız.",
     subtitle:
-      "Favori kaydetmek, kaynak önermek ve dizinin büyümesine katkıda bulunmak için katıl.",
+      "Favori kaydetmek, kaynak önermek ve deponun büyümesine katkıda bulunmak için katıl.",
     google: "Google ile devam et",
     github: "GitHub ile devam et",
     or: "veya",

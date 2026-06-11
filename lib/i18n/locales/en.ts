@@ -36,7 +36,7 @@ export const en = {
     categories: "Categories",
     notifications: "Notifications",
     favorites: "Favorites",
-    submit: "Submit a resource",
+    submit: "Add a resource",
     signOut: "Sign out",
     account: "Account",
   },
@@ -113,12 +113,23 @@ export const en = {
 
   resource: { share: "Share", related: "Related resources" },
 
+  contributor: {
+    count_one: "{{count}} resource",
+    count_other: "{{count}} resources",
+    tier: {
+      newcomer: "Newcomer",
+      contributor: "Contributor",
+      star: "Star contributor",
+      legend: "Legend",
+    },
+  },
+
   cta: {
     title: "Know a resource we're missing?",
     subtitle:
-      "Add it to the directory — every suggestion is reviewed before going live.",
-    submit: "Submit a resource",
-    emptyPrompt: "Can't find it? Suggest it and help others.",
+      "Add it to the directory — every submission is reviewed before going live.",
+    submit: "Add a resource",
+    emptyPrompt: "Can't find it? Add it and help others.",
   },
 
   command: {
@@ -149,9 +160,9 @@ export const en = {
   },
 
   submit: {
-    title: "Submit a resource",
+    title: "Add a resource",
     subtitle:
-      "Know a great resource that’s missing? Suggest it — we review every submission before it goes live.",
+      "Know a great resource that’s missing? Add it — we review every submission before it goes live.",
     name: "Name",
     url: "URL",
     category: "Category",
@@ -164,8 +175,8 @@ export const en = {
     viewMine: "View my submissions",
     note: "Note",
     notePlaceholder: "Why is this resource great?",
-    submit: "Submit resource",
-    success: "Thanks! Your suggestion is in the review queue.",
+    submit: "Add resource",
+    success: "Thanks! Your submission is in the review queue.",
     error: "Something went wrong. Please try again.",
   },
 
