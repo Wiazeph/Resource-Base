@@ -322,36 +322,38 @@ export function ResourceDetail({ resource }: { resource: ResourceWithRelated }) 
           {copied ? <Check className="text-emerald-500" /> : <Share2 />}
         </Button>
 
-        {/* Suggest edit (categories / tags / description) — hidden while the
-            editor or read-only view is already open above. */}
+        {/* Suggest edit (categories / tags / description) — icon-only, matching
+            the modal, so a long "pending" label can't break the action row.
+            Hidden while the editor or read-only view is already open above. */}
         {!taxOpen &&
           !taxViewOpen &&
           (resource.categories?.length > 0 || resource.tags?.length > 0) &&
           (user && submissionsLoading ? (
-            <Button variant="outline" size="lg" disabled>
+            <Button variant="outline" size="icon-lg" disabled>
               <Loader2 className="animate-spin" />
             </Button>
           ) : pendingTaxFix ? (
             <Button
               type="button"
               variant="outline"
-              size="lg"
+              size="icon-lg"
               onClick={() => setTaxViewOpen(true)}
               title={t("taxonomy.pendingSuggestion")}
+              aria-label={t("taxonomy.pendingSuggestion")}
               className="text-amber-600 dark:text-amber-400"
             >
               <Clock />
-              {t("taxonomy.pendingSuggestion")}
             </Button>
           ) : (
             <Button
               type="button"
               variant="outline"
-              size="lg"
+              size="icon-lg"
               onClick={() => (user ? setTaxOpen(true) : openAuth())}
+              title={t("taxonomy.editCta")}
+              aria-label={t("taxonomy.editCta")}
             >
               <PencilLine />
-              {t("taxonomy.editCta")}
             </Button>
           ))}
 

@@ -64,7 +64,9 @@ export function CategoriesClient({ categories }: { categories: Category[] }) {
                       </span>
                       <div className="min-w-0 flex-1">
                         <h3 className="inline-flex items-center gap-1 font-medium">
-                          {cat.title}
+                          <span className="group-hover:underline">
+                            {cat.title}
+                          </span>
                           <ArrowUpRight className="size-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-60" />
                         </h3>
                         <p className="text-xs text-muted-foreground">

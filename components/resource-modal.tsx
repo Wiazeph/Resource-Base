@@ -427,36 +427,38 @@ export function ResourceModal({
               </Button>
             )}
 
-            {/* Suggest edit (categories / tags / description). Hidden while the
-                editor or read-only view is already open. */}
+            {/* Suggest edit (categories / tags / description) — icon-only so a
+                long "pending" label never pushes the row past the modal width.
+                Hidden while the editor or read-only view is already open. */}
             {!taxOpen &&
               !taxViewOpen &&
               (resource.categories?.length > 0 || resource.tags?.length > 0) &&
               (user && submissionsLoading ? (
-                <Button variant="outline" size="lg" disabled>
+                <Button variant="outline" size="icon-lg" disabled>
                   <Loader2 className="animate-spin" />
                 </Button>
               ) : pendingTaxFix ? (
                 <Button
                   type="button"
                   variant="outline"
-                  size="lg"
+                  size="icon-lg"
                   onClick={() => setTaxViewOpen(true)}
                   title={t("taxonomy.pendingSuggestion")}
+                  aria-label={t("taxonomy.pendingSuggestion")}
                   className="text-amber-600 dark:text-amber-400"
                 >
                   <Clock />
-                  {t("taxonomy.pendingSuggestion")}
                 </Button>
               ) : (
                 <Button
                   type="button"
                   variant="outline"
-                  size="lg"
+                  size="icon-lg"
                   onClick={() => (user ? setTaxOpen(true) : openAuth())}
+                  title={t("taxonomy.editCta")}
+                  aria-label={t("taxonomy.editCta")}
                 >
                   <PencilLine />
-                  {t("taxonomy.editCta")}
                 </Button>
               ))}
 
