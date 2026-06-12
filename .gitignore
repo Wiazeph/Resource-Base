@@ -32,6 +32,12 @@ yarn-error.log*
 # vercel
 .vercel
 
+# cloudflare / opennext
+.open-next/
+.wrangler/
+.dev.vars
+worker-configuration.d.ts
+
 # local MCP server config (per-developer, holds your own project ref)
 .mcp.json
 

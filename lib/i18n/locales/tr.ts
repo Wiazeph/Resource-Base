@@ -218,6 +218,16 @@ export const tr = {
     confirmEmail: "Hesabını onaylamak için e-postanı kontrol et.",
     welcomeBack: "Tekrar hoş geldin!",
     failed: "Kimlik doğrulama başarısız",
+    usernameTaken: "Bu kullanıcı adı zaten alınmış",
+    forgotPassword: "Şifreni mi unuttun?",
+    resetEmailSent: "Bu e-posta kayıtlıysa, sıfırlama bağlantısı yolda.",
+    resetTitle: "Şifreni sıfırla",
+    resetSubtitle: "Hesabın için yeni bir şifre belirle.",
+    resetLinkInvalid: "Bu sıfırlama bağlantısı geçersiz veya süresi dolmuş. Yenisini iste.",
+    newPasswordPlaceholder: "Yeni şifre",
+    setNewPassword: "Yeni şifreyi belirle",
+    passwordTooShort: "Şifre en az 6 karakter olmalı",
+    passwordReset: "Şifre güncellendi. Artık giriş yapabilirsin.",
   },
 
   footer: {

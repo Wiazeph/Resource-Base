@@ -218,6 +218,16 @@ export const en = {
     confirmEmail: "Check your email to confirm your account.",
     welcomeBack: "Welcome back!",
     failed: "Authentication failed",
+    usernameTaken: "That username is already taken",
+    forgotPassword: "Forgot password?",
+    resetEmailSent: "If that email exists, a reset link is on its way.",
+    resetTitle: "Reset your password",
+    resetSubtitle: "Choose a new password for your account.",
+    resetLinkInvalid: "This reset link is invalid or has expired. Request a new one.",
+    newPasswordPlaceholder: "New password",
+    setNewPassword: "Set new password",
+    passwordTooShort: "Password must be at least 6 characters",
+    passwordReset: "Password updated. You can sign in now.",
   },
 
   footer: {

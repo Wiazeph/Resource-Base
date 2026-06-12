@@ -1,4 +1,9 @@
 import type { NextConfig } from "next";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+
+// Makes Cloudflare bindings (D1 `DB`, KV, EMAIL, ...) available during `next dev`,
+// so getCloudflareContext() resolves locally without a full workerd build.
+initOpenNextCloudflareForDev();
 
 /**
  * 301 redirects from the legacy VitePress URLs to the new category pages,

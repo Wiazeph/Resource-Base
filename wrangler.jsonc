@@ -1,0 +1,40 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "resource-base",
+  // custom-worker.ts wraps OpenNext's worker and adds the scheduled() cron handler (Phase 6).
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-04-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      // Application database (Better Auth + app tables).
+      "binding": "DB",
+      "database_name": "resource-base",
+      "database_id": "30e17abb-8039-46ae-b507-cba92062f4b8",
+      "migrations_dir": "drizzle"
+    },
+    {
+      // OpenNext tag cache — powers revalidateTag (Sanity webhook). Reserved binding name.
+      "binding": "NEXT_TAG_CACHE_D1",
+      "database_name": "resource-base-tag-cache",
+      "database_id": "58c4eb39-cb97-4721-876e-cf857ca15033"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      // OpenNext incremental (page) cache. Reserved binding name.
+      "binding": "NEXT_INC_CACHE_KV",
+      "id": "7972c906f2c84a05adf9975ba9a95643"
+    }
+  ],
+  // Cloudflare Email Sending — used only by Better Auth password reset.
+  "send_email": [{ "name": "EMAIL" }],
+  // Replaces the Vercel cron (vercel.json). Invokes the scheduled() handler.
+  "triggers": {
+    "crons": ["0 6 * * *"]
+  }
+}

@@ -1,0 +1,196 @@
+import { sql } from "drizzle-orm";
+import {
+  integer,
+  primaryKey,
+  sqliteTable,
+  text,
+  uniqueIndex,
+  index,
+} from "drizzle-orm/sqlite-core";
+
+/* -------------------------------------------------------------------------- */
+/*  Better Auth core tables                                                   */
+/*  Profile fields (username, bio, socials, show_email) are folded onto the   */
+/*  `user` table — no separate profiles table, no FK dance, no signup trigger.*/
+/*  name/email/image are Better Auth natives.                                 */
+/* -------------------------------------------------------------------------- */
+
+export const user = sqliteTable(
+  "user",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    email: text("email").notNull().unique(),
+    emailVerified: integer("email_verified", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    image: text("image"),
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+
+    // ---- folded-in profile fields (was public.profiles) ----
+    username: text("username"),
+    fullName: text("full_name"),
+    bio: text("bio"),
+    portfolioUrl: text("portfolio_url"),
+    githubUrl: text("github_url"),
+    twitterUrl: text("twitter_url"),
+    instagramUrl: text("instagram_url"),
+    dribbbleUrl: text("dribbble_url"),
+    showEmail: integer("show_email", { mode: "boolean" })
+      .notNull()
+      .default(false),
+  },
+  (t) => [
+    uniqueIndex("user_username_lower_idx").on(sql`lower(${t.username})`),
+  ],
+);
+
+export const session = sqliteTable("session", {
+  id: text("id").primaryKey(),
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+  token: text("token").notNull().unique(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+});
+
+export const account = sqliteTable("account", {
+  id: text("id").primaryKey(),
+  accountId: text("account_id").notNull(),
+  providerId: text("provider_id").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  idToken: text("id_token"),
+  accessTokenExpiresAt: integer("access_token_expires_at", { mode: "timestamp" }),
+  refreshTokenExpiresAt: integer("refresh_token_expires_at", { mode: "timestamp" }),
+  scope: text("scope"),
+  password: text("password"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+});
+
+export const verification = sqliteTable("verification", {
+  id: text("id").primaryKey(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }),
+  updatedAt: integer("updated_at", { mode: "timestamp" }),
+});
+
+/* -------------------------------------------------------------------------- */
+/*  Application tables (ported from supabase/migrations 0001–0013)            */
+/*  RLS dropped — authorization enforced in app code (lib/authz.ts).          */
+/* -------------------------------------------------------------------------- */
+
+// was public.favorites — composite PK (user_id, resource_id)
+export const favorites = sqliteTable(
+  "favorites",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    resourceId: text("resource_id").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.resourceId] })],
+);
+
+// was public.notifications
+export const notifications = sqliteTable(
+  "notifications",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    type: text("type").notNull(),
+    title: text("title"),
+    body: text("body"),
+    resourceId: text("resource_id"),
+    url: text("url"),
+    // unique-when-not-null → webhook idempotency
+    sourceKey: text("source_key"),
+    readAt: integer("read_at", { mode: "timestamp" }),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => [
+    index("notifications_user_created_idx").on(t.userId, t.createdAt),
+    uniqueIndex("notifications_source_key_idx")
+      .on(t.sourceKey)
+      .where(sql`${t.sourceKey} is not null`),
+  ],
+);
+
+// was public.resource_clicks — public read, incremented via atomic UPSERT
+export const resourceClicks = sqliteTable("resource_clicks", {
+  resourceId: text("resource_id").primaryKey(),
+  count: integer("count").notNull().default(0),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
+// was public.submissions — mirror of Sanity submission docs
+export const submissions = sqliteTable(
+  "submissions",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
+    sanitySubmissionId: text("sanity_submission_id"),
+    kind: text("kind").notNull().default("new"), // new | fix | taxonomy
+    targetResourceId: text("target_resource_id"),
+    name: text("name"),
+    url: text("url"),
+    status: text("status").notNull().default("pending"), // pending | approved | rejected
+    suggestedCategory: text("suggested_category"),
+    pricing: text("pricing"), // free | freemium | paid
+    tags: text("tags", { mode: "json" }).$type<string[]>().notNull().default([]),
+    proposedCategories: text("proposed_categories", { mode: "json" })
+      .$type<string[]>()
+      .notNull()
+      .default([]),
+    proposedTags: text("proposed_tags", { mode: "json" })
+      .$type<string[]>()
+      .notNull()
+      .default([]),
+    proposedDescription: text("proposed_description"),
+    originalCategories: text("original_categories", { mode: "json" })
+      .$type<string[]>()
+      .notNull()
+      .default([]),
+    originalTags: text("original_tags", { mode: "json" })
+      .$type<string[]>()
+      .notNull()
+      .default([]),
+    originalDescription: text("original_description"),
+    note: text("note"),
+    rejectionReason: text("rejection_reason"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => [
+    index("submissions_user_idx").on(t.userId),
+    index("submissions_sanity_idx").on(t.sanitySubmissionId),
+  ],
+);

@@ -218,6 +218,16 @@ export const es = {
     confirmEmail: "Revisa tu correo para confirmar tu cuenta.",
     welcomeBack: "¡Bienvenido de nuevo!",
     failed: "Error de autenticación",
+    usernameTaken: "Ese nombre de usuario ya está en uso",
+    forgotPassword: "¿Olvidaste tu contraseña?",
+    resetEmailSent: "Si ese correo existe, el enlace de restablecimiento va en camino.",
+    resetTitle: "Restablecer tu contraseña",
+    resetSubtitle: "Elige una nueva contraseña para tu cuenta.",
+    resetLinkInvalid: "Este enlace no es válido o ha caducado. Solicita uno nuevo.",
+    newPasswordPlaceholder: "Nueva contraseña",
+    setNewPassword: "Establecer contraseña",
+    passwordTooShort: "La contraseña debe tener al menos 6 caracteres",
+    passwordReset: "Contraseña actualizada. Ya puedes iniciar sesión.",
   },
 
   footer: {

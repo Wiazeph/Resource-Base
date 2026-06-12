@@ -1,7 +1,8 @@
 import { ImageResponse } from "next/og";
 import { siteName, siteDescription } from "@/lib/site";
 
-export const runtime = "edge";
+// No `runtime = "edge"` — OpenNext/Cloudflare runs the Node.js runtime (workerd)
+// and next/og's ImageResponse works there. Edge runtime is unsupported by OpenNext.
 export const alt = "Resource Base";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";

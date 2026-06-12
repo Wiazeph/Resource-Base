@@ -218,6 +218,16 @@ export const fr = {
     confirmEmail: "Vérifiez vos e-mails pour confirmer votre compte.",
     welcomeBack: "Bon retour !",
     failed: "Échec de l'authentification",
+    usernameTaken: "Ce nom d'utilisateur est déjà pris",
+    forgotPassword: "Mot de passe oublié ?",
+    resetEmailSent: "Si cet e-mail existe, un lien de réinitialisation arrive.",
+    resetTitle: "Réinitialiser votre mot de passe",
+    resetSubtitle: "Choisissez un nouveau mot de passe pour votre compte.",
+    resetLinkInvalid: "Ce lien est invalide ou a expiré. Demandez-en un nouveau.",
+    newPasswordPlaceholder: "Nouveau mot de passe",
+    setNewPassword: "Définir le mot de passe",
+    passwordTooShort: "Le mot de passe doit comporter au moins 6 caractères",
+    passwordReset: "Mot de passe mis à jour. Vous pouvez vous connecter.",
   },
 
   footer: {

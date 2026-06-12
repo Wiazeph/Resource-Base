@@ -218,6 +218,16 @@ export const de = {
     confirmEmail: "Prüfe deine E-Mails, um dein Konto zu bestätigen.",
     welcomeBack: "Willkommen zurück!",
     failed: "Authentifizierung fehlgeschlagen",
+    usernameTaken: "Dieser Benutzername ist bereits vergeben",
+    forgotPassword: "Passwort vergessen?",
+    resetEmailSent: "Falls diese E-Mail existiert, ist ein Reset-Link unterwegs.",
+    resetTitle: "Passwort zurücksetzen",
+    resetSubtitle: "Wähle ein neues Passwort für dein Konto.",
+    resetLinkInvalid: "Dieser Link ist ungültig oder abgelaufen. Fordere einen neuen an.",
+    newPasswordPlaceholder: "Neues Passwort",
+    setNewPassword: "Neues Passwort festlegen",
+    passwordTooShort: "Das Passwort muss mindestens 6 Zeichen haben",
+    passwordReset: "Passwort aktualisiert. Du kannst dich jetzt anmelden.",
   },
 
   footer: {

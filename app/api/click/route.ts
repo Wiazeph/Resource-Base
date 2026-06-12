@@ -24,7 +24,7 @@ function recentlyCounted(key: string): boolean {
 export async function POST(req: NextRequest) {
   let resourceId: unknown;
   try {
-    ({ resourceId } = await req.json());
+    ({ resourceId } = (await req.json()) as { resourceId?: unknown });
   } catch {
     return new NextResponse("Bad request", { status: 400 });
   }
