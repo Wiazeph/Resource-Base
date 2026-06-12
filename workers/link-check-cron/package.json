@@ -1,0 +1,16 @@
+{
+  "name": "resource-base-link-check",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev --test-scheduled",
+    "typegen": "wrangler types"
+  },
+  "dependencies": {
+    "@sanity/client": "^7.22.1"
+  },
+  "devDependencies": {
+    "wrangler": "^4.100.0"
+  }
+}

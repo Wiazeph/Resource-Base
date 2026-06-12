@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "resource-base-link-check",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-04-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // Daily at 06:00 UTC — same schedule as the old Vercel cron.
+  "triggers": {
+    "crons": ["0 6 * * *"]
+  },
+  // Non-secret Sanity config (the write token is set via `wrangler secret put`).
+  "vars": {
+    "SANITY_PROJECT_ID": "77o1dw6w",
+    "SANITY_DATASET": "production",
+    "SANITY_API_VERSION": "2024-10-01"
+  }
+}

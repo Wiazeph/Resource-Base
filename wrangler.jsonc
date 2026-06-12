@@ -1,8 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "resource-base",
-  // custom-worker.ts wraps OpenNext's worker and adds the scheduled() cron handler.
-  "main": "custom-worker.ts",
+  "main": ".open-next/worker.js",
   "compatibility_date": "2026-04-01",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
@@ -32,9 +31,7 @@
     }
   ],
   // Cloudflare Email Sending — used only by Better Auth password reset.
-  "send_email": [{ "name": "EMAIL" }],
-  // Replaces the Vercel cron (vercel.json). Invokes the scheduled() handler.
-  "triggers": {
-    "crons": ["0 6 * * *"]
-  }
+  "send_email": [{ "name": "EMAIL" }]
+  // The daily link-check cron runs in a separate Worker (workers/link-check-cron),
+  // so this app stays a clean OpenNext worker. See that dir's wrangler.jsonc.
 }
