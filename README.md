@@ -2,7 +2,7 @@
 
 A curated, searchable directory of the best resources for **development**, **design**, and — over time — anything else worth collecting. Browse ~500 hand-picked tools, libraries and references across a multi-level category and tag taxonomy, search them instantly, save your favorites, and suggest improvements. Built as a real, production application in **5 languages** with full control over design and data.
 
-![Resource Base](./thumbnail/Front-End-Development-Resources.png)
+![Resource Base](./thumbnail/Resource-Base.png)
 
 ## Features
 
