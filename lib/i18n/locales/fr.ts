@@ -206,6 +206,7 @@ export const fr = {
       "Rejoignez-nous pour enregistrer des favoris, proposer des ressources et faire grandir le répertoire.",
     google: "Continuer avec Google",
     github: "Continuer avec GitHub",
+    gitlab: "Continuer avec GitLab",
     or: "ou",
     signIn: "Se connecter",
     signUp: "S'inscrire",

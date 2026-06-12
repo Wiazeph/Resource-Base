@@ -206,6 +206,7 @@ export const de = {
       "Mach mit, um Favoriten zu speichern, Ressourcen einzureichen und das Verzeichnis wachsen zu lassen.",
     google: "Mit Google fortfahren",
     github: "Mit GitHub fortfahren",
+    gitlab: "Mit GitLab fortfahren",
     or: "oder",
     signIn: "Anmelden",
     signUp: "Registrieren",

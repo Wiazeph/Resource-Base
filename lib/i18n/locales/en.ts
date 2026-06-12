@@ -206,6 +206,7 @@ export const en = {
       "Join to save favorites, submit resources and help the directory grow.",
     google: "Continue with Google",
     github: "Continue with GitHub",
+    gitlab: "Continue with GitLab",
     or: "or",
     signIn: "Sign in",
     signUp: "Sign up",

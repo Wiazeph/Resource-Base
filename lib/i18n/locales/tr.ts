@@ -206,6 +206,7 @@ export const tr = {
       "Favori kaydetmek, kaynak önermek ve deponun büyümesine katkıda bulunmak için katıl.",
     google: "Google ile devam et",
     github: "GitHub ile devam et",
+    gitlab: "GitLab ile devam et",
     or: "veya",
     signIn: "Giriş yap",
     signUp: "Kayıt ol",

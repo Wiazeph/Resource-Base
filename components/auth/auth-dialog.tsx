@@ -14,7 +14,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { IconInput } from "@/components/ui/icon-input";
-import { GoogleIcon, GithubIcon } from "@/components/brand-icons";
+import { GoogleIcon, GithubIcon, GitlabIcon } from "@/components/brand-icons";
 import { createClient } from "@/lib/supabase/client";
 
 export function AuthDialog({
@@ -40,7 +40,7 @@ export function AuthDialog({
     return next ? `${base}?next=${encodeURIComponent(next)}` : base;
   }
 
-  async function oauth(provider: "google" | "github") {
+  async function oauth(provider: "google" | "github" | "gitlab") {
     setPending(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
@@ -112,6 +112,14 @@ export function AuthDialog({
           >
             <GithubIcon className="size-4" />
             {t("auth.github")}
+          </Button>
+          <Button
+            variant="outline"
+            disabled={pending}
+            onClick={() => oauth("gitlab")}
+          >
+            <GitlabIcon className="size-4" />
+            {t("auth.gitlab")}
           </Button>
         </div>
 

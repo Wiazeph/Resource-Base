@@ -1,4 +1,4 @@
-import { GithubIcon, GoogleIcon } from "@/components/brand-icons";
+import { GithubIcon, GitlabIcon, GoogleIcon } from "@/components/brand-icons";
 import { cn } from "@/lib/utils";
 
 /**
@@ -24,8 +24,17 @@ export function ProviderBadge({
       ? GoogleIcon
       : provider === "github"
         ? GithubIcon
-        : null;
+        : provider === "gitlab"
+          ? GitlabIcon
+          : null;
   if (!Icon) return null;
+
+  const label =
+    provider === "google"
+      ? "Google"
+      : provider === "github"
+        ? "GitHub"
+        : "GitLab";
 
   return (
     <span
@@ -33,7 +42,7 @@ export function ProviderBadge({
         "absolute -bottom-0.5 -right-0.5 grid size-4 place-items-center rounded-full bg-background ring-2 ring-background",
         className,
       )}
-      title={provider === "google" ? "Google" : "GitHub"}
+      title={label}
     >
       <Icon className={iconClassName} />
     </span>
