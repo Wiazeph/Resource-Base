@@ -6,6 +6,11 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "observability": { "enabled": true },
+  // Custom domains — Cloudflare auto-creates the DNS records + SSL.
+  "routes": [
+    { "pattern": "resource-base.com", "custom_domain": true },
+    { "pattern": "www.resource-base.com", "custom_domain": true }
+  ],
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
