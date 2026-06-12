@@ -87,9 +87,11 @@ export function PublicProfileView({
           </span>
           {/* Provider badge is private — only the profile owner sees their own
               sign-in method, never visitors. */}
+          {/* Provider badge: Better Auth keeps the sign-in provider in the
+              account table, not on the session user. Omitted for now. */}
           {isOwner && (
             <ProviderBadge
-              provider={user?.app_metadata?.provider}
+              provider={undefined}
               className="size-6 ring-[3px]"
               iconClassName="size-3.5"
             />

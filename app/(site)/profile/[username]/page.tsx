@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { createPublicClient } from "@/lib/supabase/public";
+import { fetchPublicProfile } from "@/lib/profile-actions";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import {
   allCategoriesQuery,
@@ -21,13 +21,7 @@ export default async function PublicProfilePage({
 }) {
   const { username } = await params;
 
-  // Cookie-free anonymous read → fast, no session round-trip.
-  const supabase = createPublicClient();
-  const { data: profile } = await supabase
-    .from("public_profiles")
-    .select("*")
-    .ilike("username", username)
-    .maybeSingle<PublicProfile>();
+  const profile = (await fetchPublicProfile(username)) as PublicProfile | null;
   if (!profile) notFound();
 
   // Both queries are tag-cached + CDN-served, so this stays cheap. Categories

@@ -1,25 +1,21 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useCallback, useEffect, useState } from "react";
+import {
+  listNotifications,
+  markNotificationsRead,
+  type NotificationRow,
+} from "@/lib/data-actions";
 import { useAuth } from "@/components/auth/auth-provider";
 
-export type Notification = {
-  id: string;
-  title: string | null;
-  body: string | null;
-  url: string | null;
-  read_at: string | null;
-  created_at: string;
-};
+export type Notification = NotificationRow;
 
 /**
- * Loads the signed-in user's notifications (RLS-scoped) and exposes the unread
- * count plus a markAllRead helper. Refetches on window focus.
+ * Loads the signed-in user's notifications (own only, server action) and
+ * exposes the unread count plus a markAllRead helper.
  */
 export function useNotifications() {
   const { user } = useAuth();
-  const supabase = useMemo(() => createClient(), []);
   const [items, setItems] = useState<Notification[]>([]);
 
   const load = useCallback(async () => {
@@ -27,16 +23,9 @@ export function useNotifications() {
       setItems([]);
       return;
     }
-    const { data } = await supabase
-      .from("notifications")
-      .select("id, title, body, url, read_at, created_at")
-      .order("created_at", { ascending: false })
-      .limit(30);
-    setItems(data ?? []);
-  }, [user, supabase]);
+    setItems(await listNotifications());
+  }, [user]);
 
-  // Load once when auth resolves; no focus-refetch (it doubled queries on
-  // every tab refocus). New notifications surface on the next navigation.
   useEffect(() => {
     load();
   }, [load]);
@@ -48,11 +37,8 @@ export function useNotifications() {
     if (ids.length === 0) return;
     const now = new Date().toISOString();
     setItems((prev) => prev.map((n) => ({ ...n, read_at: n.read_at ?? now })));
-    await supabase
-      .from("notifications")
-      .update({ read_at: now })
-      .in("id", ids);
-  }, [items, supabase]);
+    await markNotificationsRead(ids);
+  }, [items]);
 
   return { items, unread, markAllRead, reload: load };
 }

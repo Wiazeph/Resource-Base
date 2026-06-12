@@ -1,71 +1,69 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { headers } from "next/headers";
+import { eq } from "drizzle-orm";
+import { getDb } from "@/lib/db";
+import { user } from "@/lib/db/schema";
+import { getAuth } from "@/lib/auth";
+import { getSessionUser } from "@/lib/authz";
 import { writeClient } from "@/sanity/lib/writeClient";
 
 export const runtime = "nodejs";
 
 /**
  * GDPR/KVKK right to erasure: permanently deletes the signed-in user's account
- * and all associated data. The identity comes from the verified server session
- * (never the body), so a user can only delete their own account.
+ * and all associated data. Identity comes from the verified session (never the
+ * body), so a user can only delete their own account.
  *
- * Order: anonymize the user's Sanity submission docs (so nothing ties back to
- * them), then delete the auth user — which cascades all public tables
- * (profiles, favorites, notifications via on-delete-cascade FKs) and sets
- * submissions.user_id to null. Published resources stay; their submitter
+ * Order: anonymize the user's Sanity submission docs, then delete the user row
+ * — which cascades sessions/favorites/notifications (on-delete-cascade FKs) and
+ * sets submissions.user_id to null. Published resources stay; submitter
  * attribution is cleared.
  */
 export async function POST(req: NextRequest) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return new NextResponse("Unauthorized", { status: 401 });
+  const me = await getSessionUser();
+  if (!me) return new NextResponse("Unauthorized", { status: 401 });
 
   let body: { confirm?: string };
   try {
-    body = await req.json();
+    body = (await req.json()) as { confirm?: string };
   } catch {
     return new NextResponse("Invalid body", { status: 400 });
   }
-  // Require an explicit confirmation token to avoid accidental deletion.
   if (body.confirm !== "DELETE") {
     return new NextResponse("Confirmation required", { status: 400 });
   }
 
-  const userId = user.id;
+  const userId = me.id;
 
   // 1) Anonymize this user's Sanity submissions (best-effort).
   try {
     await writeClient
-      .patch({ query: `*[_type == "submission" && submittedBy == $uid]`, params: { uid: userId } })
+      .patch({
+        query: `*[_type == "submission" && submittedBy == $uid]`,
+        params: { uid: userId },
+      })
       .unset(["submittedBy", "email"])
       .commit();
   } catch (err) {
     console.error("sanity anonymize failed", err);
   }
 
-  const admin = createAdminClient();
-
-  // 2) Remove the user's submission mirror rows (FK is on-delete-set-null, so
-  //    deleting the auth user alone would leave orphaned rows behind).
+  // 2) Delete the user row (cascades sessions/favorites/notifications; nulls
+  //    submissions.user_id).
   try {
-    await admin.from("submissions").delete().eq("user_id", userId);
+    await getDb().delete(user).where(eq(user.id, userId));
   } catch (err) {
-    console.error("submissions delete failed", err);
-  }
-
-  // 3) Delete the auth user (cascades public.profiles/favorites/notifications).
-  //    Service role required.
-  const { error } = await admin.auth.admin.deleteUser(userId);
-  if (error) {
-    console.error("auth user delete failed", error);
+    console.error("user delete failed", err);
     return new NextResponse("Server error", { status: 500 });
   }
 
-  // 4) Sign the now-orphaned session out (clears cookies).
-  await supabase.auth.signOut();
+  // 3) Sign the now-orphaned session out (clears cookies).
+  try {
+    const auth = await getAuth();
+    await auth.api.signOut({ headers: await headers() });
+  } catch {
+    // session already invalid (user gone) — ignore
+  }
 
   return NextResponse.json({ ok: true });
 }

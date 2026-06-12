@@ -50,7 +50,10 @@ export function ContributorsProvider({
     pending.current.clear();
     if (ids.length === 0) return;
     ids.forEach((id) => requested.current.add(id));
-    const fetched = await fetchProfilesByIds(ids);
+    const fetched = (await fetchProfilesByIds(ids)) as Record<
+      string,
+      PublicProfileCompact
+    >;
     if (Object.keys(fetched).length > 0) {
       setMap((prev) => ({ ...prev, ...fetched }));
     }

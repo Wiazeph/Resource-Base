@@ -1,13 +1,7 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { getClickCounts } from "@/lib/data-actions";
 
 type ClickCountsValue = {
   get: (resourceId: string) => number;
@@ -32,25 +26,17 @@ export function ClickCountsProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = useMemo(() => createClient(), []);
   const [counts, setCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     let active = true;
-    supabase
-      .from("resource_clicks")
-      .select("resource_id, count")
-      .then(({ data }) => {
-        if (!active || !data) return;
-        const map: Record<string, number> = {};
-        for (const row of data)
-          map[row.resource_id as string] = Number(row.count);
-        setCounts(map);
-      });
+    getClickCounts().then((map) => {
+      if (active) setCounts(map);
+    });
     return () => {
       active = false;
     };
-  }, [supabase]);
+  }, []);
 
   const value = useMemo<ClickCountsValue>(
     () => ({

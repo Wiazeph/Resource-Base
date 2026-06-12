@@ -1,13 +1,7 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { getFavoriteCounts } from "@/lib/data-actions";
 
 type FavoriteCountsValue = {
   get: (resourceId: string) => number;
@@ -34,22 +28,17 @@ export function FavoriteCountsProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = useMemo(() => createClient(), []);
   const [counts, setCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     let active = true;
-    supabase.rpc("favorite_counts").then(({ data }) => {
-      if (!active || !data) return;
-      const map: Record<string, number> = {};
-      for (const row of data as { resource_id: string; count: number }[])
-        map[row.resource_id] = Number(row.count);
-      setCounts(map);
+    getFavoriteCounts().then((map) => {
+      if (active) setCounts(map);
     });
     return () => {
       active = false;
     };
-  }, [supabase]);
+  }, []);
 
   const value = useMemo<FavoriteCountsValue>(
     () => ({

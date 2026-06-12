@@ -10,7 +10,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import { createClient } from "@/lib/supabase/client";
+import { listFavorites, toggleFavorite } from "@/lib/data-actions";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useFavoriteCounts } from "@/components/favorite-counts-provider";
 
@@ -32,7 +32,6 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { bump } = useFavoriteCounts();
-  const supabase = useMemo(() => createClient(), []);
   const [ids, setIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -44,18 +43,15 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     setLoading(true);
-    supabase
-      .from("favorites")
-      .select("resource_id")
-      .then(({ data }) => {
-        if (!active) return;
-        setIds((data ?? []).map((r) => r.resource_id as string));
-        setLoading(false);
-      });
+    listFavorites().then((rows) => {
+      if (!active) return;
+      setIds(rows);
+      setLoading(false);
+    });
     return () => {
       active = false;
     };
-  }, [user, supabase]);
+  }, [user]);
 
   const toggle = useCallback(
     async (id: string) => {
@@ -66,18 +62,10 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
       // Keep the public favorite count in sync optimistically too.
       bump(id, isFav ? -1 : 1);
 
-      const { error } = isFav
-        ? await supabase
-            .from("favorites")
-            .delete()
-            .eq("user_id", user.id)
-            .eq("resource_id", id)
-        : await supabase
-            .from("favorites")
-            .insert({ user_id: user.id, resource_id: id });
-
-      // On failure, revert the optimistic UI so it never lies about state.
-      if (error) {
+      try {
+        await toggleFavorite(id);
+      } catch {
+        // On failure, revert the optimistic UI so it never lies about state.
         setIds((prev) =>
           isFav ? [...prev, id] : prev.filter((x) => x !== id),
         );
@@ -85,7 +73,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
         toast.error(t("card.favoriteError"));
       }
     },
-    [user, ids, supabase, bump, t],
+    [user, ids, bump, t],
   );
 
   const value = useMemo<FavoritesValue>(

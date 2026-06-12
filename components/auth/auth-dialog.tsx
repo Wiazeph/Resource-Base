@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { AtSign, Loader2, Lock, Mail } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -15,7 +15,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { IconInput } from "@/components/ui/icon-input";
 import { GoogleIcon, GithubIcon, GitlabIcon } from "@/components/brand-icons";
-import { createClient } from "@/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
+import { setUsername } from "@/lib/profile-actions";
 
 export function AuthDialog({
   open,
@@ -24,30 +25,25 @@ export function AuthDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Returns the post-login path to forward to (via OAuth ?next=), if any. */
+  /** Returns the post-login path to forward to after OAuth, if any. */
   getRedirect?: () => string | null;
 }) {
   const { t } = useTranslation();
-  const supabase = useMemo(() => createClient(), []);
   const [pending, setPending] = useState(false);
 
-  // OAuth leaves the page, so the post-login redirect must travel through the
-  // callback's ?next= param (only same-origin paths are honored server-side).
-  function callbackUrl() {
-    if (typeof window === "undefined") return undefined;
-    const base = `${window.location.origin}/auth/callback`;
+  function callbackPath() {
     const next = getRedirect?.();
-    return next ? `${base}?next=${encodeURIComponent(next)}` : base;
+    return next && next.startsWith("/") ? next : "/";
   }
 
   async function oauth(provider: "google" | "github" | "gitlab") {
     setPending(true);
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { error } = await authClient.signIn.social({
       provider,
-      options: { redirectTo: callbackUrl() },
+      callbackURL: callbackPath(),
     });
     if (error) {
-      toast.error(error.message);
+      toast.error(error.message ?? t("auth.failed"));
       setPending(false);
     }
   }
@@ -58,26 +54,28 @@ export function AuthDialog({
     setPending(true);
     try {
       if (mode === "signup") {
-        const username = String(form.get("username") ?? "").trim().toLowerCase();
+        const username = String(form.get("username") ?? "")
+          .trim()
+          .toLowerCase();
         if (!/^[a-z0-9_-]{3,20}$/.test(username)) {
           toast.error(t("auth.usernameInvalid"));
           setPending(false);
           return;
         }
-        const { error } = await supabase.auth.signUp({
+        const { error } = await authClient.signUp.email({
           email,
           password,
-          // Metadata flows into the profiles row via the handle_new_user trigger.
-          options: { emailRedirectTo: callbackUrl(), data: { username } },
+          name: username,
         });
-        if (error) throw error;
-        toast.success(t("auth.confirmEmail"));
+        if (error) throw new Error(error.message ?? t("auth.failed"));
+        // Apply the chosen username (overrides the auto-generated one).
+        const res = await setUsername(username);
+        if (res.error === "username_taken") toast.error(t("auth.usernameTaken"));
+        toast.success(t("auth.welcomeBack"));
+        onOpenChange(false);
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
+        const { error } = await authClient.signIn.email({ email, password });
+        if (error) throw new Error(error.message ?? t("auth.failed"));
         toast.success(t("auth.welcomeBack"));
         onOpenChange(false);
       }
@@ -86,6 +84,25 @@ export function AuthDialog({
     } finally {
       setPending(false);
     }
+  }
+
+  async function forgotPassword(form: FormData) {
+    const email = String(form.get("email") ?? "");
+    if (!email) {
+      toast.error(t("auth.emailPlaceholder"));
+      return;
+    }
+    setPending(true);
+    await authClient.requestPasswordReset({
+      email,
+      redirectTo:
+        typeof window !== "undefined"
+          ? `${window.location.origin}/reset-password`
+          : "/reset-password",
+    });
+    setPending(false);
+    // Generic message regardless of whether the email exists (no enumeration).
+    toast.success(t("auth.resetEmailSent"));
   }
 
   return (
@@ -176,6 +193,19 @@ export function AuthDialog({
                     ? t("auth.signIn")
                     : t("auth.createAccount")}
                 </Button>
+                {mode === "signin" && (
+                  <button
+                    type="button"
+                    disabled={pending}
+                    onClick={(e) => {
+                      const form = e.currentTarget.closest("form");
+                      if (form) forgotPassword(new FormData(form));
+                    }}
+                    className="justify-self-center text-xs text-muted-foreground underline-offset-4 hover:underline"
+                  >
+                    {t("auth.forgotPassword")}
+                  </button>
+                )}
               </form>
             </TabsContent>
           ))}

@@ -9,12 +9,9 @@ import {
   useMemo,
   useState,
 } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { listSubmissions } from "@/lib/data-actions";
 import { useAuth } from "@/components/auth/auth-provider";
 import type { Submission } from "@/lib/types";
-
-const SELECT =
-  "id, sanity_submission_id, kind, target_resource_id, name, url, status, suggested_category, pricing, tags, proposed_categories, proposed_tags, proposed_description, original_categories, original_tags, original_description, note, rejection_reason, created_at, updated_at";
 
 type SubmissionsValue = {
   items: Submission[];
@@ -32,7 +29,6 @@ const SubmissionsContext = createContext<SubmissionsValue | null>(null);
  */
 export function SubmissionsProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
-  const supabase = useMemo(() => createClient(), []);
   const [items, setItems] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -43,13 +39,10 @@ export function SubmissionsProvider({ children }: { children: React.ReactNode })
       return;
     }
     setLoading(true);
-    const { data } = await supabase
-      .from("submissions")
-      .select(SELECT)
-      .order("created_at", { ascending: false });
-    setItems((data as Submission[]) ?? []);
+    const data = await listSubmissions();
+    setItems(data as Submission[]);
     setLoading(false);
-  }, [user, supabase]);
+  }, [user]);
 
   // Load once when auth resolves. We deliberately don't refetch on window
   // focus — moderation decisions are rare and already arrive via notifications,

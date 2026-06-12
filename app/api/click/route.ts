@@ -1,11 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { sql } from "drizzle-orm";
+import { getDb } from "@/lib/db";
+import { resourceClicks } from "@/lib/db/schema";
 
 export const runtime = "nodejs";
 
-// Per-instance debounce: the same IP+resource only counts once per window.
-// Not perfect across serverless instances, but it kills casual spam (repeat
-// clicks, page-refresh re-counts). Upgrade to Upstash if abuse appears.
+// Per-instance debounce: same IP+resource counts once per window. Best-effort
+// across Worker isolates — kills casual spam (repeat clicks, refresh re-counts).
 const WINDOW_MS = 6 * 60 * 60 * 1000; // 6 hours
 const seen = new Map<string, number>();
 
@@ -14,7 +15,6 @@ function recentlyCounted(key: string): boolean {
   const expires = seen.get(key);
   if (expires && expires > now) return true;
   seen.set(key, now + WINDOW_MS);
-  // Opportunistic cleanup so the map doesn't grow unbounded.
   if (seen.size > 10_000) {
     for (const [k, exp] of seen) if (exp < now) seen.delete(k);
   }
@@ -36,15 +36,20 @@ export async function POST(req: NextRequest) {
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 
-  // Within the window → ack without counting (UI already bumped optimistically).
   if (recentlyCounted(`${ip}:${resourceId}`)) {
     return NextResponse.json({ counted: false });
   }
 
-  const { error } = await createAdminClient().rpc("increment_click", {
-    rid: resourceId,
-  });
-  if (error) {
+  try {
+    // Atomic UPSERT — replaces the increment_click() RPC.
+    await getDb()
+      .insert(resourceClicks)
+      .values({ resourceId, count: 1, updatedAt: new Date() })
+      .onConflictDoUpdate({
+        target: resourceClicks.resourceId,
+        set: { count: sql`${resourceClicks.count} + 1`, updatedAt: new Date() },
+      });
+  } catch (error) {
     console.error("click increment failed", error);
     return new NextResponse("Server error", { status: 500 });
   }

@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { parseBody } from "next-sanity/webhook";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { eq } from "drizzle-orm";
+import { getDb } from "@/lib/db";
+import { notifications, submissions } from "@/lib/db/schema";
 import { writeClient } from "@/sanity/lib/writeClient";
 
 export const runtime = "nodejs";
@@ -83,7 +85,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ skipped: "no user" });
   }
 
-  const supabase = createAdminClient();
+  const db = getDb();
   const approved = body.status === "approved";
   const isUrlFix = body.kind === "fix";
   const isTaxonomyFix = body.kind === "taxonomy";
@@ -137,42 +139,49 @@ export async function POST(req: NextRequest) {
 
   // Idempotent: source_key has a unique index, so webhook retries are no-ops.
   // The status is part of the key so an approve-after-reject still notifies.
-  const { error } = await supabase.from("notifications").insert({
-    user_id: body.submittedBy,
-    type: approved ? "submission_approved" : "submission_rejected",
-    title: approved
-      ? isFix
-        ? "Your fix was applied ✅"
-        : "Your resource was approved 🎉"
-      : "Your submission needs changes",
-    body: approved
-      ? isUrlFix
-        ? `Thanks! ${label} now points to the corrected link.`
-        : isTaxonomyFix
-          ? `Thanks! The categories/tags for ${label} were updated.`
-          : `${label} is now live in the directory.`
-      : body.rejectionReason
-        ? `${label} wasn’t approved: ${body.rejectionReason}`
-        : `${label} wasn’t approved. You can edit and resubmit it.`,
-    url: approved && isUrlFix ? (body.url ?? null) : approved ? null : "/profile/edit",
-    source_key: `submission_${body.status}:${body._id}`,
-  });
+  try {
+    await db.insert(notifications).values({
+      userId: body.submittedBy,
+      type: approved ? "submission_approved" : "submission_rejected",
+      title: approved
+        ? isFix
+          ? "Your fix was applied ✅"
+          : "Your resource was approved 🎉"
+        : "Your submission needs changes",
+      body: approved
+        ? isUrlFix
+          ? `Thanks! ${label} now points to the corrected link.`
+          : isTaxonomyFix
+            ? `Thanks! The categories/tags for ${label} were updated.`
+            : `${label} is now live in the directory.`
+        : body.rejectionReason
+          ? `${label} wasn’t approved: ${body.rejectionReason}`
+          : `${label} wasn’t approved. You can edit and resubmit it.`,
+      url:
+        approved && isUrlFix
+          ? (body.url ?? null)
+          : approved
+            ? null
+            : "/profile/edit",
+      sourceKey: `submission_${body.status}:${body._id}`,
+    });
+  } catch (error) {
+    // Unique-violation on source_key means we already notified — treat as ok.
+    if (!String(error).includes("UNIQUE")) {
+      console.error("notify insert failed", error);
+      return new NextResponse("Server error", { status: 500 });
+    }
+  }
 
   // Sync the mirror row so "My submissions" reflects the decision.
-  await supabase
-    .from("submissions")
-    .update({
+  await db
+    .update(submissions)
+    .set({
       status: body.status,
-      rejection_reason: approved ? null : (body.rejectionReason ?? null),
-      updated_at: new Date().toISOString(),
+      rejectionReason: approved ? null : (body.rejectionReason ?? null),
+      updatedAt: new Date(),
     })
-    .eq("sanity_submission_id", body._id);
-
-  // Duplicate-key error means we already notified — treat as success.
-  if (error && error.code !== "23505") {
-    console.error("notify insert failed", error);
-    return new NextResponse("Server error", { status: 500 });
-  }
+    .where(eq(submissions.sanitySubmissionId, body._id));
 
   return NextResponse.json({ ok: true });
 }

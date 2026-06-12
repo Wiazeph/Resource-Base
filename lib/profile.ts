@@ -1,30 +1,61 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useCallback, useEffect, useState } from "react";
+import {
+  getMyProfile,
+  updateProfile,
+  setUsername as setUsernameAction,
+} from "@/lib/profile-actions";
 import { useAuth } from "@/components/auth/auth-provider";
-import type { Profile, PublicProfile, PublicProfileCompact } from "@/lib/types";
-
-const EDITABLE_COLUMNS = [
-  "full_name",
-  "bio",
-  "portfolio_url",
-  "github_url",
-  "twitter_url",
-  "instagram_url",
-  "dribbble_url",
-  "show_email",
-] as const;
+import type { Profile } from "@/lib/types";
 
 export type EditableProfile = Pick<
   Profile,
-  (typeof EDITABLE_COLUMNS)[number]
+  | "full_name"
+  | "bio"
+  | "portfolio_url"
+  | "github_url"
+  | "twitter_url"
+  | "instagram_url"
+  | "dribbble_url"
+  | "show_email"
 >;
 
-/** Loads + updates the signed-in user's own profile (RLS-scoped). */
+type DbProfile = NonNullable<Awaited<ReturnType<typeof getMyProfile>>>;
+
+// Map a camelCase Drizzle user row to the app's snake_case Profile shape.
+function toProfile(row: DbProfile, email: string | null): Profile {
+  return {
+    id: row.id,
+    email,
+    username: row.username,
+    full_name: row.fullName,
+    avatar_url: row.image,
+    bio: row.bio,
+    portfolio_url: row.portfolioUrl,
+    github_url: row.githubUrl,
+    twitter_url: row.twitterUrl,
+    instagram_url: row.instagramUrl,
+    dribbble_url: row.dribbbleUrl,
+    show_email: row.showEmail,
+  } as Profile;
+}
+
+// Map snake_case editable fields to the camelCase server-action shape.
+const KEY_MAP: Record<keyof EditableProfile, string> = {
+  full_name: "fullName",
+  bio: "bio",
+  portfolio_url: "portfolioUrl",
+  github_url: "githubUrl",
+  twitter_url: "twitterUrl",
+  instagram_url: "instagramUrl",
+  dribbble_url: "dribbbleUrl",
+  show_email: "showEmail",
+};
+
+/** Loads + updates the signed-in user's own profile (own only). */
 export function useProfile() {
   const { user } = useAuth();
-  const supabase = useMemo(() => createClient(), []);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -34,101 +65,44 @@ export function useProfile() {
       setLoading(false);
       return;
     }
-    // email is sourced from the auth session, not the profiles table — the
-    // table no longer grants SELECT on email to any role (see migration 0005).
-    const { data } = await supabase
-      .from("profiles")
-      .select(
-        "id, username, full_name, avatar_url, bio, portfolio_url, github_url, twitter_url, instagram_url, dribbble_url, show_email",
-      )
-      .eq("id", user.id)
-      .single();
-    setProfile(
-      data ? ({ ...data, email: user.email ?? null } as Profile) : null,
-    );
+    const row = await getMyProfile();
+    setProfile(row ? toProfile(row, user.email ?? null) : null);
     setLoading(false);
-  }, [user, supabase]);
+  }, [user]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  /** Update the editable (non-username) fields. */
   const update = useCallback(
     async (fields: Partial<EditableProfile>) => {
       if (!user) return { error: "not authenticated" };
       const patch: Record<string, unknown> = {};
-      for (const key of EDITABLE_COLUMNS) {
-        if (key in fields) patch[key] = fields[key] ?? null;
+      for (const k of Object.keys(fields) as (keyof EditableProfile)[]) {
+        patch[KEY_MAP[k]] = fields[k];
       }
-      const { error } = await supabase
-        .from("profiles")
-        .update(patch)
-        .eq("id", user.id);
+      const { error } = await updateProfile(patch);
       if (!error) await load();
-      return { error: error?.message ?? null };
+      return { error };
     },
-    [user, supabase, load],
+    [user, load],
   );
 
-  /** Change username via the validated, unique-checked RPC. */
   const setUsername = useCallback(
     async (next: string): Promise<{ error: string | null }> => {
-      const { error } = await supabase.rpc("set_username", {
-        new_username: next,
-      });
-      if (error) {
-        // Map known DB exceptions to friendly codes the UI can translate.
-        if (error.message.includes("username_taken"))
-          return { error: "username_taken" };
-        if (error.message.includes("invalid_username"))
-          return { error: "invalid_username" };
-        return { error: error.message };
-      }
-      await load();
-      return { error: null };
+      const res = await setUsernameAction(next);
+      if (!res.error) await load();
+      return res;
     },
-    [supabase, load],
+    [load],
   );
 
   return { profile, loading, update, setUsername, reload: load };
 }
 
-/** Public read of a profile by username (from the public_profiles view). */
-export async function fetchPublicProfile(
-  username: string,
-): Promise<PublicProfile | null> {
-  const supabase = createClient();
-  const { data } = await supabase
-    .from("public_profiles")
-    .select("*")
-    .ilike("username", username)
-    .maybeSingle();
-  return (data as PublicProfile) ?? null;
-}
-
-/** Bulk-fetch public profiles by user id (for resource-card attribution). */
-export async function fetchProfilesByIds(
-  ids: string[],
-): Promise<Record<string, PublicProfileCompact>> {
-  if (ids.length === 0) return {};
-  const supabase = createClient();
-  const { data } = await supabase
-    .from("public_profiles")
-    .select("id, username, full_name, avatar_url")
-    .in("id", ids);
-  const map: Record<string, PublicProfileCompact> = {};
-  for (const row of (data ?? []) as PublicProfileCompact[]) map[row.id] = row;
-  return map;
-}
-
-/**
- * Public email for a user — returned only if they opted in (show_email). Goes
- * through the security-definer public_email RPC; the email column itself is
- * never directly readable by anon/authenticated.
- */
-export async function fetchPublicEmail(userId: string): Promise<string | null> {
-  const supabase = createClient();
-  const { data } = await supabase.rpc("public_email", { uid: userId });
-  return (data as string | null) ?? null;
-}
+// Public reads (server actions) — re-export so existing import sites keep working.
+export {
+  fetchPublicProfile,
+  fetchProfilesByIds,
+  fetchPublicEmail,
+} from "@/lib/profile-actions";

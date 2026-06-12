@@ -10,14 +10,18 @@ import {
   useState,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import type { Session, User } from "@supabase/supabase-js";
-import { createClient } from "@/lib/supabase/client";
+import { authClient, useSession } from "@/lib/auth-client";
 import { AuthDialog } from "@/components/auth/auth-dialog";
 import { isProtectedPage } from "@/lib/protected-routes";
 
+export type AuthUser = NonNullable<
+  ReturnType<typeof useSession>["data"]
+>["user"];
+export type AuthSession = ReturnType<typeof useSession>["data"];
+
 type AuthContextValue = {
-  user: User | null;
-  session: Session | null;
+  user: AuthUser | null;
+  session: AuthSession | null;
   loading: boolean;
   /** Open the sign-in dialog; pass a path to navigate there after success. */
   openAuth: (redirectTo?: string) => void;
@@ -33,77 +37,60 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const supabase = useMemo(() => createClient(), []);
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, isPending } = useSession();
+  const user = session?.user ?? null;
+
   const [dialogOpen, setDialogOpen] = useState(false);
-  // Where to send the user after a successful in-page sign-in (e.g. they
-  // clicked "Add a resource" while signed out). Consumed once on SIGNED_IN.
   const redirectAfterAuth = useRef<string | null>(null);
-  // Current path mirrored in a ref so the (stable) auth listener can read it
-  // without being torn down and rebuilt on every navigation.
+
+  // Reproduce the old onAuthStateChange side effects by watching the user id
+  // transition (null -> id = signed in, id -> null = signed out).
+  const prevUserId = useRef<string | null>(user?.id ?? null);
   const pathnameRef = useRef(pathname);
   useEffect(() => {
     pathnameRef.current = pathname;
   }, [pathname]);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      setLoading(false);
-    });
+    const currentId = user?.id ?? null;
+    const previousId = prevUserId.current;
+    if (currentId === previousId) return;
+    prevUserId.current = currentId;
 
-    const { data: sub } = supabase.auth.onAuthStateChange((event, next) => {
-      // On tab refocus Supabase emits TOKEN_REFRESHED (and sometimes SIGNED_IN)
-      // with a fresh token but the SAME user. Updating state every time creates
-      // a new `user` object reference, which cascades a refetch through every
-      // provider that depends on `user` (favorites, submissions, profile,
-      // notifications) — the "double-load". So only update state when the
-      // identity (user id) or the access token actually changed.
-      setSession((prev) => {
-        const sameUser = (prev?.user?.id ?? null) === (next?.user?.id ?? null);
-        const sameToken = prev?.access_token === next?.access_token;
-        if (sameUser && sameToken) return prev;
-        return next;
-      });
-      setUser((prev) => {
-        const sameUser = (prev?.id ?? null) === (next?.user?.id ?? null);
-        return sameUser ? prev : (next?.user ?? null);
-      });
-      if (event === "SIGNED_IN" && next?.user) {
-        setDialogOpen(false);
-        if (redirectAfterAuth.current) {
-          const to = redirectAfterAuth.current;
-          redirectAfterAuth.current = null;
-          router.push(to);
-        }
+    if (currentId && !previousId) {
+      setDialogOpen(false);
+      if (redirectAfterAuth.current) {
+        const to = redirectAfterAuth.current;
+        redirectAfterAuth.current = null;
+        router.push(to);
       }
-      // On sign-out, if the user is sitting on a protected page, bounce home
-      // immediately — otherwise the now-unauthorized page stays visible until
-      // the next refresh (which the middleware would then redirect).
-      if (event === "SIGNED_OUT" && isProtectedPage(pathnameRef.current)) {
-        router.replace("/");
-      }
-    });
-
-    return () => sub.subscription.unsubscribe();
-  }, [supabase, router]);
+    }
+    if (!currentId && previousId && isProtectedPage(pathnameRef.current)) {
+      router.replace("/");
+    }
+  }, [user?.id, router]);
 
   const openAuth = useCallback((redirectTo?: string) => {
     redirectAfterAuth.current = redirectTo ?? null;
     setDialogOpen(true);
   }, []);
+
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut();
-  }, [supabase]);
+    await authClient.signOut();
+    router.refresh();
+  }, [router]);
 
   const value = useMemo(
-    () => ({ user, session, loading, openAuth, signOut }),
-    [user, session, loading, openAuth, signOut],
+    () => ({
+      user,
+      session: session ?? null,
+      loading: isPending,
+      openAuth,
+      signOut,
+    }),
+    [user, session, isPending, openAuth, signOut],
   );
 
   return (

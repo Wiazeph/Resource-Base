@@ -1,36 +1,35 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { eq } from "drizzle-orm";
+import { getDb } from "@/lib/db";
+import { user, favorites, submissions, notifications } from "@/lib/db/schema";
+import { getSessionUser } from "@/lib/authz";
 
 export const runtime = "nodejs";
 
 /**
  * GDPR/KVKK data portability: returns all of the signed-in user's data as a
- * downloadable JSON file. Reads are RLS-scoped to the caller, so a user can
- * only ever export their own data.
+ * downloadable JSON file. Every query is explicitly filtered by the session
+ * user id (the app-level authz that replaces RLS).
  */
 export async function GET() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return new NextResponse("Unauthorized", { status: 401 });
+  const me = await getSessionUser();
+  if (!me) return new NextResponse("Unauthorized", { status: 401 });
 
-  // RLS already scopes every table to the caller; the explicit user_id filters
-  // are belt-and-braces so the export stays correct even if a policy changes.
-  const [profile, favorites, submissions, notifications] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
-    supabase.from("favorites").select("*").eq("user_id", user.id),
-    supabase.from("submissions").select("*").eq("user_id", user.id),
-    supabase.from("notifications").select("*").eq("user_id", user.id),
+  const db = getDb();
+  const [profileRows, favRows, subRows, notifRows] = await Promise.all([
+    db.select().from(user).where(eq(user.id, me.id)).limit(1),
+    db.select().from(favorites).where(eq(favorites.userId, me.id)),
+    db.select().from(submissions).where(eq(submissions.userId, me.id)),
+    db.select().from(notifications).where(eq(notifications.userId, me.id)),
   ]);
 
   const payload = {
     exportedAt: new Date().toISOString(),
-    account: { id: user.id, email: user.email },
-    profile: profile.data ?? null,
-    favorites: favorites.data ?? [],
-    submissions: submissions.data ?? [],
-    notifications: notifications.data ?? [],
+    account: { id: me.id, email: me.email },
+    profile: profileRows[0] ?? null,
+    favorites: favRows,
+    submissions: subRows,
+    notifications: notifRows,
   };
 
   return new NextResponse(JSON.stringify(payload, null, 2), {

@@ -1,7 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { and, eq } from "drizzle-orm";
 import { writeClient } from "@/sanity/lib/writeClient";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
+import { getDb } from "@/lib/db";
+import { submissions } from "@/lib/db/schema";
+import { getSessionUser } from "@/lib/authz";
 
 export const runtime = "nodejs";
 
@@ -42,10 +44,7 @@ export async function POST(req: NextRequest) {
   // Auth is required — derive the user from the verified server session, never
   // from the request body (so a client cannot spoof someone else's userId or
   // submit anonymously).
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
   if (!user) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
@@ -171,7 +170,7 @@ export async function POST(req: NextRequest) {
   const resubmitId = (data.submissionId ?? "").trim();
 
   try {
-    const admin = createAdminClient();
+    const db = getDb();
 
     if (resubmitId) {
       // Verify the doc belongs to this user and is rejected before touching it.
@@ -197,21 +196,25 @@ export async function POST(req: NextRequest) {
         .unset(["rejectionReason"])
         .commit();
 
-      await admin
-        .from("submissions")
-        .update({
+      await db
+        .update(submissions)
+        .set({
           name: fields.name,
           url: fields.url,
-          suggested_category: fields.suggestedCategory,
+          suggestedCategory: fields.suggestedCategory,
           pricing: fields.pricing ?? null,
           tags: fields.tags,
           note: fields.note,
           status: "pending",
-          rejection_reason: null,
-          updated_at: new Date().toISOString(),
+          rejectionReason: null,
+          updatedAt: new Date(),
         })
-        .eq("sanity_submission_id", resubmitId)
-        .eq("user_id", userId);
+        .where(
+          and(
+            eq(submissions.sanitySubmissionId, resubmitId),
+            eq(submissions.userId, userId),
+          ),
+        );
 
       return NextResponse.json({ ok: true, resubmitted: true });
     }
@@ -257,26 +260,25 @@ export async function POST(req: NextRequest) {
     // report failure instead of silently succeeding.
     let mirrorError: unknown = null;
     try {
-      const { error } = await admin.from("submissions").insert({
-        user_id: userId,
-        sanity_submission_id: created._id,
+      await db.insert(submissions).values({
+        userId,
+        sanitySubmissionId: created._id,
         kind,
-        target_resource_id: targetResourceId || null,
+        targetResourceId: targetResourceId || null,
         name: fields.name,
         url: fields.url,
-        suggested_category: fields.suggestedCategory,
+        suggestedCategory: fields.suggestedCategory,
         pricing: fields.pricing ?? null,
         tags: fields.tags,
-        proposed_categories: proposedCategories,
-        proposed_tags: proposedTags,
-        proposed_description: proposedDescription,
-        original_categories: originalCategories,
-        original_tags: originalTags,
-        original_description: originalDescription,
+        proposedCategories,
+        proposedTags,
+        proposedDescription,
+        originalCategories,
+        originalTags,
+        originalDescription,
         note: fields.note,
         status: "pending",
       });
-      mirrorError = error;
     } catch (err) {
       mirrorError = err;
     }
