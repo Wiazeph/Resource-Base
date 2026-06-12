@@ -36,7 +36,8 @@ yarn-error.log*
 .open-next/
 .wrangler/
 .dev.vars
-worker-configuration.d.ts
+# worker-configuration.d.ts is committed: it holds only binding/env TYPE names
+# (no secret values) and is required for the CI typecheck to know env.DB etc.
 
 # local MCP server config (per-developer, holds your own project ref)
 .mcp.json
