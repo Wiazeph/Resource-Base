@@ -32,6 +32,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local MCP server config (per-developer, holds your own project ref)
+.mcp.json
+
 # sanity
 /dist
 /.sanity
