@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/components/auth/auth-provider";
+import { ProviderBadge } from "@/components/auth/provider-badge";
 import {
   DribbbleIcon,
   GithubIcon,
@@ -75,12 +76,23 @@ export function PublicProfileView({
     <div className="mx-auto max-w-4xl">
       {/* Header */}
       <div className="flex flex-col items-center gap-4 text-center">
-        <span className="grid size-20 place-items-center overflow-hidden rounded-full border border-border bg-muted text-2xl font-semibold text-foreground">
-          {profile.avatar_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={profile.avatar_url} alt={profile.username} className="size-full object-cover" />
-          ) : (
-            initial(name)
+        <span className="relative grid size-20 place-items-center rounded-full text-2xl font-semibold text-foreground">
+          <span className="grid size-full place-items-center overflow-hidden rounded-full border border-border bg-muted">
+            {profile.avatar_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={profile.avatar_url} alt={profile.username} className="size-full object-cover" />
+            ) : (
+              initial(name)
+            )}
+          </span>
+          {/* Provider badge is private — only the profile owner sees their own
+              sign-in method, never visitors. */}
+          {isOwner && (
+            <ProviderBadge
+              provider={user?.app_metadata?.provider}
+              className="size-6 ring-[3px]"
+              iconClassName="size-3.5"
+            />
           )}
         </span>
         <div>

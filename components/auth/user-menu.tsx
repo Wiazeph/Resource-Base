@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/components/auth/auth-provider";
+import { ProviderBadge } from "@/components/auth/provider-badge";
 import { useNotifications } from "@/lib/notifications";
 import { useProfile } from "@/lib/profile";
 import { initial } from "@/lib/initial";
@@ -44,6 +45,9 @@ export function UserMenu() {
     "Account";
   const avatar =
     profile?.avatar_url || (user.user_metadata?.avatar_url as string | undefined);
+  // Which provider the user signed in with (google / github / email). Shown as
+  // a small badge on the avatar — only the user ever sees their own.
+  const provider = user.app_metadata?.provider as string | undefined;
   const profileHref = profile?.username
     ? `/profile/${profile.username}`
     : "/profile/edit";
@@ -52,15 +56,18 @@ export function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="relative grid size-9 cursor-pointer place-items-center overflow-hidden rounded-full border border-border bg-muted text-sm"
+          className="relative size-9 cursor-pointer rounded-full text-sm"
           aria-label="Account menu"
         >
-          {avatar ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={avatar} alt="" className="size-full object-cover" />
-          ) : (
-            <span className="font-medium text-foreground">{initial(name)}</span>
-          )}
+          <span className="grid size-full place-items-center overflow-hidden rounded-full border border-border bg-muted">
+            {avatar ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={avatar} alt="" className="size-full object-cover" />
+            ) : (
+              <span className="font-medium text-foreground">{initial(name)}</span>
+            )}
+          </span>
+          <ProviderBadge provider={provider} />
           {unread > 0 && (
             <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-emerald-500 ring-2 ring-background" />
           )}
