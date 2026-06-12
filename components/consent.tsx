@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { GoogleAnalytics } from "@next/third-parties/google";
-import { Analytics } from "@vercel/analytics/next";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -10,10 +9,9 @@ import { useTranslation } from "react-i18next";
 const KEY = "analytics-consent"; // "granted" | "denied"
 
 /**
- * Cookie/analytics consent gate. Analytics (Google Analytics + Vercel
- * Analytics) load ONLY after the user accepts; declining sets no analytics
- * scripts or cookies. Choice is persisted in localStorage. Shows a banner
- * until a choice is made. GDPR/KVKK-aligned (opt-in, not opt-out).
+ * Cookie/analytics consent gate. Google Analytics loads ONLY after the user
+ * accepts; declining sets no analytics scripts or cookies. Choice is persisted
+ * in localStorage. Shows a banner until a choice is made. GDPR/KVKK-aligned.
  */
 export function ConsentGate({ gaId }: { gaId?: string }) {
   const { t } = useTranslation();
@@ -34,12 +32,7 @@ export function ConsentGate({ gaId }: { gaId?: string }) {
 
   return (
     <>
-      {consent === "granted" && (
-        <>
-          <Analytics />
-          {gaId && <GoogleAnalytics gaId={gaId} />}
-        </>
-      )}
+      {consent === "granted" && gaId && <GoogleAnalytics gaId={gaId} />}
 
       {/* Banner: only once the stored choice is read AND none was made. */}
       {ready && consent === null && (

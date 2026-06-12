@@ -47,12 +47,13 @@ const LEGACY_REDIRECTS: Record<string, string> = {
 
 /**
  * Content Security Policy. Whitelists exactly the origins the app talks to:
- *  - scripts: self + Google Analytics (@next/third-parties) + Vercel Analytics.
+ *  - scripts: self + Google Analytics (@next/third-parties).
  *    Next.js injects inline hydration scripts, so 'unsafe-inline' is required
  *    here (nonce-based CSP needs per-request middleware wiring — out of scope).
  *  - styles: self + 'unsafe-inline' (Tailwind/Next inject inline styles) + Google Fonts.
  *  - images: self + https + data: (favicons via google s2, avatars).
- *  - connect: self + Supabase + Sanity + analytics endpoints.
+ *  - connect: self (auth + data go through same-origin server actions) + Sanity
+ *    + analytics endpoints.
  * Wildcards keep it portable across preview/prod and provider subdomains.
  */
 const isDev = process.env.NODE_ENV === "development";
@@ -60,14 +61,14 @@ const isDev = process.env.NODE_ENV === "development";
 // React's dev build uses eval() for debugging; production never does. So we
 // only relax script-src with 'unsafe-eval' in development.
 const scriptSrc = isDev
-  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://va.vercel-scripts.com"
-  : "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://va.vercel-scripts.com";
+  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com"
+  : "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com";
 
 // In dev, Next.js needs a WebSocket (ws:) to the local server for HMR; without
 // it the browser blocks the connection and the console floods with CSP errors.
 const connectSrc = isDev
-  ? "connect-src 'self' ws: wss: https://*.supabase.co https://*.sanity.io https://www.google-analytics.com https://*.vercel-scripts.com https://vitals.vercel-insights.com"
-  : "connect-src 'self' https://*.supabase.co https://*.sanity.io https://www.google-analytics.com https://*.vercel-scripts.com https://vitals.vercel-insights.com";
+  ? "connect-src 'self' ws: wss: https://*.sanity.io https://www.google-analytics.com"
+  : "connect-src 'self' https://*.sanity.io https://www.google-analytics.com";
 
 const csp = [
   "default-src 'self'",

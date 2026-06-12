@@ -1,8 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "resource-base",
-  // custom-worker.ts wraps OpenNext's worker and adds the scheduled() cron handler (Phase 6).
-  "main": ".open-next/worker.js",
+  // custom-worker.ts wraps OpenNext's worker and adds the scheduled() cron handler.
+  "main": "custom-worker.ts",
   "compatibility_date": "2026-04-01",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
