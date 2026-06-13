@@ -1,9 +1,41 @@
 "use server";
 
+import { headers } from "next/headers";
 import { and, eq, inArray, isNotNull, ne, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { user } from "@/lib/db/schema";
+import { getAuth } from "@/lib/auth";
 import { getSessionUser, requireUser } from "@/lib/authz";
+
+const PW_MIN = 8;
+const PW_MAX = 64;
+
+/**
+ * Set a password for the CURRENT user when they don't have one yet (signed up
+ * via OAuth only). Better Auth's setPassword is server-only, so it's wrapped
+ * here. Rejected if the user already has a credential account — they must use
+ * changePassword (which requires the current password) instead, so this can't
+ * be used to overwrite an existing password without knowing it.
+ */
+export async function setMyPassword(
+  newPassword: string,
+): Promise<{ error: string | null }> {
+  await requireUser();
+  if (newPassword.length < PW_MIN || newPassword.length > PW_MAX)
+    return { error: "invalid_password" };
+
+  const auth = await getAuth();
+  const hdrs = await headers();
+
+  const accounts = await auth.api.listUserAccounts({ headers: hdrs });
+  const hasCredential = (accounts ?? []).some(
+    (a: { providerId?: string }) => a.providerId === "credential",
+  );
+  if (hasCredential) return { error: "password_exists" };
+
+  await auth.api.setPassword({ body: { newPassword }, headers: hdrs });
+  return { error: null };
+}
 
 const USERNAME_RE = /^[a-z0-9_-]{3,20}$/;
 

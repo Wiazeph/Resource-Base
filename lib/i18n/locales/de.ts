@@ -242,6 +242,11 @@ export const de = {
     changePassword: "Passwort ändern",
     currentPassword: "Aktuelles Passwort",
     passwordChanged: "Passwort aktualisiert.",
+    setPassword: "Passwort festlegen",
+    setPasswordHint:
+      "Du hast dich mit einem sozialen Anbieter registriert. Lege ein Passwort fest, um dich auch per E-Mail anzumelden — deine sozialen Logins bleiben aktiv.",
+    passwordSet:
+      "Passwort festgelegt. Du kannst dich jetzt auch per E-Mail anmelden.",
     noPasswordSet:
       "Du meldest dich über einen Social-Anbieter an, daher gibt es kein Passwort zu ändern.",
     connectedAccounts: "Verbundene Konten",

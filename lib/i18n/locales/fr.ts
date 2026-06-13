@@ -242,6 +242,11 @@ export const fr = {
     changePassword: "Changer le mot de passe",
     currentPassword: "Mot de passe actuel",
     passwordChanged: "Mot de passe mis à jour.",
+    setPassword: "Définir un mot de passe",
+    setPasswordHint:
+      "Vous vous êtes inscrit avec un fournisseur social. Ajoutez un mot de passe pour vous connecter aussi par e-mail — vos connexions sociales continuent de fonctionner.",
+    passwordSet:
+      "Mot de passe défini. Vous pouvez désormais aussi vous connecter par e-mail.",
     noPasswordSet:
       "Vous vous connectez via un fournisseur social, il n'y a donc pas de mot de passe à changer.",
     connectedAccounts: "Comptes connectés",

@@ -243,6 +243,10 @@ export const en = {
     changePassword: "Change password",
     currentPassword: "Current password",
     passwordChanged: "Password updated.",
+    setPassword: "Set a password",
+    setPasswordHint:
+      "You signed up with a social provider. Add a password to also sign in with your email — your social logins keep working.",
+    passwordSet: "Password set. You can now sign in with your email too.",
     noPasswordSet:
       "You sign in with a social provider, so there's no password to change.",
     // Connected accounts (profile)

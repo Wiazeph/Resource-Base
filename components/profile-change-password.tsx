@@ -7,13 +7,19 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { IconInput } from "@/components/ui/icon-input";
 import { authClient } from "@/lib/auth-client";
+import { setMyPassword } from "@/lib/profile-actions";
 
 const PW_MIN = 8;
 const PW_MAX = 64;
 
 /**
- * Change-password section for the profile editor. Only shown to users who have
- * a password (a `credential` account); OAuth-only users see an explanatory note.
+ * Password section for the profile editor. Two modes based on whether the user
+ * already has a password (a `credential` account):
+ *  - has password  → "Change password" (current + new + confirm)
+ *  - OAuth-only     → "Set a password"  (new + confirm, no current) — lets
+ *    Google/GitHub/GitLab users add email+password sign-in without the hidden
+ *    forgot-password detour. Adding a password is safe: the user is already
+ *    authenticated in this session.
  */
 export function ProfileChangePassword() {
   const { t } = useTranslation();
@@ -22,6 +28,12 @@ export function ProfileChangePassword() {
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
   const [pending, setPending] = useState(false);
+
+  const refresh = () =>
+    authClient.listAccounts().then((res) => {
+      const accounts = (res?.data ?? []) as { providerId?: string }[];
+      setHasPassword(accounts.some((a) => a.providerId === "credential"));
+    });
 
   useEffect(() => {
     let active = true;
@@ -37,58 +49,66 @@ export function ProfileChangePassword() {
 
   if (hasPassword === null) return null; // still loading — render nothing
 
-  if (!hasPassword) {
-    return (
-      <section className="rounded-xl border border-border p-4">
-        <h2 className="text-sm font-semibold">{t("auth.changePassword")}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("auth.noPasswordSet")}
-        </p>
-      </section>
-    );
-  }
-
+  const title = hasPassword
+    ? t("auth.changePassword")
+    : t("auth.setPassword");
   const valid =
-    current.length >= PW_MIN &&
     next.length >= PW_MIN &&
     next === confirm &&
+    (hasPassword ? current.length >= PW_MIN : true) &&
     !pending;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!valid) return;
     setPending(true);
-    const { error } = await authClient.changePassword({
-      currentPassword: current,
-      newPassword: next,
-      revokeOtherSessions: true,
-    });
-    setPending(false);
-    if (error) {
-      toast.error(error.message ?? t("auth.failed"));
-      return;
+    try {
+      if (hasPassword) {
+        const { error } = await authClient.changePassword({
+          currentPassword: current,
+          newPassword: next,
+          revokeOtherSessions: true,
+        });
+        if (error) throw new Error(error.message ?? t("auth.failed"));
+        toast.success(t("auth.passwordChanged"));
+      } else {
+        const { error } = await setMyPassword(next);
+        if (error) throw new Error(t("auth.failed"));
+        toast.success(t("auth.passwordSet"));
+        await refresh(); // flip the section into change-password mode
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("auth.failed"));
+    } finally {
+      setPending(false);
+      setCurrent("");
+      setNext("");
+      setConfirm("");
     }
-    toast.success(t("auth.passwordChanged"));
-    setCurrent("");
-    setNext("");
-    setConfirm("");
   }
 
   return (
     <section className="rounded-xl border border-border p-4">
-      <h2 className="text-sm font-semibold">{t("auth.changePassword")}</h2>
+      <h2 className="text-sm font-semibold">{title}</h2>
+      {!hasPassword && (
+        <p className="mt-1 text-sm text-muted-foreground">
+          {t("auth.setPasswordHint")}
+        </p>
+      )}
       <form className="mt-3 grid gap-3" onSubmit={submit}>
-        <IconInput
-          icon={Lock}
-          type="password"
-          required
-          minLength={PW_MIN}
-          maxLength={PW_MAX}
-          value={current}
-          onChange={(e) => setCurrent(e.target.value)}
-          placeholder={t("auth.currentPassword")}
-          autoComplete="current-password"
-        />
+        {hasPassword && (
+          <IconInput
+            icon={Lock}
+            type="password"
+            required
+            minLength={PW_MIN}
+            maxLength={PW_MAX}
+            value={current}
+            onChange={(e) => setCurrent(e.target.value)}
+            placeholder={t("auth.currentPassword")}
+            autoComplete="current-password"
+          />
+        )}
         <IconInput
           icon={Lock}
           type="password"
@@ -116,7 +136,7 @@ export function ProfileChangePassword() {
         )}
         <Button type="submit" disabled={!valid} className="w-fit">
           {pending && <Loader2 className="size-4 animate-spin" />}
-          {t("auth.changePassword")}
+          {title}
         </Button>
       </form>
     </section>

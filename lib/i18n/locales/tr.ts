@@ -242,6 +242,10 @@ export const tr = {
     changePassword: "Şifre değiştir",
     currentPassword: "Mevcut şifre",
     passwordChanged: "Şifre güncellendi.",
+    setPassword: "Şifre oluştur",
+    setPasswordHint:
+      "Sosyal bir sağlayıcıyla kayıt oldun. E-postanla da giriş yapabilmek için bir şifre ekle — sosyal girişlerin çalışmaya devam eder.",
+    passwordSet: "Şifre oluşturuldu. Artık e-postanla da giriş yapabilirsin.",
     noPasswordSet:
       "Bir sosyal sağlayıcı ile giriş yapıyorsun, bu yüzden değiştirilecek bir şifre yok.",
     connectedAccounts: "Bağlı hesaplar",

@@ -242,6 +242,11 @@ export const es = {
     changePassword: "Cambiar contraseña",
     currentPassword: "Contraseña actual",
     passwordChanged: "Contraseña actualizada.",
+    setPassword: "Crear una contraseña",
+    setPasswordHint:
+      "Te registraste con un proveedor social. Añade una contraseña para iniciar sesión también con tu correo — tus inicios de sesión sociales seguirán funcionando.",
+    passwordSet:
+      "Contraseña creada. Ahora también puedes iniciar sesión con tu correo.",
     noPasswordSet:
       "Inicias sesión con un proveedor social, así que no hay contraseña que cambiar.",
     connectedAccounts: "Cuentas conectadas",
