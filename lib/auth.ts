@@ -45,6 +45,23 @@ export async function getAuth() {
     advanced: {
       ipAddress: { ipAddressHeaders: ["cf-connecting-ip", "x-forwarded-for"] },
     },
+    // Per-IP rate limiting, persisted in D1 (the `rateLimit` table) so it holds
+    // across Worker isolates — the default in-memory store resets per isolate.
+    // Strict limits on email-sending + account-creation paths to block abuse
+    // ("denial of wallet" / brute force). Windows are in SECONDS.
+    rateLimit: {
+      enabled: true,
+      storage: "database",
+      modelName: "rateLimit",
+      window: 60,
+      max: 100,
+      customRules: {
+        "/request-password-reset": { window: 3600, max: 3 }, // sends email
+        "/forget-password": { window: 3600, max: 3 }, // alias
+        "/sign-up/email": { window: 3600, max: 5 },
+        "/sign-in/email": { window: 900, max: 10 }, // allow retries, stop brute force
+      },
+    },
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false, // instant signup, no verification email

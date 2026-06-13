@@ -23,6 +23,29 @@ type EmailBinding = {
   }) => Promise<unknown>;
 };
 
+type KvBinding = {
+  get: (key: string) => Promise<string | null>;
+  put: (key: string, value: string, opts?: { expirationTtl?: number }) => Promise<void>;
+};
+
+// Global hard ceiling on emails per day, regardless of source. Per-IP rate
+// limiting (Better Auth) stops a single attacker; this is the circuit breaker
+// against DISTRIBUTED abuse exhausting the sending quota / running up cost.
+// Kept under Cloudflare Email Sending's 200/day quota.
+const MAX_EMAILS_PER_DAY = 150;
+
+/** Best-effort daily counter in KV. Returns true if under the cap (safe to send). */
+async function underDailyCap(kv: KvBinding | undefined): Promise<boolean> {
+  if (!kv) return true; // no KV (local/dev) → don't block
+  const day = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
+  const key = `email-count:${day}`;
+  const current = Number((await kv.get(key)) ?? "0");
+  if (current >= MAX_EMAILS_PER_DAY) return false;
+  // KV is eventually consistent, so this count is approximate — fine for a cap.
+  await kv.put(key, String(current + 1), { expirationTtl: 172800 }); // 2 days
+  return true;
+}
+
 export async function sendEmail(opts: {
   to: string;
   subject: string;
@@ -30,14 +53,22 @@ export async function sendEmail(opts: {
   text: string;
 }): Promise<void> {
   const { env } = getCloudflareContext();
-  const emailBinding = (env as unknown as Record<string, unknown>).EMAIL as
-    | EmailBinding
-    | undefined;
+  const e = env as unknown as Record<string, unknown>;
+  const emailBinding = e.EMAIL as EmailBinding | undefined;
+  const kv = e.NEXT_INC_CACHE_KV as KvBinding | undefined;
 
   if (!emailBinding) {
     // No EMAIL binding (free plan / local dev): don't block the auth flow.
     console.warn(
       `[email] EMAIL binding unavailable; skipped send to ${opts.to} (${opts.subject})`,
+    );
+    return;
+  }
+
+  // Circuit breaker: hard daily cap across all senders.
+  if (!(await underDailyCap(kv))) {
+    console.error(
+      `[email] daily cap (${MAX_EMAILS_PER_DAY}) reached; skipped send to ${opts.to}`,
     );
     return;
   }

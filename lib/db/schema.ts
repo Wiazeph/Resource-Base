@@ -86,6 +86,15 @@ export const verification = sqliteTable("verification", {
   updatedAt: integer("updated_at", { mode: "timestamp" }),
 });
 
+// Better Auth rate-limit store. Persisted in D1 so the limiter works across
+// Worker isolates (the default in-memory store resets per isolate = useless).
+export const rateLimit = sqliteTable("rateLimit", {
+  id: text("id").primaryKey(),
+  key: text("key"),
+  count: integer("count"),
+  lastRequest: integer("last_request"),
+});
+
 /* -------------------------------------------------------------------------- */
 /*  Application tables (user data: favorites, notifications, clicks, etc.)    */
 /*  RLS dropped — authorization enforced in app code (lib/authz.ts).          */
