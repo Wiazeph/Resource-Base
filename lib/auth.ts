@@ -29,6 +29,13 @@ export async function getAuth() {
     database: drizzleAdapter(db, { provider: "sqlite", schema }),
     secret: env.BETTER_AUTH_SECRET,
     baseURL: env.BETTER_AUTH_URL,
+    // Cloudflare passes the real client IP in cf-connecting-ip. Without this,
+    // Better Auth can't identify clients and lumps everyone into one shared
+    // rate-limit bucket → spurious 429s (and reset requests never reaching
+    // sendResetPassword).
+    advanced: {
+      ipAddress: { ipAddressHeaders: ["cf-connecting-ip", "x-forwarded-for"] },
+    },
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false, // instant signup, no verification email
@@ -55,6 +62,15 @@ export async function getAuth() {
       gitlab: {
         clientId: env.GITLAB_CLIENT_ID,
         clientSecret: env.GITLAB_CLIENT_SECRET,
+      },
+    },
+    account: {
+      accountLinking: {
+        // Link providers that share the same verified email to one account, so
+        // signing in with Google/GitHub/GitLab/email for the same address all
+        // resolve to a single user (avoids the "account_not_linked" error).
+        enabled: true,
+        trustedProviders: ["google", "github", "gitlab"],
       },
     },
     databaseHooks: {
