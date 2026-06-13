@@ -6,7 +6,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { eq } from "drizzle-orm";
 import * as schema from "@/lib/db/schema";
 import { sendEmail } from "@/lib/email";
-import { resetPasswordEmail } from "@/lib/email-templates";
+import { resetPasswordEmail, verifyEmail } from "@/lib/email-templates";
 
 /** Stem a display name/email into a username base, then add a short suffix. */
 function usernameStem(raw: string | null | undefined): string {
@@ -58,17 +58,37 @@ export async function getAuth() {
       customRules: {
         "/request-password-reset": { window: 3600, max: 3 }, // sends email
         "/forget-password": { window: 3600, max: 3 }, // alias
+        "/send-verification-email": { window: 3600, max: 5 }, // sends email
         "/sign-up/email": { window: 3600, max: 5 },
         "/sign-in/email": { window: 900, max: 10 }, // allow retries, stop brute force
       },
     },
     emailAndPassword: {
       enabled: true,
-      requireEmailVerification: false, // instant signup, no verification email
+      // Email/password signups must confirm their address before they can sign
+      // in — stops abuse with fake/other people's emails. OAuth users are
+      // unaffected (their provider verifies the email; emailVerified comes back
+      // true on link).
+      requireEmailVerification: true,
       minPasswordLength: 8,
       maxPasswordLength: 64,
       sendResetPassword: async ({ user, url }) => {
         const mail = resetPasswordEmail(url);
+        await sendEmail({
+          to: user.email,
+          subject: mail.subject,
+          html: mail.html,
+          text: mail.text,
+        });
+      },
+    },
+    emailVerification: {
+      sendOnSignUp: true, // fire the verification email right after signup
+      sendOnSignIn: true, // resend it if an unverified user tries to sign in
+      autoSignInAfterVerification: true, // clicking the link signs them in
+      expiresIn: 60 * 60, // 1 hour, consistent with password reset
+      sendVerificationEmail: async ({ user, url }) => {
+        const mail = verifyEmail(url);
         await sendEmail({
           to: user.email,
           subject: mail.subject,

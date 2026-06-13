@@ -70,3 +70,22 @@ export function resetPasswordEmail(url: string): {
     text: `Reset your ${BRAND} password\n\nWe received a request to reset your password. Open this link to choose a new one (expires in 1 hour):\n\n${url}\n\nIf you didn't request this, you can safely ignore this email.`,
   };
 }
+
+export function verifyEmail(url: string): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  return {
+    subject: `Verify your ${BRAND} email`,
+    html: shell({
+      heading: "Confirm your email",
+      intro:
+        "Welcome to Resource Base! Confirm your email address to activate your account and sign in. This link expires in 1 hour.",
+      cta: { label: "Verify email", url },
+      outro:
+        "If you didn't create this account, you can safely ignore this email — no account will be activated.",
+    }),
+    text: `Verify your ${BRAND} email\n\nConfirm your email address to activate your account. Open this link (expires in 1 hour):\n\n${url}\n\nIf you didn't create this account, you can safely ignore this email.`,
+  };
+}
