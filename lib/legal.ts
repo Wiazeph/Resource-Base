@@ -11,7 +11,7 @@ export type LegalDoc = { title: string; updated: string; intro: string; sections
 
 const CONTACT = "emreerden@pm.me";
 // Update when the policy text changes.
-export const LEGAL_UPDATED = "2026-06-10";
+export const LEGAL_UPDATED = "2026-06-13";
 
 const privacyEn: LegalDoc = {
   title: "Privacy Policy",

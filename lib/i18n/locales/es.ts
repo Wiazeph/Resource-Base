@@ -215,7 +215,6 @@ export const es = {
     usernamePlaceholder: "Nombre de usuario",
     usernameInvalid: "El nombre de usuario debe tener 3-20 caracteres: a-z, 0-9, - o _",
     passwordPlaceholder: "Contraseña",
-    confirmEmail: "Revisa tu correo para confirmar tu cuenta.",
     welcomeBack: "¡Bienvenido de nuevo!",
     failed: "Error de autenticación",
     usernameTaken: "Ese nombre de usuario ya está en uso",
