@@ -38,7 +38,14 @@
     }
   ],
   // Cloudflare Email Sending — used only by Better Auth password reset.
-  "send_email": [{ "name": "EMAIL" }]
+  "send_email": [{ "name": "EMAIL" }],
+  // Durable Object queue for OpenNext ISR revalidation (NEXT_CACHE_DO_QUEUE).
+  "durable_objects": {
+    "bindings": [
+      { "name": "NEXT_CACHE_DO_QUEUE", "class_name": "DOQueueHandler" }
+    ]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DOQueueHandler"] }]
   // The daily link-check cron runs in a separate Worker (workers/link-check-cron),
   // so this app stays a clean OpenNext worker. See that dir's wrangler.jsonc.
 }
