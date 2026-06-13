@@ -226,6 +226,20 @@ export const de = {
     sendResetLink: "Reset-Link senden",
     emailInvalid: "Gib eine gültige E-Mail-Adresse ein",
     resetEmailSent: "Falls diese E-Mail existiert, ist ein Reset-Link unterwegs.",
+    // E-Mail-Bestätigung
+    verifyCheckInbox: "Prüfe dein Postfach",
+    verifyEmailSent:
+      "Wir haben einen Bestätigungslink an deine E-Mail gesendet. Klicke darauf, um dein Konto zu aktivieren.",
+    verifyEmailHint:
+      "Nichts erhalten? Prüfe deinen Spam-Ordner oder melde dich an, um einen neuen Link zu erhalten.",
+    emailNotVerified:
+      "Bestätige zuerst deine E-Mail. Wir haben dir einen neuen Bestätigungslink gesendet.",
+    verifyTitle: "Bestätige deine E-Mail",
+    verifyExpired: "Dieser Bestätigungslink ist ungültig oder abgelaufen.",
+    verifySubtitle:
+      "Gib deine E-Mail ein und wir senden dir einen neuen Bestätigungslink.",
+    resendVerification: "Bestätigungslink erneut senden",
+    verificationResent: "Falls dieses Konto existiert, ist ein neuer Link unterwegs.",
     resetTitle: "Passwort zurücksetzen",
     resetSubtitle: "Wähle ein neues Passwort für dein Konto.",
     resetLinkInvalid: "Dieser Link ist ungültig oder abgelaufen. Fordere einen neuen an.",

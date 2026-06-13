@@ -226,6 +226,19 @@ export const en = {
     sendResetLink: "Send reset link",
     emailInvalid: "Enter a valid email address",
     resetEmailSent: "If that email exists, a reset link is on its way.",
+    // Email verification
+    verifyCheckInbox: "Check your inbox",
+    verifyEmailSent:
+      "We've sent a confirmation link to your email. Click it to activate your account.",
+    verifyEmailHint:
+      "Didn't get it? Check your spam folder, or try signing in to get a fresh link.",
+    emailNotVerified:
+      "Verify your email first. We've sent you a new confirmation link.",
+    verifyTitle: "Verify your email",
+    verifyExpired: "This confirmation link is invalid or has expired.",
+    verifySubtitle: "Enter your email and we'll send a new confirmation link.",
+    resendVerification: "Resend confirmation link",
+    verificationResent: "If that account exists, a new link is on its way.",
     resetTitle: "Reset your password",
     resetSubtitle: "Choose a new password for your account.",
     resetLinkInvalid: "This reset link is invalid or has expired. Request a new one.",

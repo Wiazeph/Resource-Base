@@ -226,6 +226,19 @@ export const tr = {
     sendResetLink: "Sıfırlama bağlantısı gönder",
     emailInvalid: "Geçerli bir e-posta adresi gir",
     resetEmailSent: "Bu e-posta kayıtlıysa, sıfırlama bağlantısı yolda.",
+    // E-posta doğrulama
+    verifyCheckInbox: "E-postanı kontrol et",
+    verifyEmailSent:
+      "E-postana bir onay bağlantısı gönderdik. Hesabını etkinleştirmek için bağlantıya tıkla.",
+    verifyEmailHint:
+      "Gelmedi mi? Spam klasörüne bak ya da yeni bir bağlantı için giriş yapmayı dene.",
+    emailNotVerified:
+      "Önce e-posta adresini doğrula. Sana yeni bir onay bağlantısı gönderdik.",
+    verifyTitle: "E-postanı doğrula",
+    verifyExpired: "Bu onay bağlantısı geçersiz veya süresi dolmuş.",
+    verifySubtitle: "E-postanı gir, sana yeni bir onay bağlantısı gönderelim.",
+    resendVerification: "Onay bağlantısını tekrar gönder",
+    verificationResent: "Bu hesap varsa, yeni bir bağlantı yolda.",
     resetTitle: "Şifreni sıfırla",
     resetSubtitle: "Hesabın için yeni bir şifre belirle.",
     resetLinkInvalid: "Bu sıfırlama bağlantısı geçersiz veya süresi dolmuş. Yenisini iste.",

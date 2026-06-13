@@ -226,6 +226,20 @@ export const es = {
     sendResetLink: "Enviar enlace",
     emailInvalid: "Introduce un correo electrónico válido",
     resetEmailSent: "Si ese correo existe, el enlace de restablecimiento va en camino.",
+    // Verificación de correo
+    verifyCheckInbox: "Revisa tu bandeja de entrada",
+    verifyEmailSent:
+      "Enviamos un enlace de confirmación a tu correo. Haz clic en él para activar tu cuenta.",
+    verifyEmailHint:
+      "¿No te llegó? Revisa la carpeta de spam o intenta iniciar sesión para recibir un enlace nuevo.",
+    emailNotVerified:
+      "Verifica tu correo primero. Te enviamos un nuevo enlace de confirmación.",
+    verifyTitle: "Verifica tu correo",
+    verifyExpired: "Este enlace de confirmación no es válido o ha caducado.",
+    verifySubtitle:
+      "Introduce tu correo y te enviaremos un nuevo enlace de confirmación.",
+    resendVerification: "Reenviar enlace de confirmación",
+    verificationResent: "Si esa cuenta existe, un nuevo enlace va en camino.",
     resetTitle: "Restablecer tu contraseña",
     resetSubtitle: "Elige una nueva contraseña para tu cuenta.",
     resetLinkInvalid: "Este enlace no es válido o ha caducado. Solicita uno nuevo.",

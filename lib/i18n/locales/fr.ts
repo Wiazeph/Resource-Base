@@ -226,6 +226,20 @@ export const fr = {
     sendResetLink: "Envoyer le lien",
     emailInvalid: "Entrez une adresse e-mail valide",
     resetEmailSent: "Si cet e-mail existe, un lien de réinitialisation arrive.",
+    // Vérification de l'e-mail
+    verifyCheckInbox: "Vérifiez votre boîte mail",
+    verifyEmailSent:
+      "Nous avons envoyé un lien de confirmation à votre e-mail. Cliquez dessus pour activer votre compte.",
+    verifyEmailHint:
+      "Pas reçu ? Vérifiez vos spams ou essayez de vous connecter pour obtenir un nouveau lien.",
+    emailNotVerified:
+      "Vérifiez d'abord votre e-mail. Nous vous avons envoyé un nouveau lien de confirmation.",
+    verifyTitle: "Vérifiez votre e-mail",
+    verifyExpired: "Ce lien de confirmation est invalide ou a expiré.",
+    verifySubtitle:
+      "Saisissez votre e-mail et nous vous enverrons un nouveau lien de confirmation.",
+    resendVerification: "Renvoyer le lien de confirmation",
+    verificationResent: "Si ce compte existe, un nouveau lien arrive.",
     resetTitle: "Réinitialiser votre mot de passe",
     resetSubtitle: "Choisissez un nouveau mot de passe pour votre compte.",
     resetLinkInvalid: "Ce lien est invalide ou a expiré. Demandez-en un nouveau.",
