@@ -6,6 +6,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { eq } from "drizzle-orm";
 import * as schema from "@/lib/db/schema";
 import { sendEmail } from "@/lib/email";
+import { resetPasswordEmail } from "@/lib/email-templates";
 
 /** Stem a display name/email into a username base, then add a short suffix. */
 function usernameStem(raw: string | null | undefined): string {
@@ -39,14 +40,15 @@ export async function getAuth() {
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false, // instant signup, no verification email
+      minPasswordLength: 8,
+      maxPasswordLength: 64,
       sendResetPassword: async ({ user, url }) => {
+        const mail = resetPasswordEmail(url);
         await sendEmail({
           to: user.email,
-          subject: "Reset your Resource Base password",
-          text: `Reset your password: ${url}\n\nThis link expires in 1 hour. If you didn't request this, ignore this email.`,
-          html: `<p>Reset your password by clicking the link below:</p>
-<p><a href="${url}">Reset password</a></p>
-<p>This link expires in 1 hour. If you didn't request this, you can safely ignore this email.</p>`,
+          subject: mail.subject,
+          html: mail.html,
+          text: mail.text,
         });
       },
     },

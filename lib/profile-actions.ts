@@ -58,14 +58,33 @@ export async function getMyProfile() {
   return row ?? null;
 }
 
-/** Update editable profile fields (own only). */
+// Server-side length caps (anti-abuse — never trust the client).
+const MAX_LEN: Record<string, number> = {
+  fullName: 60,
+  bio: 280,
+  portfolioUrl: 200,
+  githubUrl: 200,
+  twitterUrl: 200,
+  instagramUrl: 200,
+  dribbbleUrl: 200,
+};
+
+/** Update editable profile fields (own only). Caps lengths server-side. */
 export async function updateProfile(
   fields: Record<string, unknown>,
 ): Promise<{ error: string | null }> {
   const me = await requireUser();
   const patch: Record<string, unknown> = {};
   for (const key of EDITABLE) {
-    if (key in fields) patch[key] = fields[key] ?? null;
+    if (!(key in fields)) continue;
+    let v = fields[key] ?? null;
+    if (typeof v === "string") {
+      v = v.trim();
+      const cap = MAX_LEN[key];
+      if (cap && (v as string).length > cap) return { error: "too_long" };
+      if (v === "") v = null;
+    }
+    patch[key] = v;
   }
   if (Object.keys(patch).length === 0) return { error: null };
   patch.updatedAt = new Date();

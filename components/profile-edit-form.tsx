@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { IconInput } from "@/components/ui/icon-input";
 import { AccountDangerZone } from "@/components/account-danger-zone";
+import { ProfileChangePassword } from "@/components/profile-change-password";
+import { ProfileConnectedAccounts } from "@/components/profile-connected-accounts";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useProfile } from "@/lib/profile";
@@ -184,25 +186,25 @@ export function ProfileEditForm() {
         />
       </Field>
       <Field label={t("profile.fullName")}>
-        <IconInput icon={User} value={fields.full_name} onChange={(e) => setField("full_name", e.target.value)} />
+        <IconInput icon={User} maxLength={60} value={fields.full_name} onChange={(e) => setField("full_name", e.target.value)} />
       </Field>
       <Field label={t("profile.bio")}>
         <Textarea rows={3} value={fields.bio} onChange={(e) => setField("bio", e.target.value)} maxLength={280} />
       </Field>
       <Field label={t("profile.portfolio")}>
-        <IconInput icon={Globe} type="url" value={fields.portfolio_url} onChange={(e) => setField("portfolio_url", e.target.value)} placeholder="https://…" />
+        <IconInput icon={Globe} type="url" maxLength={200} value={fields.portfolio_url} onChange={(e) => setField("portfolio_url", e.target.value)} placeholder="https://…" />
       </Field>
       <Field label="GitHub">
-        <IconInput icon={Globe} type="url" value={fields.github_url} onChange={(e) => setField("github_url", e.target.value)} placeholder="https://github.com/…" />
+        <IconInput icon={Globe} type="url" maxLength={200} value={fields.github_url} onChange={(e) => setField("github_url", e.target.value)} placeholder="https://github.com/…" />
       </Field>
       <Field label="X (Twitter)">
-        <IconInput icon={Globe} type="url" value={fields.twitter_url} onChange={(e) => setField("twitter_url", e.target.value)} placeholder="https://x.com/…" />
+        <IconInput icon={Globe} type="url" maxLength={200} value={fields.twitter_url} onChange={(e) => setField("twitter_url", e.target.value)} placeholder="https://x.com/…" />
       </Field>
       <Field label="Instagram">
-        <IconInput icon={Globe} type="url" value={fields.instagram_url} onChange={(e) => setField("instagram_url", e.target.value)} placeholder="https://instagram.com/…" />
+        <IconInput icon={Globe} type="url" maxLength={200} value={fields.instagram_url} onChange={(e) => setField("instagram_url", e.target.value)} placeholder="https://instagram.com/…" />
       </Field>
       <Field label="Dribbble">
-        <IconInput icon={Globe} type="url" value={fields.dribbble_url} onChange={(e) => setField("dribbble_url", e.target.value)} placeholder="https://dribbble.com/…" />
+        <IconInput icon={Globe} type="url" maxLength={200} value={fields.dribbble_url} onChange={(e) => setField("dribbble_url", e.target.value)} placeholder="https://dribbble.com/…" />
       </Field>
 
       <Button type="submit" disabled={!canSave} size="lg" className="w-full">
@@ -210,6 +212,11 @@ export function ProfileEditForm() {
         {t("profile.save")}
       </Button>
       </form>
+
+      <div className="mt-6 space-y-4">
+        <ProfileConnectedAccounts />
+        <ProfileChangePassword />
+      </div>
 
       <AccountDangerZone />
     </>

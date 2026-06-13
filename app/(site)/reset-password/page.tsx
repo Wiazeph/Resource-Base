@@ -9,6 +9,9 @@ import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { IconInput } from "@/components/ui/icon-input";
 
+const PW_MIN = 8;
+const PW_MAX = 64;
+
 function ResetForm() {
   const { t } = useTranslation();
   const params = useSearchParams();
@@ -16,6 +19,8 @@ function ResetForm() {
   const token = params.get("token");
   const linkError = params.get("error");
   const [pending, setPending] = useState(false);
+  const [pw, setPw] = useState("");
+  const [confirm, setConfirm] = useState("");
 
   if (linkError || !token) {
     return (
@@ -25,15 +30,14 @@ function ResetForm() {
     );
   }
 
-  async function submit(form: FormData) {
-    const password = String(form.get("password") ?? "");
-    if (password.length < 6) {
-      toast.error(t("auth.passwordTooShort"));
-      return;
-    }
+  const valid = pw.length >= PW_MIN && pw === confirm && !pending;
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!valid) return;
     setPending(true);
     const { error } = await authClient.resetPassword({
-      newPassword: password,
+      newPassword: pw,
       token: token!,
     });
     setPending(false);
@@ -46,23 +50,34 @@ function ResetForm() {
   }
 
   return (
-    <form
-      className="grid gap-3"
-      onSubmit={(e) => {
-        e.preventDefault();
-        submit(new FormData(e.currentTarget));
-      }}
-    >
+    <form className="grid gap-3" onSubmit={submit}>
       <IconInput
         icon={Lock}
-        name="password"
         type="password"
         required
-        minLength={6}
+        minLength={PW_MIN}
+        maxLength={PW_MAX}
+        value={pw}
+        onChange={(e) => setPw(e.target.value)}
         placeholder={t("auth.newPasswordPlaceholder")}
         autoComplete="new-password"
+        autoFocus
       />
-      <Button type="submit" disabled={pending}>
+      <IconInput
+        icon={Lock}
+        type="password"
+        required
+        minLength={PW_MIN}
+        maxLength={PW_MAX}
+        value={confirm}
+        onChange={(e) => setConfirm(e.target.value)}
+        placeholder={t("auth.confirmPasswordPlaceholder")}
+        autoComplete="new-password"
+      />
+      {confirm.length > 0 && pw !== confirm && (
+        <p className="text-xs text-destructive">{t("auth.passwordMismatch")}</p>
+      )}
+      <Button type="submit" disabled={!valid}>
         {pending && <Loader2 className="size-4 animate-spin" />}
         {t("auth.setNewPassword")}
       </Button>
