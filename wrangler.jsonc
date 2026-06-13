@@ -39,6 +39,12 @@
   ],
   // Cloudflare Email Sending — used only by Better Auth password reset.
   "send_email": [{ "name": "EMAIL" }],
+  // Self-reference service binding. OpenNext's ISR revalidation calls back into
+  // this worker to regenerate stale pages; without it any stale ISR page throws
+  // "No service binding for cache revalidation worker" (500). Must match `name`.
+  "services": [
+    { "binding": "WORKER_SELF_REFERENCE", "service": "resource-base" }
+  ],
   // Durable Object queue for OpenNext ISR revalidation (NEXT_CACHE_DO_QUEUE).
   "durable_objects": {
     "bindings": [
