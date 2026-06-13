@@ -4,7 +4,11 @@
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-04-01",
   "compatibility_flags": ["nodejs_compat"],
-  "workers_dev": true,
+  // Disabled so the site is reachable ONLY via the custom domains below, not the
+  // auto-assigned *.workers.dev (+ preview) URLs. Those served a full duplicate
+  // of the site (200 OK), which Google could index as duplicate content and
+  // split ranking away from resource-base.com.
+  "workers_dev": false,
   "observability": { "enabled": true },
   // Custom domains — Cloudflare auto-creates the DNS records + SSL.
   "routes": [
