@@ -25,11 +25,19 @@ function usernameStem(raw: string | null | undefined): string {
 export async function getAuth() {
   const { env } = getCloudflareContext();
   const db = drizzle(env.DB, { schema });
+  const isLocal = (env.BETTER_AUTH_URL ?? "").includes("localhost");
 
   return betterAuth({
     database: drizzleAdapter(db, { provider: "sqlite", schema }),
     secret: env.BETTER_AUTH_SECRET,
     baseURL: env.BETTER_AUTH_URL,
+    // Better Auth rejects requests whose Origin isn't trusted ("Invalid origin").
+    // In local dev (BETTER_AUTH_URL on localhost) accept any origin so both
+    // `next dev` (:3000) and `cf:preview` (:8788) work; in production only the
+    // real domains are trusted (CSRF protection).
+    trustedOrigins: isLocal
+      ? ["*"]
+      : ["https://resource-base.com", "https://www.resource-base.com"],
     // Cloudflare passes the real client IP in cf-connecting-ip. Without this,
     // Better Auth can't identify clients and lumps everyone into one shared
     // rate-limit bucket → spurious 429s (and reset requests never reaching
