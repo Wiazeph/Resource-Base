@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { AtSign, Loader2, Lock, Mail } from "lucide-react";
+import { Loader2, Lock, Mail, MailCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   Dialog,
@@ -17,10 +17,8 @@ import { IconInput } from "@/components/ui/icon-input";
 import { GoogleIcon, GithubIcon, GitlabIcon } from "@/components/brand-icons";
 import { authClient } from "@/lib/auth-client";
 import { markSignInIntent } from "@/components/auth/auth-provider";
-import { setUsername } from "@/lib/profile-actions";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const USERNAME_RE = /^[a-z0-9_-]{3,20}$/;
 const PW_MIN = 8;
 const PW_MAX = 64;
 
@@ -43,12 +41,11 @@ export function AuthDialog({
 }) {
   const { t } = useTranslation();
   const [pending, setPending] = useState(false);
-  const [view, setView] = useState<"auth" | "forgot">("auth");
+  const [view, setView] = useState<"auth" | "forgot" | "verify-sent">("auth");
 
   // Controlled fields (so buttons can be disabled until valid).
   const [siEmail, setSiEmail] = useState("");
   const [siPw, setSiPw] = useState("");
-  const [suUser, setSuUser] = useState("");
   const [suEmail, setSuEmail] = useState("");
   const [suPw, setSuPw] = useState("");
   const [fpEmail, setFpEmail] = useState("");
@@ -65,7 +62,6 @@ export function AuthDialog({
     setSiPw("");
   }
   function resetSignUp() {
-    setSuUser("");
     setSuEmail("");
     setSuPw("");
   }
@@ -95,7 +91,14 @@ export function AuthDialog({
         email: siEmail.trim(),
         password: siPw,
       });
-      if (error) throw new Error(error.message ?? t("auth.failed"));
+      if (error) {
+        // Unverified email/password account: Better Auth blocks sign-in with
+        // EMAIL_NOT_VERIFIED (403) and, with sendOnSignIn, resends the link.
+        // Tell the user to check their inbox rather than showing a raw error.
+        if (error.code === "EMAIL_NOT_VERIFIED" || error.status === 403)
+          throw new Error(t("auth.emailNotVerified"));
+        throw new Error(error.message ?? t("auth.failed"));
+      }
       // Welcome toast is fired centrally in AuthProvider (on the user-id
       // transition) so it works for both email and OAuth sign-in.
       onOpenChange(false);
@@ -109,19 +112,21 @@ export function AuthDialog({
 
   async function signup() {
     setPending(true);
-    markSignInIntent();
     try {
-      const username = suUser.trim().toLowerCase();
+      // name seeds the auto-username (databaseHooks.user.create.after stems it,
+      // then adds a random suffix), exactly like OAuth signups. Use the email
+      // local-part; the user can change their handle later from Profile.
+      const email = suEmail.trim();
       const { error } = await authClient.signUp.email({
-        email: suEmail.trim(),
+        email,
         password: suPw,
-        name: username,
+        name: email.split("@")[0],
       });
       if (error) throw new Error(error.message ?? t("auth.failed"));
-      const res = await setUsername(username);
-      if (res.error === "username_taken") toast.error(t("auth.usernameTaken"));
-      // Welcome toast fired centrally in AuthProvider (see signin()).
-      onOpenChange(false);
+      // Verification is required: signUp does NOT create a session. Show a
+      // check-your-inbox screen instead of closing the dialog.
+      toast.success(t("auth.verifyEmailSent"));
+      setView("verify-sent");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("auth.failed"));
     } finally {
@@ -151,10 +156,7 @@ export function AuthDialog({
   }
 
   const siValid = emailOk(siEmail) && siPw.length >= PW_MIN;
-  const suValid =
-    USERNAME_RE.test(suUser.trim().toLowerCase()) &&
-    emailOk(suEmail) &&
-    suPw.length >= PW_MIN;
+  const suValid = emailOk(suEmail) && suPw.length >= PW_MIN;
   const fpValid = emailOk(fpEmail);
 
   return (
@@ -166,7 +168,31 @@ export function AuthDialog({
       }}
     >
       <DialogContent className="sm:max-w-sm">
-        {view === "forgot" ? (
+        {view === "verify-sent" ? (
+          <>
+            <DialogHeader>
+              <DialogTitle>{t("auth.verifyCheckInbox")}</DialogTitle>
+              <DialogDescription>{t("auth.verifyEmailSent")}</DialogDescription>
+            </DialogHeader>
+            <div className="grid place-items-center gap-3 py-2 text-center">
+              <span className="grid size-12 place-items-center rounded-full bg-primary/10 text-primary">
+                <MailCheck className="size-6" />
+              </span>
+              <p className="text-sm text-muted-foreground">
+                {t("auth.verifyEmailHint")}
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="link"
+              size="sm"
+              className="justify-self-center"
+              onClick={() => setView("auth")}
+            >
+              {t("auth.backToSignIn")}
+            </Button>
+          </>
+        ) : view === "forgot" ? (
           <>
             <DialogHeader>
               <DialogTitle>{t("auth.forgotTitle")}</DialogTitle>
@@ -315,17 +341,6 @@ export function AuthDialog({
                     if (suValid && !pending) signup();
                   }}
                 >
-                  <IconInput
-                    icon={AtSign}
-                    required
-                    minLength={3}
-                    maxLength={20}
-                    pattern="[a-zA-Z0-9_\-]{3,20}"
-                    value={suUser}
-                    onChange={(e) => setSuUser(e.target.value)}
-                    placeholder={t("auth.usernamePlaceholder")}
-                    autoComplete="username"
-                  />
                   <IconInput
                     icon={Mail}
                     type="email"
