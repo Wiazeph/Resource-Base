@@ -237,6 +237,8 @@ export const tr = {
     passwordReset: "Şifre güncellendi. Artık giriş yapabilirsin.",
     accountNotLinked:
       "Bu e-posta ile zaten bir hesap var. Önce e-posta ve şifrenle giriş yap, sonra Profil → Bağlı hesaplar'dan bu sağlayıcıyı bağla.",
+    linkEmailMismatch:
+      "Bu sağlayıcının e-postası hesabının e-postasıyla aynı değil, bu yüzden bağlanamadı. Sağlayıcıya hesabınla aynı e-postayla giriş yapıp tekrar dene.",
     changePassword: "Şifre değiştir",
     currentPassword: "Mevcut şifre",
     passwordChanged: "Şifre güncellendi.",

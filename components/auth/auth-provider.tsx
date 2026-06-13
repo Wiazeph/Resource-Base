@@ -11,6 +11,7 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { authClient, useSession } from "@/lib/auth-client";
 import { AuthDialog } from "@/components/auth/auth-dialog";
 import { isProtectedPage } from "@/lib/protected-routes";
@@ -31,6 +32,20 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// Set right before an interactive sign-in (email submit or OAuth redirect) so
+// the provider can tell a real login from a passive session restore (page
+// reload / tab refocus). Without this, the user-id transition fires on every
+// reload and spams "welcome back". sessionStorage so it survives the OAuth
+// full-page redirect.
+const SIGNIN_INTENT_KEY = "auth:signin-intent";
+export function markSignInIntent() {
+  try {
+    sessionStorage.setItem(SIGNIN_INTENT_KEY, "1");
+  } catch {
+    /* ignore */
+  }
+}
+
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used within <AuthProvider>");
@@ -50,24 +65,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Catch OAuth/auth redirects landing on the page with a query flag:
   //  - ?error=account_not_linked → open the dialog with a helpful notice
+  //  - ?error=email_doesn't_match → linking an OAuth provider whose email differs
+  //    from the account email (Better Auth blocks it for security); explain why
   //  - ?auth=required | ?auth=signin → open the dialog (e.g. bounced from a
   //    protected page, or returning from a password reset)
   // Read from window.location (in an effect, client-only) rather than
   // useSearchParams() so static pages don't need a Suspense bailout.
+  //
+  // Wait for the session to settle (isPending) before acting: a signed-in user
+  // must NOT be shown the sign-in dialog just because a stale ?auth=signin is in
+  // the URL. We always strip the flag via history.replaceState (router.replace
+  // didn't reliably clear the search string on OpenNext, so the flag stuck and
+  // the dialog kept reopening on every navigation back to that URL).
+  const flagHandled = useRef(false);
   useEffect(() => {
+    if (isPending) return;
     const params = new URLSearchParams(window.location.search);
     const error = params.get("error");
     const auth = params.get("auth");
+    const hasFlag = error || auth === "required" || auth === "signin";
+    if (!hasFlag) {
+      flagHandled.current = false;
+      return;
+    }
+    if (flagHandled.current) return;
+    flagHandled.current = true;
+
+    // Strip the flag from the URL immediately so it can't linger and retrigger.
+    window.history.replaceState(null, "", window.location.pathname);
+
+    if (error === "email_doesn't_match") {
+      toast.error(t("auth.linkEmailMismatch"));
+      return;
+    }
+    // Don't prompt sign-in if the user is already authenticated. A signed-in
+    // user can only land here with an error from a failed linkSocial attempt —
+    // surface it rather than swallowing it silently.
+    if (user) {
+      if (error) toast.error(t("auth.linkFailed"));
+      return;
+    }
     if (error === "account_not_linked") {
       setNotice(t("auth.accountNotLinked"));
       setDialogOpen(true);
-      router.replace(window.location.pathname);
     } else if (auth === "required" || auth === "signin") {
       setDialogOpen(true);
-      router.replace(window.location.pathname);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+  }, [pathname, isPending, user]);
 
   // Reproduce the old onAuthStateChange side effects by watching the user id
   // transition (null -> id = signed in, id -> null = signed out).
@@ -85,6 +130,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (currentId && !previousId) {
       setDialogOpen(false);
+      // Only greet on an INTERACTIVE sign-in, never on a passive session
+      // restore (reload / tab refocus). markSignInIntent() sets this flag right
+      // before the email submit or OAuth redirect; if it's absent this
+      // null→id transition is just the session loading, so stay silent.
+      let intentional = false;
+      try {
+        intentional = sessionStorage.getItem(SIGNIN_INTENT_KEY) === "1";
+        if (intentional) sessionStorage.removeItem(SIGNIN_INTENT_KEY);
+      } catch {
+        /* ignore */
+      }
+      if (intentional) {
+        // New vs returning: account created ≤60s ago = brand-new signup.
+        const createdAt = session?.user?.createdAt
+          ? new Date(session.user.createdAt).getTime()
+          : 0;
+        const isNew = createdAt > 0 && Date.now() - createdAt <= 60_000;
+        toast.success(t(isNew ? "auth.welcomeNew" : "auth.welcomeBack"));
+      }
+
       if (redirectAfterAuth.current) {
         const to = redirectAfterAuth.current;
         redirectAfterAuth.current = null;
@@ -94,6 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!currentId && previousId && isProtectedPage(pathnameRef.current)) {
       router.replace("/");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, router]);
 
   const openAuth = useCallback((redirectTo?: string) => {

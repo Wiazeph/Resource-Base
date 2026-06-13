@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { IconInput } from "@/components/ui/icon-input";
 import { GoogleIcon, GithubIcon, GitlabIcon } from "@/components/brand-icons";
 import { authClient } from "@/lib/auth-client";
+import { markSignInIntent } from "@/components/auth/auth-provider";
 import { setUsername } from "@/lib/profile-actions";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -57,12 +58,28 @@ export function AuthDialog({
     return next && next.startsWith("/") ? next : "/";
   }
 
+  // Clear form fields after a submit — success or failure — so stale values
+  // never linger (requested UX). Each helper resets only its own view's inputs.
+  function resetSignIn() {
+    setSiEmail("");
+    setSiPw("");
+  }
+  function resetSignUp() {
+    setSuUser("");
+    setSuEmail("");
+    setSuPw("");
+  }
+
   async function oauth(provider: "google" | "github" | "gitlab") {
     setPending(true);
+    markSignInIntent();
+    // errorCallbackURL must be a plain path (no query string — Better Auth
+    // rejects that with "Invalid errorCallbackURL"). Better Auth appends its own
+    // ?error=<code> (e.g. account_not_linked), which AuthProvider then handles.
     const { error } = await authClient.signIn.social({
       provider,
       callbackURL: callbackPath(),
-      errorCallbackURL: "/?error=account_not_linked",
+      errorCallbackURL: "/",
     });
     if (error) {
       toast.error(error.message ?? t("auth.failed"));
@@ -72,23 +89,27 @@ export function AuthDialog({
 
   async function signin() {
     setPending(true);
+    markSignInIntent();
     try {
       const { error } = await authClient.signIn.email({
         email: siEmail.trim(),
         password: siPw,
       });
       if (error) throw new Error(error.message ?? t("auth.failed"));
-      toast.success(t("auth.welcomeBack"));
+      // Welcome toast is fired centrally in AuthProvider (on the user-id
+      // transition) so it works for both email and OAuth sign-in.
       onOpenChange(false);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("auth.failed"));
     } finally {
       setPending(false);
+      resetSignIn();
     }
   }
 
   async function signup() {
     setPending(true);
+    markSignInIntent();
     try {
       const username = suUser.trim().toLowerCase();
       const { error } = await authClient.signUp.email({
@@ -99,28 +120,34 @@ export function AuthDialog({
       if (error) throw new Error(error.message ?? t("auth.failed"));
       const res = await setUsername(username);
       if (res.error === "username_taken") toast.error(t("auth.usernameTaken"));
-      toast.success(t("auth.welcomeNew"));
+      // Welcome toast fired centrally in AuthProvider (see signin()).
       onOpenChange(false);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("auth.failed"));
     } finally {
       setPending(false);
+      resetSignUp();
     }
   }
 
   async function forgot() {
     setPending(true);
-    await authClient.requestPasswordReset({
-      email: fpEmail.trim(),
-      redirectTo:
-        typeof window !== "undefined"
-          ? `${window.location.origin}/reset-password`
-          : "/reset-password",
-    });
-    setPending(false);
-    toast.success(t("auth.resetEmailSent"));
-    setView("auth");
-    setFpEmail("");
+    try {
+      await authClient.requestPasswordReset({
+        email: fpEmail.trim(),
+        redirectTo:
+          typeof window !== "undefined"
+            ? `${window.location.origin}/reset-password`
+            : "/reset-password",
+      });
+      toast.success(t("auth.resetEmailSent"));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("auth.failed"));
+    } finally {
+      setPending(false);
+      setFpEmail("");
+      setView("auth");
+    }
   }
 
   const siValid = emailOk(siEmail) && siPw.length >= PW_MIN;

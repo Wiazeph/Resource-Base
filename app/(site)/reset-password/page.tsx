@@ -43,6 +43,8 @@ function ResetForm() {
     setPending(false);
     if (error) {
       toast.error(error.message ?? t("auth.failed"));
+      setPw("");
+      setConfirm("");
       return;
     }
     toast.success(t("auth.passwordReset"));

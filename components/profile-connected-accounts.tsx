@@ -49,6 +49,12 @@ export function ProfileConnectedAccounts() {
     const { error } = await authClient.linkSocial({
       provider,
       callbackURL: "/profile/edit",
+      // Plain path only — a query string here throws "Invalid errorCallbackURL".
+      // If the provider's email differs from the account email, Better Auth
+      // blocks the link and redirects to this path with its own appended
+      // ?error=email_doesn't_match, which AuthProvider catches to show
+      // linkEmailMismatch.
+      errorCallbackURL: "/profile/edit",
     });
     if (error) {
       toast.error(error.message ?? t("auth.linkFailed"));

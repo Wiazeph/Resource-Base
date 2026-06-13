@@ -237,6 +237,8 @@ export const es = {
     passwordReset: "Contraseña actualizada. Ya puedes iniciar sesión.",
     accountNotLinked:
       "Ya existe una cuenta con este correo. Inicia sesión con tu correo y contraseña, luego conecta este proveedor desde Perfil → Cuentas conectadas.",
+    linkEmailMismatch:
+      "El correo de ese proveedor no coincide con el de tu cuenta, por lo que no se puede conectar. Inicia sesión en el proveedor con el mismo correo que tu cuenta e inténtalo de nuevo.",
     changePassword: "Cambiar contraseña",
     currentPassword: "Contraseña actual",
     passwordChanged: "Contraseña actualizada.",

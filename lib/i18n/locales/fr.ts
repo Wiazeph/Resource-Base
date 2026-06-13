@@ -237,6 +237,8 @@ export const fr = {
     passwordReset: "Mot de passe mis à jour. Vous pouvez vous connecter.",
     accountNotLinked:
       "Un compte avec cet e-mail existe déjà. Connectez-vous avec votre e-mail et mot de passe, puis connectez ce fournisseur depuis Profil → Comptes connectés.",
+    linkEmailMismatch:
+      "L'e-mail de ce fournisseur ne correspond pas à celui de votre compte, il ne peut donc pas être connecté. Connectez-vous au fournisseur avec la même adresse e-mail que votre compte, puis réessayez.",
     changePassword: "Changer le mot de passe",
     currentPassword: "Mot de passe actuel",
     passwordChanged: "Mot de passe mis à jour.",

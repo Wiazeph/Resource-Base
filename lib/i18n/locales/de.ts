@@ -237,6 +237,8 @@ export const de = {
     passwordReset: "Passwort aktualisiert. Du kannst dich jetzt anmelden.",
     accountNotLinked:
       "Es existiert bereits ein Konto mit dieser E-Mail. Melde dich mit E-Mail und Passwort an und verbinde diesen Anbieter dann unter Profil → Verbundene Konten.",
+    linkEmailMismatch:
+      "Die E-Mail dieses Anbieters stimmt nicht mit der E-Mail deines Kontos überein, daher kann er nicht verknüpft werden. Melde dich beim Anbieter mit derselben E-Mail wie dein Konto an und versuche es erneut.",
     changePassword: "Passwort ändern",
     currentPassword: "Aktuelles Passwort",
     passwordChanged: "Passwort aktualisiert.",

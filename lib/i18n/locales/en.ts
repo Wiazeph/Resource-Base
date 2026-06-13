@@ -237,6 +237,8 @@ export const en = {
     passwordReset: "Password updated. You can sign in now.",
     accountNotLinked:
       "An account with this email already exists. Sign in with your email and password, then connect this provider from Profile → Connected accounts.",
+    linkEmailMismatch:
+      "That provider's email doesn't match your account email, so it can't be linked. Sign in to the provider with the same email as your account, then try again.",
     // Change password (profile)
     changePassword: "Change password",
     currentPassword: "Current password",
