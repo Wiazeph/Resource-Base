@@ -64,7 +64,7 @@ export type LinkCheckSummary = {
 /**
  * Batch link-health check over Sanity resources, writing results back to Sanity.
  * Pure (only Sanity + fetch) so it runs from both the HTTP route (manual) and
- * the Workers scheduled() cron handler. No user auth / no Supabase.
+ * the Workers scheduled() cron handler. No user auth.
  */
 export async function runLinkCheck(): Promise<LinkCheckSummary> {
   const resources = await writeClient.fetch<{ _id: string; url: string }[]>(

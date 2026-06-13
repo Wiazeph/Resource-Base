@@ -28,7 +28,7 @@ const privacyEn: LegalDoc = {
     {
       heading: "What we collect",
       body: [
-        "Account data (only if you sign in): your email address, and a profile (username, display name, optional bio, avatar and social links) stored via our authentication provider, Supabase.",
+        "Account data (only if you sign in): your email address, and a profile (username, display name, optional bio, avatar and social links) stored in our database hosted on Cloudflare.",
         "Activity data: resources you favorite, and resources/edits you submit for review. Aggregate, anonymous click counts per resource (not tied to your identity).",
         "Technical data: standard server logs and, if you consent, anonymous usage analytics (page views, performance). We do not sell your data.",
       ],
@@ -44,7 +44,7 @@ const privacyEn: LegalDoc = {
     {
       heading: "Cookies & analytics",
       body: [
-        "Essential cookies keep you signed in. We load Google Analytics and Vercel Analytics only after you accept analytics in the cookie banner; if you decline, no analytics scripts or cookies are set.",
+        "Essential cookies keep you signed in. We load Google Analytics only after you accept analytics in the cookie banner; if you decline, no analytics scripts or cookies are set. We also use Cloudflare Web Analytics, which is privacy-first and cookieless.",
         "You can change your choice any time by clearing the site's cookies/localStorage.",
       ],
     },
@@ -57,7 +57,7 @@ const privacyEn: LegalDoc = {
     {
       heading: "Third parties",
       body: [
-        "We rely on: Supabase (authentication & user data), Sanity (content), Vercel (hosting & analytics), and Google (Analytics, favicon images). These providers process data on our behalf under their own terms.",
+        "We rely on: Cloudflare (hosting, database, authentication & user data, analytics), Sanity (content), and Google (Analytics, favicon images). These providers process data on our behalf under their own terms.",
       ],
     },
     {
@@ -97,7 +97,7 @@ const privacyTr: LegalDoc = {
     {
       heading: "Topladığımız veriler",
       body: [
-        "Hesap verileri (yalnızca giriş yaparsanız): e-posta adresiniz ve bir profil (kullanıcı adı, görünen ad, isteğe bağlı biyografi, avatar ve sosyal bağlantılar) — kimlik doğrulama sağlayıcımız Supabase üzerinden saklanır.",
+        "Hesap verileri (yalnızca giriş yaparsanız): e-posta adresiniz ve bir profil (kullanıcı adı, görünen ad, isteğe bağlı biyografi, avatar ve sosyal bağlantılar) — Cloudflare üzerinde barındırılan veritabanımızda saklanır.",
         "Etkinlik verileri: favorilediğiniz kaynaklar ve incelenmek üzere gönderdiğiniz kaynak/düzenleme önerileri. Kaynak başına toplu, anonim tıklanma sayıları (kimliğinizle ilişkilendirilmez).",
         "Teknik veriler: standart sunucu kayıtları ve onay verirseniz anonim kullanım analitiği (sayfa görüntüleme, performans). Verilerinizi satmıyoruz.",
       ],
@@ -113,7 +113,7 @@ const privacyTr: LegalDoc = {
     {
       heading: "Çerezler ve analitik",
       body: [
-        "Zorunlu çerezler oturumunuzu açık tutar. Google Analytics ve Vercel Analytics yalnızca çerez bildirimindeki analitiği kabul ettikten sonra yüklenir; reddederseniz hiçbir analitik betiği veya çerezi çalışmaz.",
+        "Zorunlu çerezler oturumunuzu açık tutar. Google Analytics yalnızca çerez bildirimindeki analitiği kabul ettikten sonra yüklenir; reddederseniz hiçbir analitik betiği veya çerezi çalışmaz. Ayrıca gizlilik-öncelikli ve çerezsiz olan Cloudflare Web Analytics kullanırız.",
         "Sitenin çerezlerini/localStorage'ını temizleyerek tercihinizi istediğiniz zaman değiştirebilirsiniz.",
       ],
     },
@@ -126,7 +126,7 @@ const privacyTr: LegalDoc = {
     {
       heading: "Üçüncü taraflar",
       body: [
-        "Şunlara güveniyoruz: Supabase (kimlik doğrulama ve kullanıcı verisi), Sanity (içerik), Vercel (barındırma ve analitik), Google (Analytics, favicon görselleri). Bu sağlayıcılar bizim adımıza kendi şartları kapsamında veri işler.",
+        "Şunlara güveniyoruz: Cloudflare (barındırma, veritabanı, kimlik doğrulama ve kullanıcı verisi, analitik), Sanity (içerik), Google (Analytics, favicon görselleri). Bu sağlayıcılar bizim adımıza kendi şartları kapsamında veri işler.",
       ],
     },
     {

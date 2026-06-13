@@ -39,9 +39,9 @@ export function UserMenu() {
   // Prefer the edited DB name; fall back to the Better Auth name, then email.
   const name = profile?.full_name || user.name || user.email || "Account";
   const avatar = profile?.avatar_url || user.image || undefined;
-  // Provider badge (which OAuth the user signed in with) lived in Supabase's
-  // app_metadata; Better Auth keeps it in the account table. Omitted for now
-  // (no badge) — can be re-added via an account lookup if desired.
+  // Provider badge (which OAuth the user signed in with) is stored in Better
+  // Auth's account table, not on the session user. Omitted for now (no badge)
+  // — can be re-added via an account lookup if desired.
   const provider: string | undefined = undefined;
   const profileHref = profile?.username
     ? `/profile/${profile.username}`

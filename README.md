@@ -35,14 +35,15 @@ The entire interface is available in **English, Turkish, Spanish, French and Ger
 - **Next.js (App Router) + React + TypeScript** — the application
 - **Tailwind CSS + shadcn/ui + Radix** — design system and accessible primitives
 - **Sanity** — headless CMS for resources, categories, tags and submissions (Studio embedded at `/studio`)
-- **Supabase** — authentication (OAuth + email) and user data, protected end-to-end with Row Level Security
+- **Better Auth** — authentication (Google/GitHub/GitLab OAuth + email/password, with password reset)
+- **Cloudflare D1 + Drizzle ORM** — user data (profiles, favorites, submissions, notifications)
 - **cmdk + Fuse.js** — the self-built command palette and fuzzy search
-- **Vercel** — hosting, Cron (broken-link checker), and Analytics
+- **Cloudflare Workers (via OpenNext)** — hosting; **KV** for the ISR page cache, a **Durable Object** queue for revalidation, **Email Sending** for password-reset mail, a separate **Cron Trigger** Worker for the broken-link checker, and **Web Analytics**
 
 ## Privacy & security
 
-- **Your data is scoped to you.** Every user table (profile, favorites, submissions, notifications) is protected by database-level Row Level Security, so one account can never read or modify another's data — enforced by the database itself, not just the app.
-- **Secrets stay on the server.** Service-role and CMS write tokens live only in server-only modules and never reach the browser; the client only ever sees public, anon-level keys.
+- **Your data is scoped to you.** Every read and write of user data (profile, favorites, submissions, notifications) goes through a server action / route handler that derives the user from the verified session and filters by their id, so one account can never read or modify another's data.
+- **Secrets stay on the server.** Auth secret, database binding and CMS write tokens live only in server-only modules / Worker bindings and never reach the browser.
 - **Hardened by default.** A strict Content-Security-Policy, HSTS, `X-Frame-Options`, `nosniff` and a safe-redirect auth callback ship in the production config. Webhooks are signature-verified; the link-checker cron is secret-gated and fails closed.
 - **You're in control of your data.** Export a full JSON copy of everything you've contributed, or delete your account permanently — both self-service, no email required (GDPR Art. 17 & 20 / KVKK).
 - **Analytics are privacy-respecting** and gated behind cookie consent.
@@ -53,25 +54,26 @@ The entire interface is available in **English, Turkish, Spanish, French and Ger
    ```bash
    cp .env.example .env.local
    ```
-   Key variables (see `.env.example` for the full, documented list):
-   - `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`
+   Public/build variables go in `.env.local`; server secrets for the Worker go in `.dev.vars` (gitignored). See `.env.example` for the full, documented list:
+   - `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`, `NEXT_PUBLIC_SITE_URL`
    - `SANITY_API_READ_TOKEN` (Viewer) and `SANITY_API_WRITE_TOKEN` (Editor)
    - `SANITY_REVALIDATE_SECRET`, `SANITY_NOTIFY_SECRET`, `CRON_SECRET`
-   - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
-   - Google/GitHub OAuth credentials are configured in the Supabase dashboard, not as app env vars.
+   - `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and the Google/GitHub/GitLab OAuth client id+secret pairs
 2. Install dependencies and run the dev server:
    ```bash
    pnpm install
    pnpm dev
    ```
-3. Open `http://localhost:3000` — the embedded Studio is at `/studio`.
+3. Open `http://localhost:3000` — the embedded Studio is at `/studio`. To test on the real Workers runtime, use `pnpm cf:preview`.
 
 ### Database
 
-User-data schema and policies live in `supabase/migrations/`. Apply them with the Supabase CLI:
+User-data schema lives in Drizzle (`lib/db/schema.ts`); migrations are generated into `drizzle/`. Apply them to Cloudflare D1:
 
 ```bash
-supabase db push
+pnpm db:generate           # generate SQL from the schema
+pnpm db:migrate:local      # apply to the local D1
+pnpm db:migrate:remote     # apply to the production D1
 ```
 
 ### Importing the legacy content
@@ -85,10 +87,12 @@ pnpm migrate       # import (idempotent — safe to re-run)
 
 ## Deploying
 
-Deploy to Vercel and set the environment variables above in the project settings. Then:
+Hosted on **Cloudflare Workers** via OpenNext. Pushing to `main` triggers an automatic build + deploy through **Workers Builds** (build command `npx opennextjs-cloudflare build`, deploy command `npx opennextjs-cloudflare deploy`). You can also deploy manually with `pnpm cf:deploy`.
 
+Notes:
+- Runtime secrets are set with `wrangler secret put`; the public `NEXT_PUBLIC_*` and Sanity tokens must also be present as **Build variables** in Workers Builds (Next.js inlines them / fetches Sanity at build time).
 - Add a Sanity webhook (**sanity.io/manage → API → Webhooks**) pointing at `/api/revalidate` (content revalidation) and `/api/notify` (submission-approval notifications), each sharing its respective secret.
-- The broken-link checker runs daily via the cron defined in `vercel.json`, authorized with `CRON_SECRET`.
+- The broken-link checker runs daily as a separate Cron Trigger Worker (`workers/link-check-cron`).
 
 ## Disclaimer
 

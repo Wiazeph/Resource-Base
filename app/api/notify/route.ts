@@ -50,7 +50,7 @@ async function resolveRefs(
 }
 
 /**
- * Sanity webhook → Supabase notification + mirror sync (+ fix apply).
+ * Sanity webhook → D1 notification + mirror sync (+ fix apply).
  * Configure a webhook in sanity.io/manage filtered to
  *   _type == "submission" && (status == "approved" || status == "rejected")
  * projecting { _id, status, submittedBy, name, url, rejectionReason, kind,

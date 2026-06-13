@@ -254,7 +254,7 @@ export async function POST(req: NextRequest) {
       createdAt: new Date().toISOString(),
     });
 
-    // Mirror to Supabase so the submission is tied to the user and shows up in
+    // Mirror to D1 so the submission is tied to the user and shows up in
     // "My submissions". If this fails the two stores would diverge (Sanity doc
     // exists, user can't see/track it), so we roll back the Sanity doc and
     // report failure instead of silently succeeding.

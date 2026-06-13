@@ -87,7 +87,7 @@ export const verification = sqliteTable("verification", {
 });
 
 /* -------------------------------------------------------------------------- */
-/*  Application tables (ported from supabase/migrations 0001–0013)            */
+/*  Application tables (user data: favorites, notifications, clicks, etc.)    */
 /*  RLS dropped — authorization enforced in app code (lib/authz.ts).          */
 /* -------------------------------------------------------------------------- */
 

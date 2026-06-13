@@ -5,7 +5,7 @@ export type Pricing = 'free' | 'freemium' | 'paid'
 export type Domain = 'developer' | 'designer' | 'general'
 export type TagKind = 'tech' | 'topic' | 'language' | 'general'
 
-/** Public profile fields (from the public_profiles Supabase view). */
+/** Public profile fields (the safe, publicly-readable subset of a user). */
 export interface PublicProfile {
   id: string
   username: string
@@ -60,7 +60,7 @@ export interface Resource {
   featured?: boolean
   addedAt?: string
   linkStatus?: LinkStatus
-  /** Supabase user id of the community member who submitted it (if any). */
+  /** User id of the community member who submitted it (if any). */
   submittedBy?: string
   categories: CategoryRef[]
   tags: TagRef[]
