@@ -11,6 +11,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { TaxonomyProvider } from "@/components/taxonomy-provider";
+import { ProfileProvider } from "@/lib/profile";
 import { SubmissionsProvider } from "@/lib/submissions";
 import type { Category, Resource, Tag } from "@/lib/types";
 import { sanityFetch } from "@/sanity/lib/fetch";
@@ -42,31 +43,35 @@ export default async function SiteLayout({
   return (
     <I18nProvider>
       <AuthProvider>
-        <SubmissionsProvider>
-          <TaxonomyProvider categories={categories} tags={tags}>
-            <FavoriteCountsProvider>
-              <FavoritesProvider>
-                <ClickCountsProvider>
-                  <ContributorsProvider>
-                    <div className="flex min-h-screen flex-col">
-                      <ScrollToTop />
-                      <SiteHeader />
-                      <CommandPalette resources={resources} />
-                      <Suspense>
-                        <AuthRequiredPrompt />
-                      </Suspense>
-                      {/* Clear the floating header (top-3 + h-14 ≈ 4.25rem) so page
-                content never renders behind it. */}
-                      <main className="flex-1 px-4 pb-12 pt-10">{children}</main>
-                      <SiteFooter />
-                    </div>
-                    <ConsentGate gaId={process.env.NEXT_PUBLIC_GA_ID} />
-                  </ContributorsProvider>
-                </ClickCountsProvider>
-              </FavoritesProvider>
-            </FavoriteCountsProvider>
-          </TaxonomyProvider>
-        </SubmissionsProvider>
+        <ProfileProvider>
+          <SubmissionsProvider>
+            <TaxonomyProvider categories={categories} tags={tags}>
+              <FavoriteCountsProvider>
+                <FavoritesProvider>
+                  <ClickCountsProvider>
+                    <ContributorsProvider>
+                      <div className="flex min-h-screen flex-col">
+                        <ScrollToTop />
+                        <SiteHeader />
+                        <CommandPalette resources={resources} />
+                        <Suspense>
+                          <AuthRequiredPrompt />
+                        </Suspense>
+                        {/* Clear the floating header (top-3 + h-14 ≈ 4.25rem) so
+                  page content never renders behind it. */}
+                        <main className="flex-1 px-4 pb-12 pt-10">
+                          {children}
+                        </main>
+                        <SiteFooter />
+                      </div>
+                      <ConsentGate gaId={process.env.NEXT_PUBLIC_GA_ID} />
+                    </ContributorsProvider>
+                  </ClickCountsProvider>
+                </FavoritesProvider>
+              </FavoriteCountsProvider>
+            </TaxonomyProvider>
+          </SubmissionsProvider>
+        </ProfileProvider>
       </AuthProvider>
     </I18nProvider>
   );

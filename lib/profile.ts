@@ -1,6 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import {
+  createContext,
+  createElement,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   getMyProfile,
   updateProfile,
@@ -53,8 +61,26 @@ const KEY_MAP: Record<keyof EditableProfile, string> = {
   show_email: "showEmail",
 };
 
-/** Loads + updates the signed-in user's own profile (own only). */
-export function useProfile() {
+type ProfileValue = {
+  profile: Profile | null;
+  loading: boolean;
+  update: (
+    fields: Partial<EditableProfile>,
+  ) => Promise<{ error: string | null }>;
+  setUsername: (next: string) => Promise<{ error: string | null }>;
+  reload: () => Promise<void>;
+};
+
+const ProfileContext = createContext<ProfileValue | null>(null);
+
+/**
+ * Loads the signed-in user's own profile ONCE and shares it via context. A
+ * single source of truth is essential: the profile editor and the header user
+ * menu both read it, so editing the username/name must update everywhere
+ * instantly. Previously each `useProfile()` call had its own state, so the menu
+ * kept showing the old username until a full page reload.
+ */
+export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -97,7 +123,19 @@ export function useProfile() {
     [load],
   );
 
-  return { profile, loading, update, setUsername, reload: load };
+  const value = useMemo<ProfileValue>(
+    () => ({ profile, loading, update, setUsername, reload: load }),
+    [profile, loading, update, setUsername, load],
+  );
+
+  return createElement(ProfileContext.Provider, { value }, children);
+}
+
+/** Read the shared profile state (own only). Must be under ProfileProvider. */
+export function useProfile(): ProfileValue {
+  const ctx = useContext(ProfileContext);
+  if (!ctx) throw new Error("useProfile must be used within <ProfileProvider>");
+  return ctx;
 }
 
 // Public reads (server actions) — re-export so existing import sites keep working.
