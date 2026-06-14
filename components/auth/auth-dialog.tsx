@@ -17,6 +17,7 @@ import { IconInput } from "@/components/ui/icon-input";
 import { GoogleIcon, GithubIcon, GitlabIcon } from "@/components/brand-icons";
 import { authClient } from "@/lib/auth-client";
 import { markSignInIntent } from "@/components/auth/auth-provider";
+import { Turnstile, turnstileEnabled } from "@/components/auth/turnstile";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PW_MIN = 8;
@@ -24,6 +25,13 @@ const PW_MAX = 64;
 
 function emailOk(v: string) {
   return EMAIL_RE.test(v.trim()) && v.trim().length <= 254;
+}
+
+/** Forward the Turnstile token to Better Auth as the captcha header. Empty
+ * when captcha is disabled (no site key) — Better Auth only enforces it when
+ * the secret key is set, so the two stay in sync. */
+function captchaHeaders(token: string) {
+  return token ? { headers: { "x-captcha-response": token } } : undefined;
 }
 
 export function AuthDialog({
@@ -49,6 +57,17 @@ export function AuthDialog({
   const [suEmail, setSuEmail] = useState("");
   const [suPw, setSuPw] = useState("");
   const [fpEmail, setFpEmail] = useState("");
+
+  // Turnstile (bot protection) token for the active form. Empty until the
+  // challenge is solved; submit is blocked until then (when captcha is on).
+  // resetKey is bumped after each submit to force a fresh single-use token.
+  const [captcha, setCaptcha] = useState("");
+  const [captchaKey, setCaptchaKey] = useState(0);
+  const captchaOk = !turnstileEnabled || captcha.length > 0;
+  function resetCaptcha() {
+    setCaptcha("");
+    setCaptchaKey((k) => k + 1);
+  }
 
   function callbackPath() {
     const next = getRedirect?.();
@@ -83,21 +102,31 @@ export function AuthDialog({
     }
   }
 
+  /** Map a Better Auth error to a user-facing message. */
+  function authErrorMessage(error: { code?: string; status?: number }): string {
+    // Captcha rejected (missing/invalid/failed verification) by the server.
+    if (error.code?.startsWith("CAPTCHA") || error.code === "MISSING_RESPONSE")
+      return t("auth.captchaFailed");
+    // Too many requests (Better Auth rate limit / per-recipient email cap).
+    if (error.status === 429) return t("auth.tooManyEmails");
+    return t("auth.failed");
+  }
+
   async function signin() {
     setPending(true);
     markSignInIntent();
     try {
-      const { error } = await authClient.signIn.email({
-        email: siEmail.trim(),
-        password: siPw,
-      });
+      const { error } = await authClient.signIn.email(
+        { email: siEmail.trim(), password: siPw },
+        captchaHeaders(captcha),
+      );
       if (error) {
         // Unverified email/password account: Better Auth blocks sign-in with
         // EMAIL_NOT_VERIFIED (403) and, with sendOnSignIn, resends the link.
         // Tell the user to check their inbox rather than showing a raw error.
         if (error.code === "EMAIL_NOT_VERIFIED" || error.status === 403)
           throw new Error(t("auth.emailNotVerified"));
-        throw new Error(error.message ?? t("auth.failed"));
+        throw new Error(error.message ?? authErrorMessage(error));
       }
       // Welcome toast is fired centrally in AuthProvider (on the user-id
       // transition) so it works for both email and OAuth sign-in.
@@ -107,6 +136,7 @@ export function AuthDialog({
     } finally {
       setPending(false);
       resetSignIn();
+      resetCaptcha(); // token is single-use; force a fresh challenge
     }
   }
 
@@ -117,12 +147,11 @@ export function AuthDialog({
       // then adds a random suffix), exactly like OAuth signups. Use the email
       // local-part; the user can change their handle later from Profile.
       const email = suEmail.trim();
-      const { error } = await authClient.signUp.email({
-        email,
-        password: suPw,
-        name: email.split("@")[0],
-      });
-      if (error) throw new Error(error.message ?? t("auth.failed"));
+      const { error } = await authClient.signUp.email(
+        { email, password: suPw, name: email.split("@")[0] },
+        captchaHeaders(captcha),
+      );
+      if (error) throw new Error(error.message ?? authErrorMessage(error));
       // Verification is required: signUp does NOT create a session. Show a
       // check-your-inbox screen instead of closing the dialog.
       toast.success(t("auth.verifyEmailSent"));
@@ -132,26 +161,32 @@ export function AuthDialog({
     } finally {
       setPending(false);
       resetSignUp();
+      resetCaptcha();
     }
   }
 
   async function forgot() {
     setPending(true);
     try {
-      await authClient.requestPasswordReset({
-        email: fpEmail.trim(),
-        redirectTo:
-          typeof window !== "undefined"
-            ? `${window.location.origin}/reset-password`
-            : "/reset-password",
-      });
+      const { error } = await authClient.requestPasswordReset(
+        {
+          email: fpEmail.trim(),
+          redirectTo:
+            typeof window !== "undefined"
+              ? `${window.location.origin}/reset-password`
+              : "/reset-password",
+        },
+        captchaHeaders(captcha),
+      );
+      if (error) throw new Error(error.message ?? authErrorMessage(error));
       toast.success(t("auth.resetEmailSent"));
+      setView("auth");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("auth.failed"));
     } finally {
       setPending(false);
       setFpEmail("");
-      setView("auth");
+      resetCaptcha();
     }
   }
 
@@ -216,17 +251,30 @@ export function AuthDialog({
                 autoComplete="email"
                 autoFocus
               />
-              <Button type="submit" disabled={!fpValid || pending}>
+              <Turnstile
+                action="forgot-password"
+                resetKey={captchaKey}
+                onToken={setCaptcha}
+              />
+              <Button type="submit" disabled={!fpValid || !captchaOk || pending}>
                 {pending && <Loader2 className="size-4 animate-spin" />}
                 {t("auth.sendResetLink")}
               </Button>
+              {fpValid && !captchaOk && (
+                <p className="text-center text-xs text-muted-foreground">
+                  {t("auth.captchaRequired")}
+                </p>
+              )}
               <Button
                 type="button"
                 variant="link"
                 size="sm"
                 className="justify-self-center"
                 disabled={pending}
-                onClick={() => setView("auth")}
+                onClick={() => {
+                  resetCaptcha();
+                  setView("auth");
+                }}
               >
                 {t("auth.backToSignIn")}
               </Button>
@@ -279,7 +327,7 @@ export function AuthDialog({
               <span className="absolute inset-x-0 top-1/2 z-0 h-px bg-border" />
             </div>
 
-            <Tabs defaultValue="signin">
+            <Tabs defaultValue="signin" onValueChange={resetCaptcha}>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="signin">{t("auth.signIn")}</TabsTrigger>
                 <TabsTrigger value="signup">{t("auth.signUp")}</TabsTrigger>
@@ -315,17 +363,33 @@ export function AuthDialog({
                     placeholder={t("auth.passwordPlaceholder")}
                     autoComplete="current-password"
                   />
-                  <Button type="submit" disabled={!siValid || pending}>
+                  <Turnstile
+                    action="signin"
+                    resetKey={captchaKey}
+                    onToken={setCaptcha}
+                  />
+                  <Button
+                    type="submit"
+                    disabled={!siValid || !captchaOk || pending}
+                  >
                     {pending && <Loader2 className="size-4 animate-spin" />}
                     {t("auth.signIn")}
                   </Button>
+                  {siValid && !captchaOk && (
+                    <p className="text-center text-xs text-muted-foreground">
+                      {t("auth.captchaRequired")}
+                    </p>
+                  )}
                   <Button
                     type="button"
                     variant="link"
                     size="sm"
                     className="justify-self-center"
                     disabled={pending}
-                    onClick={() => setView("forgot")}
+                    onClick={() => {
+                      resetCaptcha();
+                      setView("forgot");
+                    }}
                   >
                     {t("auth.forgotPassword")}
                   </Button>
@@ -362,10 +426,23 @@ export function AuthDialog({
                     placeholder={t("auth.passwordPlaceholder")}
                     autoComplete="new-password"
                   />
-                  <Button type="submit" disabled={!suValid || pending}>
+                  <Turnstile
+                    action="signup"
+                    resetKey={captchaKey}
+                    onToken={setCaptcha}
+                  />
+                  <Button
+                    type="submit"
+                    disabled={!suValid || !captchaOk || pending}
+                  >
                     {pending && <Loader2 className="size-4 animate-spin" />}
                     {t("auth.createAccount")}
                   </Button>
+                  {suValid && !captchaOk && (
+                    <p className="text-center text-xs text-muted-foreground">
+                      {t("auth.captchaRequired")}
+                    </p>
+                  )}
                 </form>
               </TabsContent>
             </Tabs>

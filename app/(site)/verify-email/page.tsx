@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { IconInput } from "@/components/ui/icon-input";
+import { Turnstile, turnstileEnabled } from "@/components/auth/turnstile";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -26,18 +27,31 @@ function VerifyEmail() {
   const error = params.get("error");
   const [pending, setPending] = useState(false);
   const [email, setEmail] = useState("");
+  // Turnstile (bot protection) — /send-verification-email is captcha-guarded.
+  const [captcha, setCaptcha] = useState("");
+  const [captchaKey, setCaptchaKey] = useState(0);
+  const captchaOk = !turnstileEnabled || captcha.length > 0;
 
-  const valid = emailOk(email) && !pending;
+  const valid = emailOk(email) && captchaOk && !pending;
 
   async function resend(e: React.FormEvent) {
     e.preventDefault();
     if (!valid) return;
     setPending(true);
     try {
-      await authClient.sendVerificationEmail({
-        email: email.trim(),
-        callbackURL: "/?auth=signin",
-      });
+      const { error: sendError } = await authClient.sendVerificationEmail(
+        { email: email.trim(), callbackURL: "/?auth=signin" },
+        captcha ? { headers: { "x-captcha-response": captcha } } : undefined,
+      );
+      if (sendError) {
+        if (
+          sendError.code?.startsWith("CAPTCHA") ||
+          sendError.code === "MISSING_RESPONSE"
+        )
+          throw new Error(t("auth.captchaFailed"));
+        if (sendError.status === 429) throw new Error(t("auth.tooManyEmails"));
+        throw new Error(sendError.message ?? t("auth.failed"));
+      }
       // Generic message (don't reveal whether the account exists / is verified).
       toast.success(t("auth.verificationResent"));
       setEmail("");
@@ -45,6 +59,8 @@ function VerifyEmail() {
       toast.error(err instanceof Error ? err.message : t("auth.failed"));
     } finally {
       setPending(false);
+      setCaptcha("");
+      setCaptchaKey((k) => k + 1); // token is single-use; force a fresh one
     }
   }
 
@@ -66,10 +82,20 @@ function VerifyEmail() {
           autoComplete="email"
           autoFocus
         />
+        <Turnstile
+          action="resend-verification"
+          resetKey={captchaKey}
+          onToken={setCaptcha}
+        />
         <Button type="submit" disabled={!valid}>
           {pending && <Loader2 className="size-4 animate-spin" />}
           {t("auth.resendVerification")}
         </Button>
+        {emailOk(email) && !captchaOk && (
+          <p className="text-center text-xs text-muted-foreground">
+            {t("auth.captchaRequired")}
+          </p>
+        )}
       </form>
     </div>
   );
