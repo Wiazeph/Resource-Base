@@ -14,6 +14,7 @@ export const de = {
     saved: "Profil gespeichert.",
     saveError: "Speichern fehlgeschlagen. Bitte erneut versuchen.",
     usernameTaken: "Dieser Benutzername ist vergeben.",
+    usernameRateLimited: "Zu viele Namensänderungen. Versuche es später erneut.",
     contributions: "Beiträge ({{count}})",
     noContributions: "Noch keine Beiträge.",
   },
@@ -76,6 +77,7 @@ export const de = {
     removeFavorite: "Aus Favoriten entfernen",
     signInToSave: "Zum Speichern anmelden",
     favoriteError: "Favorit konnte nicht aktualisiert werden. Bitte erneut versuchen.",
+    favoriteRateLimited: "Einen Moment langsamer, dann erneut versuchen.",
   },
 
   modal: {

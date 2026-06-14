@@ -14,6 +14,7 @@ export const tr = {
     saved: "Profil kaydedildi.",
     saveError: "Kaydedilemedi. Lütfen tekrar dene.",
     usernameTaken: "Bu kullanıcı adı alınmış.",
+    usernameRateLimited: "Çok fazla kullanıcı adı değişikliği. Sonra tekrar dene.",
     contributions: "Katkılar ({{count}})",
     noContributions: "Henüz katkı yok.",
   },
@@ -76,6 +77,7 @@ export const tr = {
     removeFavorite: "Favorilerden çıkar",
     signInToSave: "Kaydetmek için giriş yap",
     favoriteError: "Favori güncellenemedi. Lütfen tekrar dene.",
+    favoriteRateLimited: "Biraz yavaşla, sonra tekrar dene.",
   },
 
   modal: {

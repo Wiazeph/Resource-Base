@@ -14,6 +14,7 @@ export const fr = {
     saved: "Profil enregistré.",
     saveError: "Échec de l’enregistrement. Réessayez.",
     usernameTaken: "Ce nom d’utilisateur est déjà pris.",
+    usernameRateLimited: "Trop de changements de nom. Réessayez plus tard.",
     contributions: "Contributions ({{count}})",
     noContributions: "Aucune contribution pour le moment.",
   },
@@ -76,6 +77,7 @@ export const fr = {
     removeFavorite: "Retirer des favoris",
     signInToSave: "Connectez-vous pour enregistrer",
     favoriteError: "Impossible de mettre à jour le favori. Veuillez réessayer.",
+    favoriteRateLimited: "Ralentissez un instant, puis réessayez.",
   },
 
   modal: {

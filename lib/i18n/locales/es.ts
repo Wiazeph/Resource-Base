@@ -14,6 +14,7 @@ export const es = {
     saved: "Perfil guardado.",
     saveError: "No se pudo guardar. Inténtalo de nuevo.",
     usernameTaken: "Ese nombre de usuario ya está en uso.",
+    usernameRateLimited: "Demasiados cambios de nombre. Inténtalo más tarde.",
     contributions: "Contribuciones ({{count}})",
     noContributions: "Aún no hay contribuciones.",
   },
@@ -76,6 +77,7 @@ export const es = {
     removeFavorite: "Quitar de favoritos",
     signInToSave: "Inicia sesión para guardar",
     favoriteError: "No se pudo actualizar el favorito. Inténtalo de nuevo.",
+    favoriteRateLimited: "Espera un momento e inténtalo de nuevo.",
   },
 
   modal: {

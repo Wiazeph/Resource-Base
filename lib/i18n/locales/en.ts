@@ -14,6 +14,7 @@ export const en = {
     saved: "Profile saved.",
     saveError: "Could not save. Please try again.",
     usernameTaken: "That username is taken.",
+    usernameRateLimited: "Too many username changes. Try again later.",
     contributions: "Contributions ({{count}})",
     noContributions: "No contributions yet.",
   },
@@ -76,6 +77,7 @@ export const en = {
     removeFavorite: "Remove favorite",
     signInToSave: "Sign in to save",
     favoriteError: "Couldn't update favorite. Please try again.",
+    favoriteRateLimited: "Slow down a moment, then try again.",
   },
 
   modal: {
