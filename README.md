@@ -47,6 +47,7 @@ The entire interface is available in **English, Turkish, Spanish, French and Ger
 - **Secrets stay on the server.** Auth secret, database binding and CMS write tokens live only in server-only modules / Worker bindings and never reach the browser.
 - **Hardened by default.** A strict Content-Security-Policy, HSTS, `X-Frame-Options`, `nosniff` and a safe-redirect auth callback ship in the production config. Webhooks are signature-verified; the link-checker cron is secret-gated and fails closed.
 - **Email sign-up is verified and abuse-resistant.** New email/password accounts must confirm their address before they can sign in (OAuth is unaffected). The endpoints that create accounts or send mail are layered against spam / "denial of wallet": **Cloudflare Turnstile** blocks bots up front, **per-recipient** cooldown + hourly/daily caps stop mailbox bombing even across rotating IPs, Better Auth's **per-IP** rate limits sit on top, and a **global daily cap** is the final circuit breaker. When a limit is hit the user gets a clear message rather than a silent failure.
+- **Write endpoints are rate-limited.** The public click counter (per IP + resource) and the favorite-toggle and username-change actions (per user) are throttled in KV — shared across isolates and persistent, so the limits hold across cold starts. Thresholds sit far above real usage, so they only ever bite scripted abuse (inflating click counts, hammering D1 writes), never a real visitor.
 - **You're in control of your data.** Export a full JSON copy of everything you've contributed, or delete your account permanently — both self-service, no email required (GDPR Art. 17 & 20 / KVKK).
 - **Analytics are privacy-respecting** and gated behind cookie consent.
 
@@ -111,6 +112,8 @@ Two extra steps lock down the auth endpoints against bot abuse and spam. Both ar
    - **Action:** `Block` (or `Managed Challenge`) for `1 minute`
 
    This is defense-in-depth on top of the in-app per-IP and per-recipient limits — adjust the threshold to taste.
+
+   For broader coverage you can add a second, looser rule on **all** API routes (catches floods against the public click/data endpoints too): path `contains` `/api/`, e.g. `100` requests per `10 seconds` per IP, action `Managed Challenge`. Keep this threshold well above normal use so real visitors are never challenged. In-app, the click counter, favorite toggles and username changes are already KV-rate-limited per IP/user, so this is purely an extra network-layer guard.
 
 ## Disclaimer
 
