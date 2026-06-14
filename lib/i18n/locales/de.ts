@@ -240,6 +240,10 @@ export const de = {
       "Gib deine E-Mail ein und wir senden dir einen neuen Bestätigungslink.",
     resendVerification: "Bestätigungslink erneut senden",
     verificationResent: "Falls dieses Konto existiert, ist ein neuer Link unterwegs.",
+    // Bot-Schutz / Ratenbegrenzung
+    captchaRequired: "Schließe zum Fortfahren die Verifizierung unten ab.",
+    captchaFailed: "Verifizierung fehlgeschlagen. Lade die Seite neu und versuche es erneut.",
+    tooManyEmails: "Zu viele Versuche. Bitte versuche es in ein paar Minuten erneut.",
     resetTitle: "Passwort zurücksetzen",
     resetSubtitle: "Wähle ein neues Passwort für dein Konto.",
     resetLinkInvalid: "Dieser Link ist ungültig oder abgelaufen. Fordere einen neuen an.",

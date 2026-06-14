@@ -240,6 +240,10 @@ export const fr = {
       "Saisissez votre e-mail et nous vous enverrons un nouveau lien de confirmation.",
     resendVerification: "Renvoyer le lien de confirmation",
     verificationResent: "Si ce compte existe, un nouveau lien arrive.",
+    // Protection anti-bots / limite de débit
+    captchaRequired: "Complétez la vérification ci-dessous pour continuer.",
+    captchaFailed: "Échec de la vérification. Actualisez la page et réessayez.",
+    tooManyEmails: "Trop de tentatives. Réessayez dans quelques minutes.",
     resetTitle: "Réinitialiser votre mot de passe",
     resetSubtitle: "Choisissez un nouveau mot de passe pour votre compte.",
     resetLinkInvalid: "Ce lien est invalide ou a expiré. Demandez-en un nouveau.",

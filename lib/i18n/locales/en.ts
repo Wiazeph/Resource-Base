@@ -239,6 +239,10 @@ export const en = {
     verifySubtitle: "Enter your email and we'll send a new confirmation link.",
     resendVerification: "Resend confirmation link",
     verificationResent: "If that account exists, a new link is on its way.",
+    // Bot protection / rate limiting
+    captchaRequired: "Complete the verification below to continue.",
+    captchaFailed: "Verification failed. Refresh the page and try again.",
+    tooManyEmails: "Too many attempts. Please try again in a few minutes.",
     resetTitle: "Reset your password",
     resetSubtitle: "Choose a new password for your account.",
     resetLinkInvalid: "This reset link is invalid or has expired. Request a new one.",

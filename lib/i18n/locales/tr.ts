@@ -239,6 +239,10 @@ export const tr = {
     verifySubtitle: "E-postanı gir, sana yeni bir onay bağlantısı gönderelim.",
     resendVerification: "Onay bağlantısını tekrar gönder",
     verificationResent: "Bu hesap varsa, yeni bir bağlantı yolda.",
+    // Bot koruması / hız sınırı
+    captchaRequired: "Devam etmek için aşağıdaki doğrulamayı tamamla.",
+    captchaFailed: "Doğrulama başarısız. Sayfayı yenileyip tekrar dene.",
+    tooManyEmails: "Çok fazla deneme. Lütfen birkaç dakika sonra tekrar dene.",
     resetTitle: "Şifreni sıfırla",
     resetSubtitle: "Hesabın için yeni bir şifre belirle.",
     resetLinkInvalid: "Bu sıfırlama bağlantısı geçersiz veya süresi dolmuş. Yenisini iste.",

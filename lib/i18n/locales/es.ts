@@ -240,6 +240,10 @@ export const es = {
       "Introduce tu correo y te enviaremos un nuevo enlace de confirmación.",
     resendVerification: "Reenviar enlace de confirmación",
     verificationResent: "Si esa cuenta existe, un nuevo enlace va en camino.",
+    // Protección anti-bots / límite de tasa
+    captchaRequired: "Completa la verificación de abajo para continuar.",
+    captchaFailed: "La verificación falló. Actualiza la página e inténtalo de nuevo.",
+    tooManyEmails: "Demasiados intentos. Inténtalo de nuevo en unos minutos.",
     resetTitle: "Restablecer tu contraseña",
     resetSubtitle: "Elige una nueva contraseña para tu cuenta.",
     resetLinkInvalid: "Este enlace no es válido o ha caducado. Solicita uno nuevo.",
