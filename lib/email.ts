@@ -25,7 +25,11 @@ type EmailBinding = {
 
 type KvBinding = {
   get: (key: string) => Promise<string | null>;
-  put: (key: string, value: string, opts?: { expirationTtl?: number }) => Promise<void>;
+  put: (
+    key: string,
+    value: string,
+    opts?: { expirationTtl?: number },
+  ) => Promise<void>;
 };
 
 // Global hard ceiling on emails per day, regardless of source. Per-IP rate
@@ -33,6 +37,32 @@ type KvBinding = {
 // against DISTRIBUTED abuse exhausting the sending quota / running up cost.
 // Kept under Cloudflare Email Sending's 200/day quota.
 const MAX_EMAILS_PER_DAY = 150;
+
+// Per-RECIPIENT limits. Unlike per-IP limits (which an attacker defeats by
+// rotating IPs), these are keyed on the destination address — the one thing an
+// attacker bombarding someone's inbox (or spinning up signups to a victim's
+// address) can't rotate. Stops "mail bombing" a single mailbox.
+const RECIPIENT_COOLDOWN_SECONDS = 60; // min gap between two mails to the same address
+const RECIPIENT_MAX_PER_HOUR = 3;
+const RECIPIENT_MAX_PER_DAY = 5;
+
+/** Reason a send was suppressed (surfaced to callers so the UI can explain). */
+export type EmailResult = {
+  ok: boolean;
+  /** Why the send didn't go out. Absent when ok === true. */
+  reason?: "no_binding" | "daily_cap" | "rate_limited";
+};
+
+/** SHA-256 hex of a string — used to key per-recipient counters without
+ * storing raw email addresses in KV. */
+async function hashKey(value: string): Promise<string> {
+  const data = new TextEncoder().encode(value.trim().toLowerCase());
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("")
+    .slice(0, 32);
+}
 
 /** Best-effort daily counter in KV. Returns true if under the cap (safe to send). */
 async function underDailyCap(kv: KvBinding | undefined): Promise<boolean> {
@@ -46,12 +76,52 @@ async function underDailyCap(kv: KvBinding | undefined): Promise<boolean> {
   return true;
 }
 
+/**
+ * Per-recipient cooldown + hourly/daily caps. Returns true if this address is
+ * within limits (safe to send). Keyed on a hash of the address so we never put
+ * raw emails in KV. Best-effort (KV is eventually consistent) — that's fine for
+ * abuse limiting.
+ */
+async function recipientAllowed(
+  kv: KvBinding | undefined,
+  email: string,
+): Promise<boolean> {
+  if (!kv) return true; // no KV (local/dev) → don't block
+  const h = await hashKey(email);
+  const now = new Date();
+  const hour = now.toISOString().slice(0, 13); // YYYY-MM-DDTHH
+  const day = now.toISOString().slice(0, 10); // YYYY-MM-DD
+
+  // Cooldown: a short window key that simply existing means "sent recently".
+  const cdKey = `mail-cd:${h}`;
+  if ((await kv.get(cdKey)) !== null) return false;
+
+  const hourKey = `mail-h:${h}:${hour}`;
+  const dayKey = `mail-d:${h}:${day}`;
+  const hourCount = Number((await kv.get(hourKey)) ?? "0");
+  const dayCount = Number((await kv.get(dayKey)) ?? "0");
+  if (hourCount >= RECIPIENT_MAX_PER_HOUR) return false;
+  if (dayCount >= RECIPIENT_MAX_PER_DAY) return false;
+
+  // Reserve a slot: bump counters and arm the cooldown.
+  await kv.put(cdKey, "1", { expirationTtl: RECIPIENT_COOLDOWN_SECONDS });
+  await kv.put(hourKey, String(hourCount + 1), { expirationTtl: 7200 }); // 2h
+  await kv.put(dayKey, String(dayCount + 1), { expirationTtl: 172800 }); // 2d
+  return true;
+}
+
 export async function sendEmail(opts: {
   to: string;
   subject: string;
   html: string;
   text: string;
-}): Promise<void> {
+  /**
+   * Recipient-scoped abuse key. When set, the send is subject to per-recipient
+   * cooldown + hourly/daily caps (defeats IP rotation). Pass the recipient email
+   * for auth/transactional mail. Omit only for trusted internal sends.
+   */
+  dedupeKey?: string;
+}): Promise<EmailResult> {
   const { env } = getCloudflareContext();
   const e = env as unknown as Record<string, unknown>;
   const emailBinding = e.EMAIL as EmailBinding | undefined;
@@ -62,7 +132,16 @@ export async function sendEmail(opts: {
     console.warn(
       `[email] EMAIL binding unavailable; skipped send to ${opts.to} (${opts.subject})`,
     );
-    return;
+    return { ok: false, reason: "no_binding" };
+  }
+
+  // Per-recipient abuse limit (IP-independent) — checked before the global cap
+  // so a single targeted address can't burn the shared daily quota.
+  if (opts.dedupeKey && !(await recipientAllowed(kv, opts.dedupeKey))) {
+    console.warn(
+      `[email] per-recipient limit hit; skipped send to ${opts.to} (${opts.subject})`,
+    );
+    return { ok: false, reason: "rate_limited" };
   }
 
   // Circuit breaker: hard daily cap across all senders.
@@ -70,7 +149,7 @@ export async function sendEmail(opts: {
     console.error(
       `[email] daily cap (${MAX_EMAILS_PER_DAY}) reached; skipped send to ${opts.to}`,
     );
-    return;
+    return { ok: false, reason: "daily_cap" };
   }
 
   const from = env.EMAIL_FROM || "noreply@resource-base.com";
@@ -81,4 +160,5 @@ export async function sendEmail(opts: {
     html: opts.html,
     text: opts.text,
   });
+  return { ok: true };
 }

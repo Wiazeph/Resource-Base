@@ -79,6 +79,7 @@ export async function getAuth() {
           subject: mail.subject,
           html: mail.html,
           text: mail.text,
+          dedupeKey: user.email, // per-recipient abuse limit (IP-independent)
         });
       },
     },
@@ -94,6 +95,7 @@ export async function getAuth() {
           subject: mail.subject,
           html: mail.html,
           text: mail.text,
+          dedupeKey: user.email, // per-recipient abuse limit (IP-independent)
         });
       },
     },
