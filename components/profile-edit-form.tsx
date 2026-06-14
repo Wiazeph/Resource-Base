@@ -115,7 +115,9 @@ export function ProfileEditForm() {
               ? t("profile.usernameTaken")
               : error === "invalid_username"
                 ? t("auth.usernameInvalid")
-                : error,
+                : error === "rate_limited"
+                  ? t("profile.usernameRateLimited")
+                  : error,
           );
           setPending(false);
           return;

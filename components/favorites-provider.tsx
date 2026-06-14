@@ -63,7 +63,16 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
       bump(id, isFav ? -1 : 1);
 
       try {
-        await toggleFavorite(id);
+        const res = await toggleFavorite(id);
+        // Rate-limited (spam guard): the write didn't happen, so revert the
+        // optimistic UI rather than let it lie about the saved state.
+        if (res?.error === "rate_limited") {
+          setIds((prev) =>
+            isFav ? [...prev, id] : prev.filter((x) => x !== id),
+          );
+          bump(id, isFav ? 1 : -1);
+          toast.error(t("card.favoriteRateLimited"));
+        }
       } catch {
         // On failure, revert the optimistic UI so it never lies about state.
         setIds((prev) =>

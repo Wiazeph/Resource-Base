@@ -2,24 +2,16 @@ import { type NextRequest, NextResponse } from "next/server";
 import { sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { resourceClicks } from "@/lib/db/schema";
+import { alreadySeen } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
-// Per-instance debounce: same IP+resource counts once per window. Best-effort
-// across Worker isolates — kills casual spam (repeat clicks, refresh re-counts).
-const WINDOW_MS = 6 * 60 * 60 * 1000; // 6 hours
-const seen = new Map<string, number>();
-
-function recentlyCounted(key: string): boolean {
-  const now = Date.now();
-  const expires = seen.get(key);
-  if (expires && expires > now) return true;
-  seen.set(key, now + WINDOW_MS);
-  if (seen.size > 10_000) {
-    for (const [k, exp] of seen) if (exp < now) seen.delete(k);
-  }
-  return false;
-}
+// Dedup: same IP+resource counts at most once per window. Backed by KV (shared
+// across Worker isolates and persistent), so — unlike an in-memory Map — it
+// can't be reset by forcing a cold start. This is what stops a bot inflating a
+// resource's click count / trending rank by hammering the public endpoint; the
+// link itself still opens, only the COUNT is debounced. The user never notices.
+const CLICK_DEDUP_WINDOW_SEC = 24 * 60 * 60; // 24 hours
 
 export async function POST(req: NextRequest) {
   let resourceId: unknown;
@@ -34,9 +26,11 @@ export async function POST(req: NextRequest) {
   }
 
   const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    req.headers.get("cf-connecting-ip") ??
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    "unknown";
 
-  if (recentlyCounted(`${ip}:${resourceId}`)) {
+  if (await alreadySeen(`click:${ip}:${resourceId}`, CLICK_DEDUP_WINDOW_SEC)) {
     return NextResponse.json({ counted: false });
   }
 

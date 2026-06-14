@@ -9,6 +9,7 @@ import {
   submissions,
 } from "@/lib/db/schema";
 import { getSessionUser, requireUser } from "@/lib/authz";
+import { isRateLimited } from "@/lib/rate-limit";
 
 /* ----------------------------- favorites (own) ---------------------------- */
 
@@ -24,8 +25,20 @@ export async function listFavorites(): Promise<string[]> {
 
 export async function toggleFavorite(
   resourceId: string,
-): Promise<{ favorited: boolean }> {
+): Promise<{ favorited: boolean; error?: "rate_limited" }> {
   const me = await requireUser();
+  // Per-user ceiling well above real use (nobody toggles 30×/min) — only trips
+  // a script spamming D1 writes. Returns the current state unchanged on trip.
+  if (await isRateLimited(`fav:${me.id}`, 30, 60)) {
+    const [row] = await getDb()
+      .select({ resourceId: favorites.resourceId })
+      .from(favorites)
+      .where(
+        and(eq(favorites.userId, me.id), eq(favorites.resourceId, resourceId)),
+      )
+      .limit(1);
+    return { favorited: Boolean(row), error: "rate_limited" };
+  }
   const db = getDb();
   const existing = await db
     .select({ resourceId: favorites.resourceId })

@@ -6,6 +6,7 @@ import { getDb } from "@/lib/db";
 import { user } from "@/lib/db/schema";
 import { getAuth } from "@/lib/auth";
 import { getSessionUser, requireUser } from "@/lib/authz";
+import { isRateLimited } from "@/lib/rate-limit";
 
 const PW_MIN = 8;
 const PW_MAX = 64;
@@ -63,6 +64,10 @@ export async function setUsername(
   const me = await requireUser();
   const cleaned = next.trim().toLowerCase();
   if (!USERNAME_RE.test(cleaned)) return { error: "invalid_username" };
+  // A human changes their handle rarely; cap at 5/hour to stop a script from
+  // hammering the uniqueness query + write. Far above any real use.
+  if (await isRateLimited(`username:${me.id}`, 5, 3600))
+    return { error: "rate_limited" };
 
   const db = getDb();
   const clash = await db
