@@ -1,6 +1,8 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
+import { captcha } from "better-auth/plugins";
+import type { BetterAuthPlugin } from "better-auth";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { drizzle } from "drizzle-orm/d1";
 import { eq } from "drizzle-orm";
@@ -26,6 +28,33 @@ export async function getAuth() {
   const { env } = getCloudflareContext();
   const db = drizzle(env.DB, { schema });
   const isLocal = (env.BETTER_AUTH_URL ?? "").includes("localhost");
+
+  // Bot protection (Cloudflare Turnstile). The captcha plugin verifies an
+  // `x-captcha-response` token (sent by the widget) against Cloudflare before
+  // letting the request reach the account-creation / email-sending endpoints —
+  // this is what stops a bot from mass-registering random addresses and firing
+  // verification mail at scale (per-IP limits don't, since bots rotate IPs).
+  // Only wired up when TURNSTILE_SECRET_KEY is set, so local dev (no key) and
+  // the OAuth-only path keep working unguarded.
+  const turnstileSecret = (env as unknown as Record<string, string | undefined>)
+    .TURNSTILE_SECRET_KEY;
+  const plugins: BetterAuthPlugin[] = [];
+  if (turnstileSecret) {
+    plugins.push(
+      captcha({
+        provider: "cloudflare-turnstile",
+        secretKey: turnstileSecret,
+        // Guard every endpoint that creates an account or sends an email.
+        endpoints: [
+          "/sign-up/email",
+          "/sign-in/email",
+          "/send-verification-email",
+          "/request-password-reset",
+          "/forget-password",
+        ],
+      }),
+    );
+  }
 
   return betterAuth({
     database: drizzleAdapter(db, { provider: "sqlite", schema }),
@@ -158,6 +187,7 @@ export async function getAuth() {
         showEmail: { type: "boolean", required: false, defaultValue: false },
       },
     },
-    plugins: [nextCookies()], // MUST be last
+    // captcha (if enabled) runs before nextCookies; nextCookies MUST be last.
+    plugins: [...plugins, nextCookies()],
   });
 }

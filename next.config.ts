@@ -60,15 +60,19 @@ const isDev = process.env.NODE_ENV === "development";
 
 // React's dev build uses eval() for debugging; production never does. So we
 // only relax script-src with 'unsafe-eval' in development.
+// Cloudflare Turnstile (bot protection) loads its script from and runs its
+// challenge in an iframe on challenges.cloudflare.com.
+const TURNSTILE = "https://challenges.cloudflare.com";
+
 const scriptSrc = isDev
-  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com"
-  : "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com";
+  ? `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com ${TURNSTILE}`
+  : `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com ${TURNSTILE}`;
 
 // In dev, Next.js needs a WebSocket (ws:) to the local server for HMR; without
 // it the browser blocks the connection and the console floods with CSP errors.
 const connectSrc = isDev
-  ? "connect-src 'self' ws: wss: https://*.sanity.io https://www.google-analytics.com"
-  : "connect-src 'self' https://*.sanity.io https://www.google-analytics.com";
+  ? `connect-src 'self' ws: wss: https://*.sanity.io https://www.google-analytics.com ${TURNSTILE}`
+  : `connect-src 'self' https://*.sanity.io https://www.google-analytics.com ${TURNSTILE}`;
 
 const csp = [
   "default-src 'self'",
@@ -77,6 +81,7 @@ const csp = [
   "img-src 'self' https: data:",
   "font-src 'self' https://fonts.gstatic.com",
   connectSrc,
+  `frame-src ${TURNSTILE}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
