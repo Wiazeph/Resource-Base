@@ -106,14 +106,12 @@ Two extra steps lock down the auth endpoints against bot abuse and spam. Both ar
 
 1. **Turnstile (bot protection).** In the Cloudflare dashboard go to **Turnstile → Add widget**, add your domain (`resource-base.com`), and copy the two keys. Set `NEXT_PUBLIC_TURNSTILE_SITE_KEY` as a **Build variable** in Workers Builds (it's inlined into the client) and `TURNSTILE_SECRET_KEY` as a runtime secret (`wrangler secret put TURNSTILE_SECRET_KEY`). Once both are present, the auth forms render the widget and Better Auth rejects any sign-up / sign-in / verification / reset request without a valid challenge token. Until they're set, captcha is simply off.
 
-2. **WAF rate limiting (network layer).** This stops floods *before* they reach the Worker, so they never cost you compute. It's a dashboard setting, not code. In the Cloudflare dashboard go to **Security → WAF → Rate limiting rules → Create rule**:
+2. **WAF rate limiting (network layer).** This stops floods *before* they reach the Worker, so they never cost you compute. It's a dashboard setting, not code. In the Cloudflare dashboard go to **Security → WAF → Rate limiting rules → Create rule** and guard the auth endpoints (the highest-value target):
    - **Field / match:** `URI Path` `contains` `/api/auth/`
-   - **Rate:** e.g. `10` requests per `1 minute` per client IP
-   - **Action:** `Block` (or `Managed Challenge`) for `1 minute`
+   - **Rate:** `10` requests per `10 seconds` per client IP
+   - **Action:** `Block` for `10 seconds`
 
-   This is defense-in-depth on top of the in-app per-IP and per-recipient limits — adjust the threshold to taste.
-
-   For broader coverage you can add a second, looser rule on **all** API routes (catches floods against the public click/data endpoints too): path `contains` `/api/`, e.g. `100` requests per `10 seconds` per IP, action `Managed Challenge`. Keep this threshold well above normal use so real visitors are never challenged. In-app, the click counter, favorite toggles and username changes are already KV-rate-limited per IP/user, so this is purely an extra network-layer guard.
+   This is defense-in-depth on top of the in-app per-IP and per-recipient limits. The Free plan allows **one** rate-limiting rule, so spend it on `/api/auth/`. On a paid plan you can add a second, looser rule on all API routes (`URI Path contains /api/`, e.g. `100` requests per `10 seconds`, action `Managed Challenge`) — but it's optional: the click counter, favorite toggles and username changes are already KV-rate-limited per IP/user in-app, and Cloudflare's automatic DDoS protection covers volumetric floods on every plan.
 
 ## Disclaimer
 
