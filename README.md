@@ -35,7 +35,8 @@ The entire interface is available in **English, Turkish, Spanish, French and Ger
 - **Next.js (App Router) + React + TypeScript** — the application
 - **Tailwind CSS + shadcn/ui + Radix** — design system and accessible primitives
 - **Sanity** — headless CMS for resources, categories, tags and submissions (Studio embedded at `/studio`)
-- **Better Auth** — authentication (Google/GitHub/GitLab OAuth + email/password, with password reset)
+- **Better Auth** — authentication (Google/GitHub/GitLab OAuth + email/password with required email verification and password reset)
+- **Cloudflare Turnstile** — bot protection on the account-creation and email-sending endpoints
 - **Cloudflare D1 + Drizzle ORM** — user data (profiles, favorites, submissions, notifications)
 - **cmdk + Fuse.js** — the self-built command palette and fuzzy search
 - **Cloudflare Workers (via OpenNext)** — hosting; **KV** for the ISR page cache, a **Durable Object** queue for revalidation, **Email Sending** for password-reset mail, a separate **Cron Trigger** Worker for the broken-link checker, and **Web Analytics**
@@ -45,6 +46,7 @@ The entire interface is available in **English, Turkish, Spanish, French and Ger
 - **Your data is scoped to you.** Every read and write of user data (profile, favorites, submissions, notifications) goes through a server action / route handler that derives the user from the verified session and filters by their id, so one account can never read or modify another's data.
 - **Secrets stay on the server.** Auth secret, database binding and CMS write tokens live only in server-only modules / Worker bindings and never reach the browser.
 - **Hardened by default.** A strict Content-Security-Policy, HSTS, `X-Frame-Options`, `nosniff` and a safe-redirect auth callback ship in the production config. Webhooks are signature-verified; the link-checker cron is secret-gated and fails closed.
+- **Email sign-up is verified and abuse-resistant.** New email/password accounts must confirm their address before they can sign in (OAuth is unaffected). The endpoints that create accounts or send mail are layered against spam / "denial of wallet": **Cloudflare Turnstile** blocks bots up front, **per-recipient** cooldown + hourly/daily caps stop mailbox bombing even across rotating IPs, Better Auth's **per-IP** rate limits sit on top, and a **global daily cap** is the final circuit breaker. When a limit is hit the user gets a clear message rather than a silent failure.
 - **You're in control of your data.** Export a full JSON copy of everything you've contributed, or delete your account permanently — both self-service, no email required (GDPR Art. 17 & 20 / KVKK).
 - **Analytics are privacy-respecting** and gated behind cookie consent.
 
@@ -59,6 +61,9 @@ The entire interface is available in **English, Turkish, Spanish, French and Ger
    - `SANITY_API_READ_TOKEN` (Viewer) and `SANITY_API_WRITE_TOKEN` (Editor)
    - `SANITY_REVALIDATE_SECRET`, `SANITY_NOTIFY_SECRET`, `CRON_SECRET`
    - `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and the Google/GitHub/GitLab OAuth client id+secret pairs
+   - `EMAIL_FROM` (verified sender), and optionally `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` for bot protection
+
+   > **Turnstile is optional locally.** Leave the two `TURNSTILE_*` values blank and the captcha widget hides itself while the auth endpoints run unguarded — handy for local dev. Set both (site key as a build variable, secret via `wrangler secret put`) to turn bot protection on in production.
 2. Install dependencies and run the dev server:
    ```bash
    pnpm install
@@ -93,6 +98,19 @@ Notes:
 - Runtime secrets are set with `wrangler secret put`; the public `NEXT_PUBLIC_*` and Sanity tokens must also be present as **Build variables** in Workers Builds (Next.js inlines them / fetches Sanity at build time).
 - Add a Sanity webhook (**sanity.io/manage → API → Webhooks**) pointing at `/api/revalidate` (content revalidation) and `/api/notify` (submission-approval notifications), each sharing its respective secret.
 - The broken-link checker runs daily as a separate Cron Trigger Worker (`workers/link-check-cron`).
+
+### Production hardening
+
+Two extra steps lock down the auth endpoints against bot abuse and spam. Both are optional to *run* the app but strongly recommended in production:
+
+1. **Turnstile (bot protection).** In the Cloudflare dashboard go to **Turnstile → Add widget**, add your domain (`resource-base.com`), and copy the two keys. Set `NEXT_PUBLIC_TURNSTILE_SITE_KEY` as a **Build variable** in Workers Builds (it's inlined into the client) and `TURNSTILE_SECRET_KEY` as a runtime secret (`wrangler secret put TURNSTILE_SECRET_KEY`). Once both are present, the auth forms render the widget and Better Auth rejects any sign-up / sign-in / verification / reset request without a valid challenge token. Until they're set, captcha is simply off.
+
+2. **WAF rate limiting (network layer).** This stops floods *before* they reach the Worker, so they never cost you compute. It's a dashboard setting, not code. In the Cloudflare dashboard go to **Security → WAF → Rate limiting rules → Create rule**:
+   - **Field / match:** `URI Path` `contains` `/api/auth/`
+   - **Rate:** e.g. `10` requests per `1 minute` per client IP
+   - **Action:** `Block` (or `Managed Challenge`) for `1 minute`
+
+   This is defense-in-depth on top of the in-app per-IP and per-recipient limits — adjust the threshold to taste.
 
 ## Disclaimer
 
