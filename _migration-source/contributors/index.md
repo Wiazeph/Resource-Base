@@ -7,9 +7,9 @@ const members = [
     name: "Emre Erden",
     title: "Creator",
     links: [
-      { icon: "linkedin", link: "https://linkedin.com/in/Wiazeph" },
-      { icon: "github", link: "https://github.com/Wiazeph" },
-      { icon: "twitter", link: "https://twitter.com/Wiazeph" },
+      { icon: "linkedin", link: "https://linkedin.com/in/emreerdendev" },
+      { icon: "github", link: "https://github.com/emreerdendev" },
+      { icon: "twitter", link: "https://twitter.com/emreerdendev" },
       { icon: "instagram", link: "https://instagram.com/Wiazeph" },
       ],
   },

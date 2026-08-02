@@ -6,10 +6,10 @@ import { Boxes, CircleDot, Globe, Heart, Mail } from "lucide-react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
-const REPO_URL = "https://github.com/Wiazeph/Resource-Base";
-const ISSUES_URL = "https://github.com/Wiazeph/Resource-Base/issues";
+const REPO_URL = "https://github.com/emreerdendev/Resource-Base";
+const ISSUES_URL = "https://github.com/emreerdendev/Resource-Base/issues";
 const SITE_URL = "https://emreerden.dev";
-const SPONSOR_URL = "https://github.com/sponsors/Wiazeph";
+const SPONSOR_URL = "https://github.com/sponsors/emreerdendev";
 const CONTACT_EMAIL = "emreerden@pm.me";
 
 function Dot() {
